@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <p>
       {/* twich clone part 1/2 의 강의 반 정도 들음 */}
-      Hello therzze
+      홈화면 데햇 zyzyz쿄쿄쿄
       <Button size="sm">click</Button>
     </p>
   );
