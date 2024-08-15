@@ -1,15 +1,8 @@
 import React from "react";
+import Wrapper from "./wrapper";
 
 const Sidebar = () => {
-  return (
-    <div className="border border-green-500">
-      Sidebar
-      <div>이게 왜나오지 ?</div>
-      <div>이게 왜나오지 ?</div>
-      <div>이게 왜나오지 ?</div>
-      <div>여기는 사이드바</div>
-    </div>
-  );
+  return <Wrapper>여기는 사이드 바 입니다</Wrapper>;
 };
 
 export default Sidebar;
