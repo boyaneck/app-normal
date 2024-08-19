@@ -1,8 +1,13 @@
 import React from "react";
 import Wrapper from "./wrapper";
+import Toggle from "./toggle";
 
 const Sidebar = () => {
-  return <Wrapper>여기는 사이드 바 입니다</Wrapper>;
+  return (
+    <Wrapper>
+      <Toggle />
+    </Wrapper>
+  );
 };
 
 export default Sidebar;
