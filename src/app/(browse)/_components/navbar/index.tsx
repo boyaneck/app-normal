@@ -1,6 +1,7 @@
 import React from "react";
 import Search from "./search";
 import { SearchIcon, X } from "lucide-react";
+import Login_toolbar from "./login_toolbar";
 const Navbar = () => {
   return (
     <nav
@@ -8,6 +9,7 @@ const Navbar = () => {
     lg:px-4 flex justify-between items-center shadow-sm"
     >
       <Search />
+      <Login_toolbar />
     </nav>
   );
 };
