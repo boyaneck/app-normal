@@ -1,13 +1,13 @@
-// import { create } from "zustand";
+import { create } from "zustand";
 
-// interface userState {
-//   user: userData | undefined;
-//   setUser: (user: null) => void;
-// }
+interface userState {
+  user: userData | undefined;
+  setUser: (user: userData) => void;
+}
 
-// const useUserStore = create<userState>((set) => ({
-//   user: undefined,
-//   setUser: (user) => set(user),
-// }));
+const useUserStore = create<userState>((set) => ({
+  user: undefined,
+  setUser: (user) => set({ user }),
+}));
 
-// export default useUserStore;
+export default useUserStore;

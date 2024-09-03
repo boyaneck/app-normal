@@ -1,9 +1,10 @@
 "use client";
+import useSinginAndLogout from "@/hooks/useSigninAndLogout";
 import { supabaseForClient } from "@/supabase/supabase_client";
 import Image from "next/image";
 import React from "react";
-
 const Signin = () => {
+  useSinginAndLogout({});
   const getGoogleSocialLogin = async () => {
     try {
       await supabaseForClient.auth.signInWithOAuth({
