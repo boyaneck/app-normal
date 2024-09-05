@@ -18,6 +18,8 @@ const useSinginAndLogout = ({ arbre }: Props) => {
         if (session) {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
           }
+        } else {
+          console.log("세션이 없습니다ㅣ.", session);
         }
       }
     );
