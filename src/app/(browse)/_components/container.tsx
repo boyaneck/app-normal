@@ -9,7 +9,6 @@ interface ContainerProps {
 
 const Container = ({ children }: ContainerProps) => {
   const { collapsed } = useSidebarStore((state) => state);
-  // const matches = useMedia;
   return (
     <div
       className={cn("flex-1", collapsed ? "ml-[70px]" : "ml-[70px] lg:ml-60")}
