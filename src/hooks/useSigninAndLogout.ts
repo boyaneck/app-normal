@@ -10,14 +10,17 @@ interface Props {
 
 const useSigninAndLogout = () => {
   const { setUser } = useUserStore((state) => state);
-  const [sessionUserEmail, setSessionUserEmail] = useState<string>("");
-  const [isIdentified, setIsIdentified] = useState<string>("");
+  const [sessionUserEmail, setSessionUserEmail] = useState<string | undefined>(
+    ""
+  );
+  const [isIdentified, setIsIdentified] = useState<boolean>(false);
   const { data: fetchedUserInfo, error } = useQuery({
     queryKey: ["fetchedUserInfo"],
     queryFn: () => getUserInfo(sessionUserEmail),
     enabled: !!sessionUserEmail,
   });
   console.log("state 유무 ", sessionUserEmail);
+  console.log("패치된 데이터", fetchedUserInfo);
   // console.log("슈퍼베이스에서 데이터 페칭", userInfo);
   useEffect(() => {
     const loginSubscription = supabaseForClient.auth.onAuthStateChange(
@@ -25,16 +28,27 @@ const useSigninAndLogout = () => {
         console.log("여기 세션이 있습니다", session);
         if (session) {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
-            setSessionUserEmail(session.user.id);
+            setSessionUserEmail(session?.user?.email);
             if (fetchedUserInfo) {
+              console.log(
+                "슈퍼베이스로 부터 유저 정보 가져오기",
+                fetchedUserInfo
+              );
               const userInfo = {
                 user_nickname: fetchedUserInfo.user_nickname,
                 avatar_url: fetchedUserInfo.avatar_url,
-                user_email: fetchedUserInfo.avatar_url,
+                user_email: fetchedUserInfo.user_email,
                 created_at: fetchedUserInfo.created_at,
                 isLive: fetchedUserInfo.isLive,
               };
+              setUser(userInfo);
+              setIsIdentified(true);
+            } else {
+              console.log("유저 정보를 불러오지 못했습니다.");
             }
+          } else if (event === "SIGNED_OUT") {
+            setUser(null);
+            setIsIdentified(false);
           }
         } else {
           console.log("세션이 없습니다ㅣ.", session);
