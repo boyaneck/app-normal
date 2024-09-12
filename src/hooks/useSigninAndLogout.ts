@@ -29,6 +29,7 @@ const useSigninAndLogout = () => {
         if (session) {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
             setSessionUserEmail(session?.user?.email);
+            console.log("이제 패치된 데이터가 들어올 차례", fetchedUserInfo);
             if (fetchedUserInfo) {
               console.log(
                 "슈퍼베이스로 부터 유저 정보 가져오기",
@@ -49,6 +50,7 @@ const useSigninAndLogout = () => {
           } else if (event === "SIGNED_OUT") {
             setUser(null);
             setIsIdentified(false);
+            console.log("로그아웃 되었을때 ", isIdentified);
           }
         } else {
           console.log("세션이 없습니다ㅣ.", session);
@@ -58,7 +60,7 @@ const useSigninAndLogout = () => {
     return () => {
       loginSubscription.data.subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchedUserInfo]);
 
   return {
     isIdentified,
