@@ -12,7 +12,9 @@ const Login_authbar = () => {
   return (
     <div className="">
       {isIdentified ? (
-        <span>회원정보 바</span>
+        <span className="hover cursor-pointer hover:transition-opacity">
+          회원정보 바
+        </span>
       ) : (
         <span>
           <Link href={"/signin"}>로그인</Link>
