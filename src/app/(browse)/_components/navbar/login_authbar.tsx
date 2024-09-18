@@ -7,6 +7,7 @@ interface userIdentifyProps {}
 
 const Login_authbar = () => {
   // const [isIdentified, setIsIdentified] = useState<string>("");
+  const [isLoginTooltipVisible, setIsLoginTooltipVisible] = useState(false);
   const { isIdentified } = useSigninAndLogout();
   console.log("회원로그인 유무 확인하기", isIdentified);
   return (
