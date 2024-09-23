@@ -9,8 +9,8 @@ interface Props {
 const layout = ({ children }: Props) => {
   return (
     <div className="pt-20">
-      {/* <Navbar />
-      <Sidebar /> */}
+      {/* <Navbar /> */}
+      <Sidebar />
       {children}
       홈화면 레이아웃
     </div>
