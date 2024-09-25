@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import Wrapper from "./wrapper";
 import Toggle from "./toggle";

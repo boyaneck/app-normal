@@ -8,6 +8,7 @@ interface WrapperProps {
 }
 
 const Wrapper = ({ children }: WrapperProps) => {
+  
   const { collapsed } = useSidebarStore((state) => state);
   return (
     <aside
