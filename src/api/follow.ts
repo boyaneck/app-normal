@@ -4,7 +4,7 @@ interface Props {
   user_email: string;
 }
 
-export const addFollow = async (user_email: Props) => {
+export const addFollow = async (user_email: Props)=> {
   const { error } = await supabaseForClient
     .from("users")
     .update("")
