@@ -13,6 +13,7 @@ const useSigninAndLogout = () => {
   const [sessionUserEmail, setSessionUserEmail] = useState<string | undefined>(
     ""
   );
+
   const [isIdentified, setIsIdentified] = useState<boolean>(false);
   const { data: fetchedUserInfo, error } = useQuery({
     queryKey: ["fetchedUserInfo"],

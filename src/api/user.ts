@@ -19,15 +19,3 @@ export const getUserInfo = async (user_email: string | undefined) => {
 
   return userInfo;
 };
-
-export const getFollowedUser = async () => {
-  const { data, error } = await supabaseForClient.from("users").select("*");
-
-  if (error) {
-    console.log("팔로우 패칭 에러가 떴어요!", error);
-    console.log("팔로우에러메세지", error.message);
-    console.log("팔로우에러메세지", error.details);
-  }
-  console.log("data가 넘어왔나요", data);
-  return data;
-};
