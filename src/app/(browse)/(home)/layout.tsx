@@ -17,7 +17,7 @@ const Layout = ({ children }: childrenProps) => {
         <Navbar />
         {children}
       </QueryClientProvider>
-      Layout
+      현재 라이브중인 사람들의 목록 Layout
     </div>
   );
 };

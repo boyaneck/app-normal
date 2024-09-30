@@ -25,7 +25,7 @@ export const toggleFollow = async (
     // 타겟 유저의 현재 팔로워 목록 가져오기
     const { data: targetUser, error: targetUserError } = await supabaseForClient
       .from("users")
-      .select("follower")
+      .select("*,follow(followed)")
       .eq("id", targetUserId)
       .single();
 
@@ -33,7 +33,7 @@ export const toggleFollow = async (
     const { data: currentUser, error: currentUserError } =
       await supabaseForClient
         .from("users")
-        .select("follow")
+        .select("*,follow(follow)")
         .eq("id", currentUserId)
         .single();
 
@@ -41,14 +41,14 @@ export const toggleFollow = async (
       throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
     }
 
-    const isFollowing = targetUser.follower.includes(currentUserId);
+    const isFollowing = targetUser.includes(currentUserId);
 
     if (isFollowing) {
       // 이미 팔로우 중이므로 언팔로우 처리
-      const updatedFollowers = targetUser.follower.filter(
+      const updatedFollowers = targetUser.filter(
         (id: string) => id !== currentUserId
       );
-      const updatedFollows = currentUser.follow.filter(
+      const updatedFollows = currentUser.filter(
         (id: string) => id !== targetUserId
       );
 
@@ -63,17 +63,17 @@ export const toggleFollow = async (
         .eq("id", currentUserId);
     } else {
       // 팔로우하지 않은 상태이므로 팔로우 처리
-      const updatedFollowers = [...targetUser.follower, currentUserId];
-      const updatedFollows = [...currentUser.follow, targetUserId];
+      // const updatedFollowers = [...targetUser.follower, currentUserId];
+      // const updatedFollows = [...currentUser.follow, targetUserId];
 
       await supabaseForClient
-        .from("users")
-        .update({ follower: updatedFollowers })
+        .from("follow")
+        .insert({ follower: currentUserId })
         .eq("id", targetUserId);
 
       await supabaseForClient
-        .from("users")
-        .update({ follow: updatedFollows })
+        .from("follow")
+        .insert({ follow: targetUserId })
         .eq("id", currentUserId);
     }
   } catch (error) {
