@@ -12,12 +12,12 @@ const Layout = ({ children }: childrenProps) => {
   const { setUser } = useUserStore((state) => state);
   const queryClient = new QueryClient();
   return (
-    <div>
+    <div className="border border-blue-500">
       <QueryClientProvider client={queryClient}>
         <Navbar />
         {children}
       </QueryClientProvider>
-      현재 라이브중인 사람들의 목록 Layout
+      홈화면의 라이브중인 사람들의 목록 Layout
     </div>
   );
 };
