@@ -8,14 +8,7 @@ export const getUserInfo = async (user_email: string | undefined) => {
     .select("*")
     .eq("user_email", user_email)
     .maybeSingle();
-  if (userInfoError) console.log("유저이메일", user_email);
-  console.log(
-    "error",
-    userInfoError,
-    "데이터 패칭 정보",
-    userInfoError?.message,
-    userInfoError?.details
-  );
+  if (userInfoError) console.log("유저이메일", userInfoError.message);
 
   return userInfo;
 };
@@ -40,6 +33,5 @@ export const getLiveUser = async () => {
       error
     );
 
-  console.log("현재라이브중인 유저정보 ", data);
   return data;
 };
