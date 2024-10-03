@@ -12,20 +12,20 @@ const Login_authbar = () => {
   const [LoginTooltipVisible, setLoginTooltipVisible] =
     useState<boolean>(false);
 
-  const { isIdentified, setIsIdentified } = useSigninAndLogout();
+  // const { isIdentified, setIsIdentified } = useSigninAndLogout();
   const router = useRouter();
   const { setUser } = useUserStore((state) => state);
   const signOut = () => {
     supabaseForClient.auth.signOut();
-    setIsIdentified(false);
+    // setIsIdentified(false);
     router.push("/");
   };
 
-  console.log("회원로그인 유무 확인하기", isIdentified);
+  // console.log("회원로그인 유무 확인하기", isIdentified);
   return (
     <>
       <div className="relative border border-red-500">
-        {isIdentified ? (
+        {/* {isIdentified ? (
           <span
             onClick={() => {
               setLoginTooltipVisible(true);
@@ -54,7 +54,7 @@ const Login_authbar = () => {
           <span>
             <Link href={"/signin"}>로그인</Link>
           </span>
-        )}
+        )} */}
       </div>
       <span>Another one</span>
     </>

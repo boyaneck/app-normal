@@ -8,12 +8,11 @@ interface WrapperProps {
 }
 
 const Wrapper = ({ children }: WrapperProps) => {
-  
   const { collapsed } = useSidebarStore((state) => state);
   return (
     <aside
       className={cn(
-        "fixed top-40 ml-10 left-0 h-[500px] w-60 flex flex-col bg-sky-400 border border-red-400 z-50 rounded-lg",
+        "sticky fixed top-40 ml-10 left-0 h-[500px] w-60 flex flex-col bg-sky-400 border border-red-400 z-50 rounded-lg",
         collapsed && "w-[70px]"
       )}
     >

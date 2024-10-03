@@ -8,11 +8,11 @@ interface Props {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="pt-20 border border-red-400">
+    <div className="mt-[600px] pt-20 border border-red-400">
       {/* <Navbar /> */}
       <Sidebar />
       {children}
-      홈화면 레이아웃
+      홈화면 레이아웃 개꿀ㅁ너ㅣㅏㅓ미어ㅣㅏㄴ머인머ㅣㅏ머아ㅣ
     </div>
   );
 };

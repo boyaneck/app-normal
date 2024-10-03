@@ -13,10 +13,10 @@ const Layout = ({ children }: childrenProps) => {
   const queryClient = new QueryClient();
   return (
     <div className="border border-blue-500">
-      <QueryClientProvider client={queryClient}>
-        <Navbar />
-        {children}
-      </QueryClientProvider>
+      {/* <QueryClientProvider client={queryClient}> */}
+      <Navbar />
+      {children}
+      {/* </QueryClientProvider> */}
       홈화면의 라이브중인 사람들의 목록 Layout
     </div>
   );
