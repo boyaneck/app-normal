@@ -8,7 +8,7 @@ interface Props {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="mt-[600px] pt-20 border border-red-400">
+    <div className="pt-28 border border-purple-600 bg-black">
       {/* <Navbar /> */}
       <Sidebar />
       {children}
