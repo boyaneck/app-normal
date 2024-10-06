@@ -15,29 +15,10 @@ interface User {
 }
 
 export default function Home() {
-  const [liveuser, setLiveUser] = useState<User[]>([]);
-  const {
-    data: LiveUser,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["LiveUser"],
-    queryFn: getLiveUser,
-  });
-
-  console.log("라이브유저의 정보", LiveUser);
-  useEffect(() => {
-    if (LiveUser) {
-      setLiveUser(LiveUser);
-    }
-  }, [LiveUser]);
-
-  if (isLoading) {
-    return <div>데이터를 가져오고 있습니다</div>;
-  }
   return (
     <div className="bg-yellow-300 z-50">
       <Screen />
+      <Button />
     </div>
   );
 }

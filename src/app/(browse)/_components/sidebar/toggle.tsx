@@ -4,10 +4,16 @@ import { useSidebarStore } from "@/store/sidebar_store";
 import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
 import Hint from "@/components/hint";
 import React from "react";
+import { toggleFollow } from "@/api/follow";
 
 const Toggle = () => {
   const { collapsed, onCollapse, onExpand } = useSidebarStore((state) => state);
   const label = collapsed ? "Expand" : "Collapse";
+
+  const santé = () => {
+    toggleFollow;
+  };
+
   return (
     <>
       {collapsed && (
@@ -32,6 +38,7 @@ const Toggle = () => {
               <ArrowLeftFromLine className="h-4 w-4" />
             </Button>
           </Hint>
+          <Button onClick={santé}></Button>
         </div>
       )}
     </>

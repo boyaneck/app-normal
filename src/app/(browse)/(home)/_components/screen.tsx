@@ -1,5 +1,8 @@
 "use client";
 import { getLiveUser } from "@/api";
+import { toggleFollow } from "@/api/follow";
+import { Button } from "@/components/ui/button";
+import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 
@@ -12,6 +15,10 @@ interface User {
 }
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
+  const { user } = useUserStore((state) => state);
+  const currentUserEmail =
+    typeof user?.user_email === "string" ? user?.user_email : "";
+
   const {
     data: LiveUser,
     error,
@@ -28,6 +35,15 @@ const Screen = () => {
     }
   }, [LiveUser]);
 
+  if (isLoading) {
+    return <div>데이터 가져오는 중입니다</div>;
+  }
+
+  const follow = (targetUserEmail: string) => {
+    alert("팔로우가 되었습니다");
+
+    toggleFollow(currentUserEmail, targetUserEmail);
+  };
   return (
     <div className="grid grid-cols-4 gap-2 p-4 transition-all duration-300 ease-in-out">
       {liveuser.length > 0 ? (
@@ -36,6 +52,11 @@ const Screen = () => {
             {/* 스크린 컨테이너 */}
             <div className="h-40 bg-gray-200 mb-4 rounded-md flex items-center justify-center">
               <span className="text-xl font-semibold text-gray-700">
+                <Button
+                  onClick={() => {
+                    follow(user.user_email);
+                  }}
+                />
                 스크린
               </span>
             </div>
