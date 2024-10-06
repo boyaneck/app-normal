@@ -21,6 +21,7 @@ export const toggleFollow = async (
   currentUserId: string,
   targetUserId: string
 ) => {
+  console.log("팔로우하기 테스트", currentUserId, targetUserId);
   try {
     // 타겟 유저의 현재 팔로워 목록 가져오기
     const { data: targetUser, error: targetUserError } = await supabaseForClient
@@ -41,7 +42,8 @@ export const toggleFollow = async (
       throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
     }
 
-    const isFollowing = targetUser.includes(currentUserId);
+    // const isFollowing = targetUser.includes(currentUserId);
+    const isFollowing = currentUser.includes(targetUserId);
 
     if (isFollowing) {
       // 이미 팔로우 중이므로 언팔로우 처리
@@ -53,18 +55,18 @@ export const toggleFollow = async (
       );
 
       await supabaseForClient
-        .from("users")
+        .from("follow")
         .update({ follower: updatedFollowers })
         .eq("id", targetUserId);
 
       await supabaseForClient
-        .from("users")
+        .from("follow")
         .update({ follow: updatedFollows })
         .eq("id", currentUserId);
     } else {
       // 팔로우하지 않은 상태이므로 팔로우 처리
-      // const updatedFollowers = [...targetUser.follower, currentUserId];
-      // const updatedFollows = [...currentUser.follow, targetUserId];
+      const updatedFollowers = [...targetUser.follower, currentUserId];
+      const updatedFollows = [...currentUser.follow, targetUserId];
 
       await supabaseForClient
         .from("follow")
