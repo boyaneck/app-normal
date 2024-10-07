@@ -17,6 +17,7 @@ export const addFollow = async (user_email: Props) => {
   return data;
 };
 
+//팔로우 & 언팔로우
 export const toggleFollow = async (
   currentUserId: string,
   targetUserId: string
@@ -39,6 +40,7 @@ export const toggleFollow = async (
         .single();
 
     if (targetUserError || currentUserError) {
+      console.log(targetUserError, currentUserError);
       throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
     }
 
@@ -65,6 +67,7 @@ export const toggleFollow = async (
         .eq("id", currentUserId);
     } else {
       // 팔로우하지 않은 상태이므로 팔로우 처리
+      console.log("어떠헥 나오려나....", targetUserId, currentUserId);
       const updatedFollowers = [...targetUser.follower, currentUserId];
       const updatedFollows = [...currentUser.follow, targetUserId];
 

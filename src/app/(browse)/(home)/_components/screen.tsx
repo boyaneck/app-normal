@@ -2,6 +2,8 @@
 import { getLiveUser } from "@/api";
 import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
@@ -18,7 +20,7 @@ const Screen = () => {
   const { user } = useUserStore((state) => state);
   const currentUserEmail =
     typeof user?.user_email === "string" ? user?.user_email : "";
-
+  const { collapsed } = useSidebarStore();
   const {
     data: LiveUser,
     error,
@@ -41,11 +43,9 @@ const Screen = () => {
 
   const follow = (targetUserEmail: string) => {
     alert("팔로우가 되었습니다");
-
-    toggleFollow(currentUserEmail, targetUserEmail);
   };
   return (
-    <div className="grid grid-cols-4 gap-2 p-4 transition-all duration-300 ease-in-out">
+    <div className="grid grid-cols-4 gap-2">
       {liveuser.length > 0 ? (
         liveuser.map((user) => (
           <div key={user.id} className="p-4 bg-white rounded-lg shadow-lg">
