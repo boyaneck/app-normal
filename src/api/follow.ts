@@ -4,17 +4,32 @@ interface Props {
   user_email: string;
 }
 
-//follow를 누르면 추가,
-export const addFollow = async (user_email: Props) => {
-  const { error, data } = await supabaseForClient
-    .from("users")
-    // .update("")
-    .select("*")
-    .eq("user_email", user_email);
+//로그인 하면 해당 유저의 follow테이블의 row를 체크하고 없을 경우 생성,
+export const addFollow = async (user_id: Props) => {
+  try {
+    const { data: checkFollow, error: checkFollowError } =
+      await supabaseForClient.from("follow").select("*").eq("user_id", user_id);
 
-  if (error) console.log("follow시 문제가 발생했습니다!", error);
+    if (checkFollowError)
+      console.log(
+        "유저의 팔로우 데이터를 가져오는데 문제가 발생했습니다!",
+        checkFollowError.message
+      );
 
-  return data;
+    if (checkFollow === null || checkFollow.length === 0) {
+      console.log("지금 여기가 나와야함!!!", user_id);
+      const { data, error } = await supabaseForClient.from("follow").insert([
+        {
+          user_id,
+        },
+      ]);
+    }
+  } catch (error) {
+    console.log(
+      "유저의 팔로우 레코드를 확인 혹은 생성하는데 에러가 발생했습니다.",
+      error
+    );
+  }
 };
 
 //팔로우 & 언팔로우
@@ -41,6 +56,10 @@ export const toggleFollow = async (
 
     if (targetUserError || currentUserError) {
       console.log(targetUserError, currentUserError);
+
+      const { data, error } = await supabaseForClient.from("follow").insert({
+        user_id: currentUserId,
+      });
       throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
     }
 
