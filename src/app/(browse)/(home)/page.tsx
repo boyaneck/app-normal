@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Screen from "./_components/screen";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/sidebar_store";
+import Main_banner from "./_components/main_banner";
 
 interface User {
   id: string;
@@ -26,6 +27,7 @@ export default function Home() {
         collapsed ? "ml-[150px] " : " ml-[260px] "
       )}
     >
+      <Main_banner />
       <Screen />
       <Button />
     </div>
