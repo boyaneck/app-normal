@@ -1,11 +1,15 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 
 interface Props {
+  user_id: string;
   user_email: string;
 }
 
 //로그인 하면 해당 유저의 follow테이블의 row를 체크하고 없을 경우 생성,
-export const addFollow = async (user_id: Props) => {
+export const addFollow = async (
+  user_id: string | undefined,
+  current_user_email: string | undefined
+) => {
   try {
     const { data: checkFollow, error: checkFollowError } =
       await supabaseForClient.from("follow").select("*").eq("user_id", user_id);
@@ -17,12 +21,18 @@ export const addFollow = async (user_id: Props) => {
       );
 
     if (checkFollow === null || checkFollow.length === 0) {
-      console.log("지금 여기가 나와야함!!!", user_id);
       const { data, error } = await supabaseForClient.from("follow").insert([
         {
           user_id,
+          follower: [],
+          follow: [],
+          user_email: current_user_email,
         },
       ]);
+
+      if (error) {
+        console.log("데이터 삽입 중 에러 발생:", error.message);
+      }
     }
   } catch (error) {
     console.log(
@@ -34,45 +44,48 @@ export const addFollow = async (user_id: Props) => {
 
 //팔로우 & 언팔로우
 export const toggleFollow = async (
-  currentUserId: string,
-  targetUserId: string
+  current_user_email: string,
+  target_user_email: string,
+  user_id: string
 ) => {
-  console.log("팔로우하기 테스트", currentUserId, targetUserId);
+  console.log("팔로우하기 ", current_user_email, target_user_email);
   try {
     // 타겟 유저의 현재 팔로워 목록 가져오기
-    const { data: targetUser, error: targetUserError } = await supabaseForClient
-      .from("users")
-      .select("*,follow(followed)")
-      .eq("id", targetUserId)
-      .single();
-
-    // 현재 유저의 팔로우 목록 가져오기
-    const { data: currentUser, error: currentUserError } =
+    const { data: target_user, error: target_user_error } =
       await supabaseForClient
-        .from("users")
-        .select("*,follow(follow)")
-        .eq("id", currentUserId)
+        .from("follow")
+        .select("*")
+        .eq("user_email", target_user_email)
         .single();
 
-    if (targetUserError || currentUserError) {
-      console.log(targetUserError, currentUserError);
+    // 현재 유저의 팔로우 목록 가져오기
+    const { data: current_user, error: current_user_error } =
+      await supabaseForClient
+        .from("follow")
+        .select("*")
+        .eq("user_email", current_user_email)
+        .single();
 
-      const { data, error } = await supabaseForClient.from("follow").insert({
-        user_id: currentUserId,
-      });
+    if (target_user_error || current_user_error) {
       throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
     }
 
+    if (target_user?.follow) {
+      const { data, error } = await supabaseForClient.from("follow").update({
+        user_id: current_user_email,
+      });
+    }
+
     // const isFollowing = targetUser.includes(currentUserId);
-    const isFollowing = currentUser.includes(targetUserId);
+    const isFollowing = current_user.includes(target_user_email);
 
     if (isFollowing) {
       // 이미 팔로우 중이므로 언팔로우 처리
-      const updatedFollowers = targetUser.filter(
-        (id: string) => id !== currentUserId
+      const updatedFollowers = target_user.filter(
+        (id: string) => id !== current_user_email
       );
       const updatedFollows = currentUser.filter(
-        (id: string) => id !== targetUserId
+        (id: string) => id !== target_user_email
       );
 
       await supabaseForClient
