@@ -2,7 +2,9 @@
 import { getLiveUser } from "@/api";
 import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
+import useFollow from "@/hooks/useFollow";
 import { cn } from "@/lib/utils";
+import useFollowedUserStore from "@/store/followedUsers";
 import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
@@ -21,6 +23,7 @@ const Screen = () => {
   const currentUserEmail =
     typeof user?.user_email === "string" ? user?.user_email : "";
   const { collapsed } = useSidebarStore();
+  const { followMutation } = useFollow();
   const {
     data: LiveUser,
     error,
@@ -41,7 +44,13 @@ const Screen = () => {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
-  const follow = (targetUserEmail: string) => {
+  const user_email = user?.user_email === undefined ? "" : user.user_email;
+  const follow = (target_user_email: string, user_id: string) => {
+    followMutation.mutate({
+      current_user_email: user_email,
+      target_user_email,
+      user_id,
+    });
     alert("팔로우가 되었습니다");
   };
   return (
@@ -54,7 +63,7 @@ const Screen = () => {
               <span className="text-xl font-semibold text-gray-700">
                 <Button
                   onClick={() => {
-                    follow(user.user_email);
+                    follow(user.user_email, user.id);
                   }}
                 />
                 스크린
