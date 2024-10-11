@@ -2,6 +2,7 @@ import React from "react";
 import Wrapper from "./wrapper";
 import Toggle from "./toggle";
 import Recommended from "./recommended";
+import FollowingPage from "../../(home)/following/page";
 
 const Sidebar = () => {
   return (
@@ -9,6 +10,7 @@ const Sidebar = () => {
       <Toggle />
       <div className="space-y-4 pt-4 lg:pt-0">
         <Recommended />
+        <FollowingPage />
       </div>
     </Wrapper>
   );
