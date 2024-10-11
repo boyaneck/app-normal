@@ -17,7 +17,7 @@ const Toggle = () => {
   return (
     <>
       {collapsed && (
-        <div className="transition-all duration-300 ease-in-out hidden lg:flex w-full items-center justify-center pt-4 mb-4">
+        <div className="hidden lg:flex w-full items-center justify-center pt-4 mb-4">
           <Hint label={label} side="right" asChild>
             <Button onClick={onExpand} variant="ghost" className="h-auto p-2">
               <ArrowRightFromLine className="h-4 w-4" />
@@ -26,7 +26,7 @@ const Toggle = () => {
         </div>
       )}
       {!collapsed && (
-        <div className=" transition-all duration-300 ease-in-out p-3 pl-6 mb-2 flex items-center w-full">
+        <div className="p-3 pl-6 mb-2 flex items-center w-full">
           <p className="font-semibold text-primary">For you</p>
 
           <Hint label={label} side="right" asChild>
@@ -38,7 +38,6 @@ const Toggle = () => {
               <ArrowLeftFromLine className="h-4 w-4" />
             </Button>
           </Hint>
-          <Button onClick={santé}></Button>
         </div>
       )}
     </>
