@@ -56,6 +56,14 @@ const Login_authbar = () => {
           </span>
         )}
       </div>
+      <span
+        className="font-bold"
+        onClick={() => {
+          router.push("/dashboard");
+        }}
+      >
+        DashBoard
+      </span>
       <span>Another one</span>
     </>
   );

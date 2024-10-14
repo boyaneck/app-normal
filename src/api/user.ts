@@ -1,6 +1,6 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 
-export const insertUserInfo = async () => {};
+export const insertUser = async () => {};
 
 export const getUserInfo = async (user_email: string | undefined) => {
   const { data: userInfo, error: userInfoError } = await supabaseForClient
