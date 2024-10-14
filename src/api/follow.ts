@@ -48,45 +48,7 @@ export const toggleFollow = async (
   target_user_email: string,
   user_id: string
 ) => {
-  console.log("팔로우하기 ", current_user_email, target_user_email);
-  // try {
-  //   // 타겟 유저의 현재 팔로워 목록 가져오기
-  //   const { data: target_user, error: target_user_error } =
-  //     await supabaseForClient
-  //       .from("follow")
-  //       .select("*")
-  //       .eq("user_email", target_user_email)
-  //       .single();
 
-  //   // 현재 유저의 팔로우 목록 가져오기
-  //   const { data: current_user, error: current_user_error } =
-  //     await supabaseForClient
-  //       .from("follow")
-  //       .select("*")
-  //       .eq("user_email", current_user_email)
-  //       .single();
-
-  //   if (target_user_error || current_user_error) {
-  //     throw new Error("유저의 팔로우 데이터를 가져오는 중 오류가 발생했습니다");
-  //   }
-
-  //   //팔로우 유무 확인 = 현재 유저의 follow 배열안에 해당 유저의 이메일 존재
-
-  //   if (target_user?.follow) {
-  //     const { data, error } = await supabaseForClient.from("follow").update({
-  //       user_id: current_user_email,
-  //     });
-  //   }
-
-  //   // const isFollowing = targetUser.includes(currentUserId);
-  //   const isFollowing = current_user.includes(target_user_email);
-
-  //   if (isFollowing) {
-  //     // 이미 팔로우 중이므로 언팔로우 처리
-  //   }
-  // } catch (error) {
-  //   console.error("팔로우 상태를 변경하는 중 오류 발생:", error);
-  // }
   const { data, error } = await supabaseForClient.rpc("follow_user", {
     target_user_email,
     current_user_email,
