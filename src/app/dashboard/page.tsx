@@ -10,7 +10,7 @@ const page = async () => {
     <div className="p-6">
       page
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-boldd">Keys URLS</h1>
+        <h1 className="text-2xl font-bold">Keys URLS</h1>
         <Connect_Modal />
       </div>
       <div className="space-y-4">
