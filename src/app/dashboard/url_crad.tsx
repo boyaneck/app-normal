@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import Copy_button from "./copy_button";
 
-const Url_crad = () => {
+const Url_Card = () => {
   return (
     <div className="rounded-xl bg-muted p-6">
       <div className="flex items-center gap-x-10">
@@ -17,4 +17,4 @@ const Url_crad = () => {
   );
 };
 
-export default Url_crad;
+export default Url_Card;

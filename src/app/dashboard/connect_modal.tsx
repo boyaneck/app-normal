@@ -1,5 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState, useTransition, useRef, ElementRef } from "react";
+import { createIngress } from "@/api/ingress";
+import { IngressInput } from "livekit-server-sdk";
 import {
   Dialog,
   DialogClose,
@@ -18,7 +20,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+const RTMP = String(IngressInput.RTMP_INPUT);
+const WHIP = String(IngressInput.WHIP_INPUT);
+
+type IngressType = typeof RTMP | typeof WHIP;
 const Connect_Modal = () => {
+  const closeRef = useRef<ElementRef<"button">>(null);
+  const [isPending, startTransition] = useTransition();
+  const [ingressType, setIngressType] = useState<IngressType>(RTMP);
+
+  const onSubmit = () => {
+    startTransition(() => {
+      createIngress(parseInt(ingressType))
+        .then(() => {
+          alert("Ingress가 만들어 졌습니다");
+          closeRef?.current?.click();
+        })
+        .catch(() => alert("error 가 생김"));
+    });
+  };
   return (
     <Dialog>
       <DialogTrigger>
@@ -31,13 +52,17 @@ const Connect_Modal = () => {
             <DialogTitle>Generate Connection </DialogTitle>
           </DialogHeader>
         </DialogHeader>
-        <Select>
+        <Select
+          disabled={isPending}
+          value={ingressType}
+          onValueChange={(value) => setIngressType(value)}
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Ingress Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="RTMP">RTMP</SelectItem>
-            <SelectItem value="WHIP">WHIP</SelectItem>
+            <SelectItem value={RTMP}>RTMP</SelectItem>
+            <SelectItem value={WHIP}>WHIP</SelectItem>
           </SelectContent>
         </Select>
         <Alert>
@@ -48,10 +73,12 @@ const Connect_Modal = () => {
           </AlertDescription>
         </Alert>
         <div className="flex justify-between">
-          <DialogClose>
+          <DialogClose ref={closeRef} asChild>
             <Button variant="ghost">Cancel</Button>
           </DialogClose>
-          <Button onClick={() => {}}>Generate</Button>
+          <Button disabled={isPending} onClick={onSubmit}>
+            Generate
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
