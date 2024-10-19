@@ -73,5 +73,7 @@ export const createIngress = async (ingressType: IngressInput) => {
 
   //${} 안에 현재 유저의 이름 혹은 이메일 넣기
   //  revalidatePath(`/u/${}/keys`)
+
+  //피그마 생성
   return ingress;
 };

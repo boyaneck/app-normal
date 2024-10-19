@@ -21,10 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+//IngressInput에 들어갈 각각의 형식에 맞는 수를 문자열로 변환한다.
 const RTMP = String(IngressInput.RTMP_INPUT);
 const WHIP = String(IngressInput.WHIP_INPUT);
-
 type IngressType = typeof RTMP | typeof WHIP;
+console.log("잉그레스 타입", typeof RTMP, typeof WHIP);
 const Connect_Modal = () => {
   const closeRef = useRef<ElementRef<"button">>(null);
   const [isPending, startTransition] = useTransition();
