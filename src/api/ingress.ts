@@ -75,5 +75,6 @@ export const createIngress = async (ingressType: IngressInput) => {
   //  revalidatePath(`/u/${}/keys`)
 
   //피그마 생성
+  //코딩테스트 1시간 반
   return ingress;
 };
