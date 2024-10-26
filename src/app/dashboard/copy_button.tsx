@@ -18,7 +18,7 @@ const Copy_button = ({ value }: CopyClientProps) => {
     setTimeout(() => {
       setIsCopied(false);
     }, 1000);
-  }; 
+  };
   const Icon = isCopied ? CheckCheck : Copy;
   return (
     <Button
@@ -27,6 +27,7 @@ const Copy_button = ({ value }: CopyClientProps) => {
       variant="ghost"
       size="sm"
     >
+      zz
       <Icon className="h-4 w-4" />
     </Button>
   );

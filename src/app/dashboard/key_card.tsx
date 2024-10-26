@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import Copy_button from "./copy_button";
 import { Button } from "@/components/ui/button";
 
-interface KeyCardProps {
+interface key_card_props {
   value: string | null;
 }
 
-const Key_Card = ({ value }: KeyCardProps) => {
+const Key_Card = ({ value }: key_card_props) => {
   const [show, setShow] = useState(false);
   return (
     <div className="rounded-xl bg-muted p-6">
