@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useTransition, useRef, ElementRef } from "react";
-import { createIngress } from "@/api/ingress";
+import { createIngress, yap } from "@/api/ingress";
 import { IngressInput } from "livekit-server-sdk";
 import {
   Dialog,
@@ -25,21 +25,39 @@ import {
 const RTMP = String(IngressInput.RTMP_INPUT);
 const WHIP = String(IngressInput.WHIP_INPUT);
 type IngressType = typeof RTMP | typeof WHIP;
-console.log("잉그레스 타입", typeof RTMP, typeof WHIP);
+console.log(
+  "잉그레스 타입",
+  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
+);
+console.log(process.env.NEXT_PUBLIC_SUPABASE_API_KEY, "수퍼베이스");
 const Connect_Modal = () => {
   const closeRef = useRef<ElementRef<"button">>(null);
   const [isPending, startTransition] = useTransition();
   const [ingressType, setIngressType] = useState<IngressType>(RTMP);
 
   const onSubmit = () => {
+    // createIngress(parseInt(ingressType));
+    // yap();
     startTransition(() => {
+      yap();
       createIngress(parseInt(ingressType))
         .then(() => {
+          console.log("Ingress create succeed");
           alert("Ingress가 만들어 졌습니다");
           closeRef?.current?.click();
         })
-        .catch(() => alert("error 가 생김"));
+        .catch((error) => {
+          if (isNaN(parseInt(ingressType))) {
+            console.error("Invalid ingressType:", ingressType);
+          }
+
+          alert("error 가 생김");
+          console.log("errr는", error);
+        });
     });
+    console.log("startTransition이 끝났습니다.");
   };
   return (
     <Dialog>
