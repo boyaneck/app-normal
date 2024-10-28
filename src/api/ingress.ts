@@ -11,16 +11,20 @@ import {
 
 import { TrackSource } from "livekit-server-sdk/dist/proto/livekit_models";
 import { revalidatePath } from "next/cache";
-import { getUserInfo } from "./user";
-import { useStore } from "zustand";
-import useUserStore from "@/store/user";
-import { stream_update } from "./stream";
 import { create_ingress } from "./live";
 // import { TrackSource } from "@livekit/protocol";
+
+// const getUserEmailFromCookie = () => {
+//   const cookies = document.cookie.split("; ");
+//   const user_email_cookie = cookies.find((cookie) =>
+//     cookie.startsWith("user_email=")
+//   );
+//   return user_email_cookie ? user_email_cookie.split("=")[1] : undefined;
+// };
 const roomService = new RoomServiceClient(
-  process.env.LIVEKIT_API_URL!,
-  process.env.LIVEKIT_API_KEY!,
-  process.env.LIVEKIT_API_SECRET!
+  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
 );
 
 //api_url을 담아 ingress 생성
@@ -29,12 +33,11 @@ const ingressClient = new IngressClient(
 );
 
 // const { user } = useUserStore((state) => state);
-getUserInfo;
-export const resetIngress = async (hostIdentity: string) => {
+export const resetIngress = async (host_identity: string) => {
   const ingresses = await ingressClient.listIngress({
-    roomName: hostIdentity,
+    roomName: host_identity,
   });
-  const rooms = await roomService.listRooms([hostIdentity]);
+  const rooms = await roomService.listRooms([host_identity]);
 
   for (const room of rooms) {
     await roomService.deleteRoom(room.name);
@@ -47,11 +50,14 @@ export const resetIngress = async (hostIdentity: string) => {
   }
 };
 
-export const yap = async () => {
-  console.log("에러학인 유무 함수");
-};
 export const createIngress = async (ingressType: IngressInput) => {
-  console.log("무슨에러인가요?", ingressType);
+  console.log(
+    "process.env 로컬 상관없다고 좀 ?",
+    process.env.NEXT_PUBLIC_LIVEKIT_API_URL,
+    process.env.NEXT_PUBLIC_LIVEKIT_API_KEY
+  );
+
+  // const user_email = getUserEmailFromCookie();
 
   //TODO : Reset previous ingress
 
@@ -81,8 +87,19 @@ export const createIngress = async (ingressType: IngressInput) => {
     throw new Error("Failed to create Ingress");
   }
 
-  create_ingress(ingress.ingressId, ingress.streamKey, ingress.url);
+  // create_ingress(
+  //   "jinxx93@naver.com",
+  //   ingress.url,
+  //   ingress.streamKey,
+  //   ingress.ingressId
+  // );
 
+  create_ingress(
+    "jinxx93@naver.com",
+    "임시 url",
+    "임시 스티리밍 키",
+    "임시 ingressId"
+  );
   //  revalidatePath(`/u/${}/keys`)
 
   return ingress;

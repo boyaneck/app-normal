@@ -37,6 +37,11 @@ const useSigninAndLogout = () => {
 
               setUser(userInfo);
               setIsIdentified(true);
+              // 로그인 시 쿠키에 해당 유저의 이메일 저장
+              document.cookie =
+                "user_email=" +
+                fetchedUserInfo.user_email +
+                "; path=/; max-age=3600"; // 1시간 유효
 
               addFollow(fetchedUserInfo.id, fetchedUserInfo.user_email);
             } else {
