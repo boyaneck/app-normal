@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useTransition, useRef, ElementRef } from "react";
-import { createIngress, yap } from "@/api/ingress";
+import { createIngress } from "@/api/ingress";
 import { IngressInput } from "livekit-server-sdk";
 import {
   Dialog,
@@ -41,7 +41,6 @@ const Connect_Modal = () => {
     // createIngress(parseInt(ingressType));
     // yap();
     startTransition(() => {
-      yap();
       createIngress(parseInt(ingressType))
         .then(() => {
           console.log("Ingress create succeed");
