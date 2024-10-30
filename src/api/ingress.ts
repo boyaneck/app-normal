@@ -4,6 +4,7 @@ import {
   IngressAudioEncodingPreset,
   IngressInput,
   IngressClient,
+  IngressInfo,
   IngressVideoEncodingPreset,
   RoomServiceClient,
   type CreateIngressOptions,
@@ -27,9 +28,16 @@ const roomService = new RoomServiceClient(
   process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
 );
 
+console.log(
+  "잘 전달 되나요 ?",
+  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
+);
 //api_url을 담아 ingress 생성
 const ingressClient = new IngressClient(
-  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!
+  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!,
+  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
 );
 
 // const { user } = useUserStore((state) => state);
@@ -52,11 +60,11 @@ export const resetIngress = async (host_identity: string) => {
 
 export const createIngress = async (ingressType: IngressInput) => {
   console.log(
-    "process.env 로컬 상관없다고 좀 ?",
-    process.env.NEXT_PUBLIC_LIVEKIT_API_URL,
-    process.env.NEXT_PUBLIC_LIVEKIT_API_KEY
+    "왜 자꾸 안찍히는거야 ?",
+    process.env.NEXT_PUBLIC_LIVEKIT_API_KEY,
+    process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET,
+    process.env.NEXT_PUBLIC_LIVEKIT_API_URL
   );
-
   // const user_email = getUserEmailFromCookie();
 
   //TODO : Reset previous ingress
