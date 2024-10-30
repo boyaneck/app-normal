@@ -25,13 +25,7 @@ import {
 const RTMP = String(IngressInput.RTMP_INPUT);
 const WHIP = String(IngressInput.WHIP_INPUT);
 type IngressType = typeof RTMP | typeof WHIP;
-console.log(
-  "잉그레스 타입",
-  process.env.NEXT_PUBLIC_LIVEKIT_API_URL!,
-  process.env.NEXT_PUBLIC_LIVEKIT_API_KEY!,
-  process.env.NEXT_PUBLIC_LIVEKIT_API_SECRET!
-);
-console.log(process.env.NEXT_PUBLIC_SUPABASE_API_KEY, "수퍼베이스");
+
 const Connect_Modal = () => {
   const closeRef = useRef<ElementRef<"button">>(null);
   const [isPending, startTransition] = useTransition();
