@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { create_ingress } from "@/api/live";
 
 //IngressInput에 들어갈 각각의 형식에 맞는 수를 문자열로 변환한다.
 const RTMP = String(IngressInput.RTMP_INPUT);
@@ -47,13 +48,32 @@ const Connect_Modal = () => {
           }
 
           alert("error 가 생김");
-          console.log("errr는", error);
+          console.log("errr는", error, error.message);
         });
     });
     console.log("startTransition이 끝났습니다.");
   };
+  const ddd = () => {
+    const user_id = "88560f0a-d2bd-47b0-a340-02ac2e3343aa";
+    const user_id_string = user_id.toString();
+    create_ingress(
+      user_id_string,
+      "jinxx93@naver.com",
+      "캬캬캬",
+      "쿄쿄쿄",
+      "ㅋㅋㅋㅋ"
+    );
+    alert("");
+  };
   return (
     <Dialog>
+      <Button
+        onClick={() => {
+          ddd();
+        }}
+      >
+        실험테스트
+      </Button>
       <DialogTrigger>
         {/* <Button>Generate connection</Button> */}
         <span className="border borer-black">Generate Connection</span>
@@ -67,7 +87,7 @@ const Connect_Modal = () => {
         <Select
           disabled={isPending}
           value={ingressType}
-          onValueChange={(value) => setIngressType(value)}
+          onValueChange={(value: any) => setIngressType(value)}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Ingress Type" />
@@ -86,7 +106,8 @@ const Connect_Modal = () => {
         </Alert>
         <div className="flex justify-between">
           <DialogClose ref={closeRef} asChild>
-            <Button variant="ghost">Cancel</Button>
+            {/* <Button variant="ghost">Cancel</Button> */}
+            <Button>Cancel</Button>
           </DialogClose>
           <Button disabled={isPending} onClick={onSubmit}>
             Generate
