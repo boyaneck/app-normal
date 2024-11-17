@@ -20,7 +20,7 @@ interface User {
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
   const { user } = useUserStore((state) => state);
-  const currentUserEmail =
+  const current_user_email =
     typeof user?.user_email === "string" ? user?.user_email : "";
   const { collapsed } = useSidebarStore();
   const { followMutation } = useFollow();

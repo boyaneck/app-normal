@@ -74,6 +74,15 @@ const Following_user = () => {
                 {following_users_info?.map((following_user: any, idx) => (
                   <>
                     참
+                    <div className="relative group">
+                      <div className="text-gray-700 p-4 bg-gray-200">
+                        툴팁박스
+                      </div>
+
+                      <div className="absolute left-0 top-full mt-2 w-0 h-8 bg-blue-500 text-white text-center rounded transition-all duration-300 ease-in-out group-hover:w-48 group-hover:scale-x-100 scale-x-0 origin-left">
+                        툴팁 내용
+                      </div>
+                    </div>
                     {following_user.is_live === true ? (
                       <div key={idx}>
                         <div className="relative group w-10 h-10 border border-black">

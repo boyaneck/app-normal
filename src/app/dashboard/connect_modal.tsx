@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { create_ingress } from "@/api/live";
+import { insertIngress } from "@/api/live";
 
 //IngressInput에 들어갈 각각의 형식에 맞는 수를 문자열로 변환한다.
 const RTMP = String(IngressInput.RTMP_INPUT);
@@ -56,7 +56,7 @@ const Connect_Modal = () => {
   const ddd = () => {
     const user_id = "88560f0a-d2bd-47b0-a340-02ac2e3343aa";
     const user_id_string = user_id.toString();
-    create_ingress(
+    insertIngress(
       user_id_string,
       "jinxx9222223@naver.com",
       "벙찌네",
