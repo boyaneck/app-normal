@@ -12,7 +12,7 @@ import {
 
 import { TrackSource } from "livekit-server-sdk/dist/proto/livekit_models";
 import { revalidatePath } from "next/cache";
-import { create_ingress } from "./live";
+import { insertIngress } from "./live";
 // import { TrackSource } from "@livekit/protocol";
 
 // const getUserEmailFromCookie = () => {
