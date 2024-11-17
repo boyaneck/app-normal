@@ -58,25 +58,25 @@ const Connect_Modal = () => {
     const user_id_string = user_id.toString();
     create_ingress(
       user_id_string,
-      "jinxx93@naver.com",
-      "캬캬캬",
-      "쿄쿄쿄",
+      "jinxx9222223@naver.com",
+      "벙찌네",
+      "뭐지",
       "ㅋㅋㅋㅋ"
     );
     alert("");
   };
   return (
     <Dialog>
-      <Button
+      {/* <Button
         onClick={() => {
           ddd();
         }}
       >
         실험테스트
-      </Button>
+      </Button> */}
       <DialogTrigger>
         {/* <Button>Generate connection</Button> */}
-        <span className="border borer-black">Generate Connection</span>
+        <span className="border border-black">Generate Connection</span>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

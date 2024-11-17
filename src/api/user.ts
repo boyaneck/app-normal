@@ -29,7 +29,7 @@ export const getLiveUser = async () => {
 
   if (error)
     console.log(
-      "현재 라이브중인 유저의 정보를 가져오는데 문제가 있습니다",
+      "현재 라이브중인 유저의 정보를 가져오는데 문제가 있습니다🚀🚀",
       error
     );
 

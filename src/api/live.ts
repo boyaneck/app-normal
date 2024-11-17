@@ -1,6 +1,6 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 
-export const create_ingress = async (
+export const createIngress = async (
   user_id: string | undefined,
   target_user_email: string | undefined,
   stream_key: string | undefined,

@@ -24,9 +24,7 @@ const Key_Card = ({ value }: key_card_props) => {
         />
         <Copy_button value={value || ""} />
       </div>
-      <Button onClick={() => setShow(!show)} size="sm" variant="link">
-        {show ? "Hide" : "Show"}
-      </Button>
+      <Button onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</Button>
     </div>
   );
 };

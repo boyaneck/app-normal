@@ -1,13 +1,34 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
+module.exports = {
+  content: [
+    "./src/**/*.{html,js,jsx,ts,tsx}", // Tailwind가 CSS를 추출할 파일들
+  ],
+  theme: {
+    extend: {
+      colors: {
+        main_color: "#69E2FF", // 커스텀 색상을 main_color로 지정
+      },
+      animation: {
+        "spin-wave": "spin-wave 3s linear infinite",
+      },
+      keyframes: {
+        "spin-wave": {
+          "0%": { transform: "rotate(0deg)", borderColor: "red" },
+          "100%": { transform: "rotate(360deg)", borderColor: "transparent" },
+        },
+      },
+    },
+  },
+};
 
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -75,6 +96,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;
