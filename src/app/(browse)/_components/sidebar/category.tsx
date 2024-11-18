@@ -1,7 +1,14 @@
 import React from "react";
-
-const category = () => {
-  return <div>category</div>;
+import { TbCategoryPlus } from "react-icons/tb";
+const Category = () => {
+  return (
+    <div>
+      카테고리
+      <div>
+        <TbCategoryPlus />
+      </div>
+    </div>
+  );
 };
 
-export default category;
+export default Category;
