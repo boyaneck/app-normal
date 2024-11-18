@@ -71,10 +71,22 @@ const Following_user = () => {
             ))} */}
             {following_users_info !== undefined ? (
               <>
+                ㅠ
                 {following_users_info?.map((following_user: any, idx) => (
                   <>
                     참
                     <div className="relative group">
+                      {/* 툴팁이 나타나는 요소 */}
+                      <div className="text-gray-700 p-4 bg-gray-200">
+                        툴팁박스
+                      </div>
+
+                      {/* 툴팁 */}
+                      <div className="absolute left-0 top-full mt-2 w-48 h-8 bg-blue-500 text-white text-center rounded transform scale-0 origin-top-left transition-transform duration-300 ease-in-out group-hover:scale-100">
+                        툴팁 내용
+                      </div>
+                    </div>
+                    {/* <div className="relative group">
                       <div className="text-gray-700 p-4 bg-gray-200">
                         툴팁박스
                       </div>
@@ -82,7 +94,7 @@ const Following_user = () => {
                       <div className="absolute left-0 top-full mt-2 w-0 h-8 bg-blue-500 text-white text-center rounded transition-all duration-300 ease-in-out group-hover:w-48 group-hover:scale-x-100 scale-x-0 origin-left">
                         툴팁 내용
                       </div>
-                    </div>
+                    </div> */}
                     {following_user.is_live === true ? (
                       <div key={idx}>
                         <div className="relative group w-10 h-10 border border-black">
