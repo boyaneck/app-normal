@@ -5,8 +5,7 @@ import { supabaseForClient } from "@/supabase/supabase_client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-
-interface userIdentifyProps {}
+import { LuLampDesk } from "react-icons/lu";
 
 const Login_authbar = () => {
   const [LoginTooltipVisible, setLoginTooltipVisible] =
@@ -57,14 +56,13 @@ const Login_authbar = () => {
         )}
       </div>
       <span
-        className="font-bold"
+        className="h-10 w-10"
         onClick={() => {
           router.push("/dashboard");
         }}
       >
-        DashBoard
+        <LuLampDesk size={25} />
       </span>
-      <span>Another one</span>
     </>
   );
 };

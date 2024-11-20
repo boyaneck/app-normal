@@ -8,7 +8,7 @@ interface Props {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="pt-28 border border-emerald-100  bg-emerald-500 ">
+    <div className="pt-28 border border-emerald-100  ">
       {/* <Navbar /> */}
 
       <div className="grid border border-purple">
