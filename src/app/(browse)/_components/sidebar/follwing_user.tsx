@@ -40,11 +40,11 @@ const Following_user = () => {
 
   console.log("값을 주세요", following_users, following_users_info);
   return (
-    <div>
+    <span>
       <>
         <FaRegHeart className="w-8 h-8" />
       </>
-      <div>
+      <span>
         {/* 팔로잉한 유저중에 한번이라도 방송을 한사람만 보여주는 */}
 
         {following_users ? (
@@ -79,7 +79,7 @@ const Following_user = () => {
                           <div className="absolute inset-0 rounded-full border-2 border-transparent border-red-500 animate-spin-wave">
                             <div className="absolute inset-0 rounded-full group-hover:animate-wave"></div>
                           </div>
-                          <div className="border border-green-600 rounded-full overflow-hidden w-full h-full">
+                          <div className=" rounded-full overflow-hidden w-full h-full">
                             <Image
                               width={60}
                               height={60}
@@ -109,22 +109,6 @@ const Following_user = () => {
                         </div>
                       </div>
                     )}
-                    {/* <div key={idx}>
-                      <div className="relative group w-10 h-10 border border-black">
-                        <div className="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-red-500 group-hover:animate-spin-wave">
-                          <div className="absolute inset-0 rounded-full group-hover:animate-wave"></div>
-                        </div>
-                        <div className="border border-green-600 rounded-full overflow-hidden w-full h-full">
-                          <Image
-                            width={60}
-                            height={60}
-                            src={""}
-                            alt="유저 이미지"
-                            className="object-cover"
-                          />
-                        </div>
-                      </div>
-                    </div> */}
                   </>
                 ))}
               </>
@@ -133,10 +117,10 @@ const Following_user = () => {
             )}
           </div>
         ) : (
-          <div>팔로잉한 유저가 없어요</div>
+          <span>!</span>
         )}
-      </div>
-    </div>
+      </span>
+    </span>
   );
 };
 
