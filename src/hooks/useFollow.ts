@@ -1,4 +1,4 @@
-import { addFollow, toggleFollow } from "@/api/follow";
+import { toggleFollow } from "@/api/follow";
 import {
   QueryCache,
   QueryClient,

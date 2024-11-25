@@ -32,6 +32,7 @@ export const useViewrToken = (host_identity: string) => {
     };
   }, [host_identity]);
 
+  console.log("콘솔토큰나와라", token, name, identity, "d엥에엥ㅇ?");
   return {
     token,
     name,
