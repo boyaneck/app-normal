@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/api";
 import { userInfo } from "os";
-import { addFollow } from "@/api/follow";
+// import { addFollow } from "@/api/follow";
 interface Props {
   arbre: string;
 }
@@ -43,7 +43,7 @@ const useSigninAndLogout = () => {
                 fetchedUserInfo.user_email +
                 "; path=/; max-age=3600"; // 1시간 유효
 
-              addFollow(fetchedUserInfo.id, fetchedUserInfo.user_email);
+              // addFollow(fetchedUserInfo.id, fetchedUserInfo.user_email);
             } else {
               console.log("유저 정보를 불러오지 못했습니다.");
             }
