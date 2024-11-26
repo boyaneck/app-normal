@@ -6,13 +6,14 @@ import { LiveKitRoom } from "@livekit/components-react";
 import React from "react";
 
 interface StreamPlayerProps {
-  user: string;
+  user: string | userData | null;
   stream: string;
-  is_following: string;
+  is_following: string[] | null;
 }
 
-const Stream_Player = ({ user, stream, is_following }: StreamPlayerProps) => {
+const Live_Player = ({ user, stream, is_following }: StreamPlayerProps) => {
   const { user: current_user } = useUserStore((state) => state);
+  //현재가 아닌 해당 유저의 id가 와야함
   const { token, name, identity } = useViewrToken(current_user?.user_email!);
 
   console.log("뿡빳뿡커리 유저 토큰", token, name, identity);
@@ -33,4 +34,4 @@ const Stream_Player = ({ user, stream, is_following }: StreamPlayerProps) => {
   );
 };
 
-export default Stream_Player;
+export default Live_Player;

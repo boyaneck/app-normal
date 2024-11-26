@@ -4,7 +4,7 @@ import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
 import { cn } from "@/lib/utils";
-import useFollowedUserStore from "@/store/followedUsers";
+import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
@@ -66,7 +66,7 @@ const Screen = () => {
                     follow(user.user_email, user.id);
                   }}
                 />
-                스크린
+                스크린!!
               </span>
             </div>
 
