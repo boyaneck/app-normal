@@ -1,16 +1,17 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import useFollowedUserStore from "@/store/followedUsers";
 import { getFollowingUsers, getFollowingUsersInfo } from "@/api/follow";
 import useUserStore from "@/store/user";
 import { FaRegHeart } from "react-icons/fa6";
 import Image from "next/image";
+import useFollowingUserStore from "@/store/following_user";
 
 const Following_user = () => {
   // const { setUser2, user2 } = useFollowedUserStore((state) => state);
   const { user } = useUserStore((state) => state);
   const [follow_user, setFollow_user] = useState<string[] | null>([]);
+  const { setFollowingUser } = useFollowingUserStore((state) => state);
   const current_user_email =
     typeof user?.user_email === "string" ? user?.user_email : "";
 
@@ -35,6 +36,7 @@ const Following_user = () => {
   useEffect(() => {
     if (following_users) {
       setFollow_user(following_users);
+      setFollowingUser(following_users);
     }
   }, [following_users]);
 
