@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
+import { TbWorldWww } from "react-icons/tb";
 
 export const useViewrToken = (host_identity: string) => {
   const [token, setToken] = useState("");
@@ -11,13 +12,14 @@ export const useViewrToken = (host_identity: string) => {
     const createToken = async () => {
       try {
         const viewer_token = await createViewerToken(host_identity);
-        setToken(viewer_token);
+        // setToken(viewer_token);
+        console.log("여기가 정지선입니다!!!!", typeof host_identity);
 
-        const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
-          name?: string;
-        };
-        const name = decoded_token?.name;
-        const identity = decoded_token.jti;
+        // const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
+        //   name?: string;
+        // };
+        // const name = decoded_token?.name;
+        // const identity = decoded_token.jti;
 
         if (identity) {
           setIdentity(identity);
@@ -28,11 +30,10 @@ export const useViewrToken = (host_identity: string) => {
       } catch (error) {
         console.log("토큰 생성시 문제가 생겼어요!", error);
       }
-      createToken();
     };
+    createToken();
   }, [host_identity]);
 
-  console.log("콘솔토큰나와라", token, name, identity, "d엥에엥ㅇ?");
   return {
     token,
     name,
