@@ -13,6 +13,15 @@ export const getUserInfo = async (user_email: string | undefined) => {
   return userInfo;
 };
 
+export const getUserInfoById = async (user_id: string | undefined) => {
+  const { data: userId, error } = await supabaseForClient
+    .from("users")
+    .select("*")
+    .eq("id", user_id)
+    .maybeSingle();
+
+  return userId;
+};
 export const allUserInfo = async () => {
   const { data, error } = await supabaseForClient.from("users").select("*");
 
