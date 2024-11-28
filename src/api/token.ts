@@ -6,66 +6,72 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 import { cookies } from "next/headers";
 import { getUserInfoById } from "./user";
+import { supabaseForClient } from "@/supabase/supabase_client";
 
 //supabase에서 유저의 db가져오기
+import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
+import { updateSession } from "@/utils/supabase_middleware";
 
-export async function createClient() {
-  const cookieStore = await cookies();
+// 수정된 createViewerToken 함수
+export const createViewerToken = async (host_identity: string) => {
+  const cookie_store = cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll();
+        get(name: string) {
+          return cookie_store.get(name)?.value;
         },
-        setAll(cookiesToSet) {
+
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookie_store.set({ name, value, ...options });
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
           }
         },
+
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookie_store.set({ name, value: "", ...options });
+          } catch (error) {
+            {
+            }
+          }
+        },
       },
     }
   );
-}
 
-//host_identity는 user_id를 인수로 갖는다.
-export const createViewerToken = async (host_identity: string) => {
-  console.log("자 여기가 라인입니다");
-  let self;
-  try {
-    self = createClient();
-  } catch (error) {
-    const id = v4();
-    const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
-    self = { id, user_name };
-  }
+  //   console.log("createViewerToken이 받은 것은", host_identity);
+  //   let current_user_auth;
+  //   try {
+  //     // updateSession 호출 시 request 객체를 전달
+  //     // current_user_auth = await updateSession(request:NextRequest);
+  //     current_user_auth=updateSession(request:NextRequest)
+  //     const user_server = await current_user_auth; // user_server는 supabase 응답을 포함한 객체
+  //   } catch (error) {
+  //     const id = v4();
+  //     const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
+  //     current_user_auth = { id, user_name };
+  //   }
 
-  console.log("서버에서 확인하기", host_identity);
-  //   //현재 스트리머의 아이디 정보 가져오기
+  // 스트리머의 아이디 정보 가져오기
   const host = await getUserInfoById(host_identity);
   if (!host) {
     // throw new Error("User not Found");
   }
-  //   // const is_blocked= await 블락드바이유저(host.id)
-  //   // if(is_blocked){
-  //   //     throw new Error("User is blocked")
-  //   // }
-  const is_host =
-    (self as { id: string; user_name: string }).user_name === host.id;
+
+  // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
     {
-      // identity:is_host?`host-${self.id}`:self.id
-      // name:self:user_name
       identity: "string",
       name: "string",
     }
@@ -76,6 +82,6 @@ export const createViewerToken = async (host_identity: string) => {
     canPublish: false,
     canPublishData: true,
   });
-  console.log("과연 슈퍼베이스가 서버에서 해당 유저의 정보를 ?", self);
+
   return await Promise.resolve(token.toJwt());
 };
