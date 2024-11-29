@@ -18,7 +18,6 @@ const Live_Player = ({ user, stream, is_following }: StreamPlayerProps) => {
   const { token, name, identity } = useViewrToken(
     "88560f0a-d2bd-47b0-a340-02ac2e3343aa"
   );
-  console.log("자!!!!!!!!!!!!!!!!!!!!");
 
   console.log("뿡빳뿡커리 유저 토큰", token);
 

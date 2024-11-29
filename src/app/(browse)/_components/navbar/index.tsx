@@ -1,7 +1,7 @@
 import React from "react";
 import Search from "./search";
 import Login_authbar from "./login_authbar";
-import Studio from "../../studio/studio";
+import Studio from "../../studio/studio_main_banner";
 import { BiBell } from "react-icons/bi";
 import { useRouter } from "next/navigation";
 const Navbar = () => {

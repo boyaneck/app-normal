@@ -12,6 +12,7 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
+          console.log("토큰확인하기", request.cookies.getAll());
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
@@ -36,8 +37,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  console.log("과연 슈퍼베이스는 세션을 읽었나 ?", user);
 
   if (
     !user &&
