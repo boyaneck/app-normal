@@ -45,5 +45,8 @@ export const stream_update = async (
     .eq("user_email", user_email);
 
   if (error)
-    console.log("스트리밍 관련 정보 업데이터 도중 에러 발생!!", error.message);
+    console.log(
+      "스트리밍 관련 정보 업데이터 도중 에러 발생!!🚀🚀",
+      error.message
+    );
 };

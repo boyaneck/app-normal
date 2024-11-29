@@ -6,76 +6,63 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 import { cookies } from "next/headers";
 import { getUserInfoById } from "./user";
+import { supabaseForClient } from "@/supabase/supabase_client";
 
 //supabase에서 유저의 db가져오기
+import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
+import { updateSession } from "@/utils/supabase_middleware";
+import { createServer } from "http";
+import { createClient } from "@/utils/supabase_server";
 
-export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
-    }
-  );
-}
-
-//host_identity는 user_id를 인수로 갖는다.
+// 수정된 createViewerToken 함수
 export const createViewerToken = async (host_identity: string) => {
-  console.log("자 여기가 라인입니다");
-  let self;
-  try {
-    self = createClient();
-  } catch (error) {
-    const id = v4();
-    const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
-    self = { id, user_name };
-  }
+  const data = await createClient();
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-  console.log("서버에서 확인하기", host_identity);
-  //   //현재 스트리머의 아이디 정보 가져오기
-  const host = await getUserInfoById(host_identity);
-  if (!host) {
-    // throw new Error("User not Found");
-  }
-  //   // const is_blocked= await 블락드바이유저(host.id)
-  //   // if(is_blocked){
-  //   //     throw new Error("User is blocked")
-  //   // }
-  const is_host =
-    (self as { id: string; user_name: string }).user_name === host.id;
-  const token = new AccessToken(
-    process.env.LIVEKIT_API_KEY,
-    process.env.LIVEKIT_API_SECRET,
-    {
-      // identity:is_host?`host-${self.id}`:self.id
-      // name:self:user_name
-      identity: "string",
-      name: "string",
-    }
-  );
-  token.addGrant({
-    room: host.id,
-    roomJoin: true,
-    canPublish: false,
-    canPublishData: true,
-  });
-  console.log("과연 슈퍼베이스가 서버에서 해당 유저의 정보를 ?", self);
-  return await Promise.resolve(token.toJwt());
+  console.log("이메일만 좀 알고싶은데,", supabase);
+  console.log("나와라 유저 진민용", user);
+  //   const {
+  //     data: { user },
+  //   } = await supabase.auth.getUser()
+  //     console.log("createViewerToken이 받은 것은", host_identity);
+  //     let current_user_auth;
+  //     try {
+  //       // updateSession 호출 시 request 객체를 전달
+  //       // current_user_auth = await updateSession(request:NextRequest);
+  //       current_user_auth=updateSession(request:NextRequest)
+  //       const user_server = await current_user_auth; // user_server는 supabase 응답을 포함한 객체
+  //     } catch (error) {
+  //       const id = v4();
+  //       const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
+  //       current_user_auth = { id, user_name };
+  //     }
+
+  //   // 스트리머의 아이디 정보 가져오기
+  //   const host = await getUserInfoById(host_identity);
+  //   if (!host) {
+  //     // throw new Error("User not Found");
+  //   }
+
+  //   // LiveKit 토큰 생성
+  //   const token = new AccessToken(
+  //     process.env.LIVEKIT_API_KEY,
+  //     process.env.LIVEKIT_API_SECRET,
+  //     {
+  //       identity: "string",
+  //       name: "string",
+  //     }
+  //   );
+  //   token.addGrant({
+  //     room: host.id,
+  //     roomJoin: true,
+  //     canPublish: false,
+  //     canPublishData: true,
+  //   });
+
+  //   return await Promise.resolve(token.toJwt());
 };
