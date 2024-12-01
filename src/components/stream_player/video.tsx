@@ -28,7 +28,8 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   if (!participant && connection_state === ConnectionState.Connected) {
     content = (
       <p>
-        Host is offline
+        host is offline
+        <p className="font-extrabold">is Offline !!@</p>
         <p>
           <Offline_Video user_name={host_name} />
         </p>
@@ -46,7 +47,11 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   } else {
     content = <p>Live video</p>;
   }
-  return <div className="aspect-video border-b group relative">Video</div>;
+  return (
+    <div className="aspect-video border-b group relative">
+      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`
+    </div>
+  );
 };
 
 export default Video;

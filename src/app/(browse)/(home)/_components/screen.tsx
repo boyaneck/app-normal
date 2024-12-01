@@ -8,6 +8,7 @@ import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface User {
@@ -19,6 +20,7 @@ interface User {
 }
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
+  const router = useRouter();
   const { user } = useUserStore((state) => state);
   const current_user_email =
     typeof user?.user_email === "string" ? user?.user_email : "";
@@ -44,6 +46,10 @@ const Screen = () => {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
+  const onHandlerRouter = (user_id: string) => {
+    router.push(`/live/+user_id=${user_id}`);
+  };
+
   const user_email = user?.user_email === undefined ? "" : user.user_email;
   const follow = (target_user_email: string, user_id: string) => {
     followMutation.mutate({
@@ -57,7 +63,13 @@ const Screen = () => {
     <div className="grid grid-cols-4 gap-2">
       {liveuser.length > 0 ? (
         liveuser.map((user) => (
-          <div key={user.id} className="p-4 bg-white rounded-lg shadow-lg">
+          <div
+            key={user.id}
+            className="p-4 bg-white rounded-lg shadow-lg"
+            onClick={() => {
+              onHandlerRouter(user.id);
+            }}
+          >
             {/* 스크린 컨테이너 */}
             <div className="h-40 bg-gray-200 mb-4 rounded-md flex items-center justify-center">
               <span className="text-xl font-semibold text-gray-700">

@@ -4,6 +4,7 @@ import { createViewerToken } from "@/api/token";
 import { TbWorldWww } from "react-icons/tb";
 import { NextRequest } from "next/server";
 import { createClient } from "@/utils/supabase_server";
+import { updateSession } from "@/utils/supabase_middleware";
 
 export const useViewrToken = (host_identity: string) => {
   const [token, setToken] = useState("");
@@ -15,11 +16,11 @@ export const useViewrToken = (host_identity: string) => {
       try {
         const viewer_token = await createViewerToken(host_identity);
         console.log("ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ", viewer_token);
-        // setToken(viewer_token);
+        setToken(viewer_token);
 
-        // const decoded_token = jwtDecode(viewer_token) as JwtPayload & {};
-        // // const name = decoded_token?.name;
-        // const identity = decoded_token.jti;
+        const decoded_token = jwtDecode(viewer_token) as JwtPayload & {};
+        // const name = decoded_token?.name;
+        const identity = decoded_token.jti;
 
         if (identity) {
           setIdentity(identity);
