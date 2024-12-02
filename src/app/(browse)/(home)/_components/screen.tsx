@@ -51,7 +51,7 @@ const Screen = () => {
     user_id: string,
     user_nickname: string | undefined
   ) => {
-    router.push(`/live?user_id=${user_id}&user_nickname=${user_nickname}`);
+    router.push(`/live/+?user_id=${user_id}&user_nickname=${user_nickname}`);
   };
 
   const user_email = user?.user_email === undefined ? "" : user.user_email;
