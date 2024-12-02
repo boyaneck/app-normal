@@ -3,6 +3,7 @@ import { getLiveUser } from "@/api";
 import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
+import { useViewrToken } from "@/hooks/useViewerToken";
 import { cn } from "@/lib/utils";
 import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
@@ -46,8 +47,11 @@ const Screen = () => {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
-  const onHandlerRouter = (user_id: string) => {
-    router.push(`/live/+user_id=${user_id}`);
+  const onHandlerRouter = (
+    user_id: string,
+    user_nickname: string | undefined
+  ) => {
+    router.push(`/live?user_id=${user_id}&user_nickname=${user_nickname}`);
   };
 
   const user_email = user?.user_email === undefined ? "" : user.user_email;
@@ -67,7 +71,8 @@ const Screen = () => {
             key={user.id}
             className="p-4 bg-white rounded-lg shadow-lg"
             onClick={() => {
-              onHandlerRouter(user.id);
+              onHandlerRouter(user.id, user.user_nickname);
+              alert(user.user_nickname);
             }}
           >
             {/* 스크린 컨테이너 */}
@@ -79,6 +84,7 @@ const Screen = () => {
                   }}
                 />
                 스크린!!
+                {user.user_nickname}
               </span>
             </div>
 
