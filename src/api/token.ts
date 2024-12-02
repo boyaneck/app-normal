@@ -17,7 +17,7 @@ import { cookies } from "next/headers";
 
 // 수정된 createViewerToken 함수
 export const createViewerToken = async (
-  host_identity: string,
+  host_identity: string | undefined,
   host_nickname: string | undefined
 ) => {
   const cookie_store = await cookies();
@@ -35,7 +35,6 @@ export const createViewerToken = async (
   // const host = await getUserInfoById(host_identity);
 
   const is_host = current_user_info?.id;
-  console.log("현재 방송인의 정보");
   if (!host_identity) {
     // throw new Error("User not Found");
   }

@@ -12,15 +12,18 @@ const UserLivePage = () => {
   const current_id = id === null ? undefined : id;
   const current_user_nickname =
     user_nickname === null ? undefined : user_nickname;
-  //   console.log("유저쪽에서는 왜 ??", id, user_nickname);
-  //   console.log("유저의 아이디", current_id);
-  //   console.log("유저의닉네임", current_user_nickname);
+
   const { token, name, identity } = useViewrToken(
     current_id,
     current_user_nickname
   );
+
   console.log("다시하넙ㄴ ㅜ머가문제제인가요?", { token, name, identity });
   useEffect(() => {}, []);
+
+  if (!token || !name || !identity) {
+    return <div>Cannot watch the stream</div>;
+  }
 
   return <div>UserLivePage{}</div>;
 };
