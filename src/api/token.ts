@@ -16,15 +16,15 @@ import { createClient } from "@/utils/supabase_server";
 import { cookies } from "next/headers";
 
 // 수정된 createViewerToken 함수
-export const createViewerToken = async (host_identity: string) => {
-  const supabase = await createClient();
+export const createViewerToken = async (
+  host_identity: string,
+  host_nickname: string | undefined
+) => {
   const cookie_store = await cookies();
   const current_user_email = cookie_store.getAll()[0].value;
-  console.log("zzzzzzzzzzzzzzzzzzzzzz", cookie_store.getAll()[0].value);
   let current_user_info;
   try {
     current_user_info = await getUserInfo(current_user_email);
-    console.log("현재유저의 정보가져와", current_user_info);
   } catch (error) {
     const id = v4();
     const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
@@ -32,8 +32,11 @@ export const createViewerToken = async (host_identity: string) => {
   }
 
   // 스트리머의 아이디 정보 가져오기
-  const host = await getUserInfoById(host_identity);
-  if (!host) {
+  // const host = await getUserInfoById(host_identity);
+
+  const is_host = current_user_info?.id;
+  console.log("현재 방송인의 정보");
+  if (!host_identity) {
     // throw new Error("User not Found");
   }
 
@@ -42,12 +45,12 @@ export const createViewerToken = async (host_identity: string) => {
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
     {
-      identity: "string",
-      name: "string",
+      identity: host_identity,
+      name: host_nickname,
     }
   );
   token.addGrant({
-    room: host.id,
+    room: host_identity,
     roomJoin: true,
     canPublish: false,
     canPublishData: true,

@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
-import { TbWorldWww } from "react-icons/tb";
-import { NextRequest } from "next/server";
-import { createClient } from "@/utils/supabase_server";
-import { updateSession } from "@/utils/supabase_middleware";
 
-export const useViewrToken = (host_identity: string) => {
+export const useViewrToken = (
+  host_identity: string | undefined,
+  host_nickname: string | undefined
+) => {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
   const [identity, setIdentity] = useState("");
 
+  console.log("호스트 네임이 뭔가요", host_nickname);
+  console.log("당신 이름이 뭐요,", name);
   useEffect(() => {
     const createToken = async () => {
       try {
-        const viewer_token = await createViewerToken(host_identity);
+        const viewer_token = await createViewerToken(
+          host_identity,
+          host_nickname
+        );
         console.log("ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ", viewer_token);
         setToken(viewer_token);
 
-        const decoded_token = jwtDecode(viewer_token) as JwtPayload & {};
-        // const name = decoded_token?.name;
+        const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
+          name?: string;
+        };
+        const name = decoded_token?.name;
         const identity = decoded_token.jti;
 
         if (identity) {
