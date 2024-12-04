@@ -10,8 +10,6 @@ export const useViewrToken = (
   const [name, setName] = useState("");
   const [identity, setIdentity] = useState("");
 
-  console.log("호스트 네임이 뭔가요", host_nickname);
-  console.log("당신 이름이 뭐요,", name);
   useEffect(() => {
     const createToken = async () => {
       try {
