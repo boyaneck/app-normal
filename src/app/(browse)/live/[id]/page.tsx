@@ -1,13 +1,34 @@
 "use client";
 import { useViewrToken } from "@/hooks/useViewerToken";
 import { useParams, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Live_Player from "../_components/live_screen";
+import { Room } from "livekit-client";
 const UserLivePage = () => {
   const search_params = useSearchParams();
-
+  const [room, setRoom] = useState<Room | null>(null);
+  const [connectionState, setConnectionState] = useState("");
   const id = search_params.get("user_id");
   const user_nickname = search_params.get("user_nickname");
+
+  useEffect(() => {
+    const initializeRoom = async () => {
+      const newRoom = new Room();
+      await newRoom.connect(process.env.NEXT_PUBLIC_LIVEKIT_WS_URL!, token); // Replace with valid token
+      setRoom(newRoom);
+      setConnectionState(newRoom.state);
+    };
+
+    initializeRoom();
+
+    return () => {
+      room?.disconnect();
+    };
+  }, []);
+
+  if (!room) {
+    return <div>Loading room...</div>;
+  }
 
   console.log("유저의 정보", id, user_nickname);
   const current_id = id === null ? undefined : id;

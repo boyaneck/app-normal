@@ -4,6 +4,7 @@ import { useViewrToken } from "@/hooks/useViewerToken";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import { cookies } from "next/headers";
+import { Room } from "livekit-client";
 import React from "react";
 
 interface StreamPlayerProps {
@@ -11,6 +12,7 @@ interface StreamPlayerProps {
   stream: string;
   is_following: string[] | null;
   token: string;
+  room: Room;
 }
 
 const Live_Player = ({
@@ -18,6 +20,7 @@ const Live_Player = ({
   stream,
   is_following,
   token,
+  room,
 }: StreamPlayerProps) => {
   const { user: current_user } = useUserStore((state) => state);
   //현재가 아닌 해당 유저의 id가 와야함
