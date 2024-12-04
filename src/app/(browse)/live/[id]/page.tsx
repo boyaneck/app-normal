@@ -2,6 +2,7 @@
 import { useViewrToken } from "@/hooks/useViewerToken";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
+import Live_Player from "../_components/live_screen";
 const UserLivePage = () => {
   const search_params = useSearchParams();
 
@@ -25,7 +26,17 @@ const UserLivePage = () => {
     return <div>Cannot watch the stream</div>;
   }
 
-  return <div>UserLivePage{}</div>;
+  return (
+    <div>
+      <div className="font-extrabold">유저의 스트리밍 페에지</div>
+
+      <div>
+        스크린
+        <Live_Player user={""} stream="" is_following={[""]} token="" />잘
+        나오고 있나요 ??
+      </div>
+    </div>
+  );
 };
 
 export default UserLivePage;

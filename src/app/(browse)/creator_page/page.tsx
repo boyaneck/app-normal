@@ -2,7 +2,7 @@
 import React from "react";
 import { AccessToken } from "livekit-server-sdk";
 import useUserStore from "@/store/user";
-import Live_Player from "../_components/live_screen/live_player";
+import Live_Player from "../_components/live_screen/qa";
 import useFollowingUserStore from "@/store/following_user";
 interface CreatorPageProps {
   params: {

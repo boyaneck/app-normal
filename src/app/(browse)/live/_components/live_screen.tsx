@@ -10,24 +10,22 @@ interface StreamPlayerProps {
   user: string | userData | null;
   stream: string;
   is_following: string[] | null;
+  token: string;
 }
 
-const Live_Player = ({ user, stream, is_following }: StreamPlayerProps) => {
+const Live_Player = ({
+  user,
+  stream,
+  is_following,
+  token,
+}: StreamPlayerProps) => {
   const { user: current_user } = useUserStore((state) => state);
   //현재가 아닌 해당 유저의 id가 와야함
   // const { token, name, identity } = useViewrToken(current_user?.user_email!);
-  const { token, name, identity } = useViewrToken(
-    "88560f0a-d2bd-47b0-a340-02ac2e3343aa",
-    ""
-  );
-
-  console.log("뿡빳뿡커리 유저 토큰", token);
-
-  console.log("이름입니다", name);
-  console.log("현재 스트리머의 아이디 입니다", identity);
-  if (!token || !name || identity) {
-    return <div>Cannot watch the stream</div>;
-  }
+  // const { token, name, identity } = useViewrToken(
+  //   "88560f0a-d2bd-47b0-a340-02ac2e3343aa",
+  //   ""
+  // );
 
   return (
     <div>
