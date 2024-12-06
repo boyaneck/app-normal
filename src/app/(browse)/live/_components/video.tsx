@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ConnectionState, Track } from "livekit-client";
+import { ConnectionState, Room, Track } from "livekit-client";
 import {
   useConnectionState,
   useTracks,
@@ -16,6 +16,8 @@ interface VideoProps {
 }
 
 const Video = ({ host_name, host_identity }: VideoProps) => {
+  const room = new Room();
+
   const connection_state = useConnectionState();
   const participant = useRemoteParticipant(host_identity);
   const tracks = useTracks([
@@ -28,7 +30,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   if (!participant && connection_state === ConnectionState.Connected) {
     content = (
       <p>
-        host is offline
+        host is offline host is offline host is offline
         <p className="font-extrabold">is Offline !!@</p>
         <p>
           <Offline_Video user_name={host_name} />

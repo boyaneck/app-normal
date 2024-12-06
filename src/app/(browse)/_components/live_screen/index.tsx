@@ -1,4 +1,4 @@
-import Video from "@/components/stream_player/video";
+import Video from "@/app/(browse)/live/_components/video";
 import React from "react";
 
 const LiveScreen = () => {
