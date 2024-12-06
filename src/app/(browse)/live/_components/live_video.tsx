@@ -7,7 +7,7 @@ interface LiveVideoProps {
   participant: Participant;
 }
 
-const Live_Video = ({ participant }: LiveVideoProps) => {
+const LiveVideo = ({ participant }: LiveVideoProps) => {
   const video_ref = useRef<HTMLVideoElement>(null);
   const wrapper_ref = useRef<HTMLDivElement>(null);
   useTracks([Track.Source.Microphone, Track.Source.Camera])
@@ -29,4 +29,4 @@ const Live_Video = ({ participant }: LiveVideoProps) => {
   );
 };
 
-export default Live_Video;
+export default LiveVideo;

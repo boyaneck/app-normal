@@ -2,8 +2,8 @@
 import React from "react";
 import { AccessToken } from "livekit-server-sdk";
 import useUserStore from "@/store/user";
-import Live_Player from "../_components/live_screen/qa";
 import useFollowingUserStore from "@/store/following_user";
+import LiveScreenFrame from "../live/_components/live_index";
 interface CreatorPageProps {
   params: {
     username: string;
@@ -23,7 +23,12 @@ const CreatorPage = async ({ params }: CreatorPageProps) => {
   return (
     <div>
       {/* /파라미터로 현재 user와 user안에 있는 stream 값을 넘겨준다 */}
-      <Live_Player user={user} stream={""} is_following={following_user} />
+      <LiveScreenFrame
+        user={user}
+        stream={""}
+        is_following={following_user}
+        token=""
+      />
       추르릅춥춥
     </div>
   );

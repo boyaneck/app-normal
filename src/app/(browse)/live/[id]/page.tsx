@@ -2,8 +2,13 @@
 import { useViewrToken } from "@/hooks/useViewerToken";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Live_Player from "../_components/live_screen";
 import { Room } from "livekit-client";
+import {
+  LiveKitRoom,
+  RoomContext,
+  useConnectionState,
+} from "@livekit/components-react";
+import Video from "../_components/video";
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const [room, setRoom] = useState<Room | null>(null);
@@ -11,25 +16,24 @@ const UserLivePage = () => {
   const id = search_params.get("user_id");
   const user_nickname = search_params.get("user_nickname");
 
-  useEffect(() => {
-    const initializeRoom = async () => {
-      const newRoom = new Room();
-      await newRoom.connect(process.env.NEXT_PUBLIC_LIVEKIT_WS_URL!, token); // Replace with valid token
-      setRoom(newRoom);
-      setConnectionState(newRoom.state);
-    };
+  // useEffect(() => {
+  //   const initializeRoom = async () => {
+  //     const newRoom = new Room();
+  //     await newRoom.connect(process.env.NEXT_PUBLIC_LIVEKIT_WS_URL!, token); // Replace with valid token
+  //     setRoom(newRoom);
+  //     setConnectionState(newRoom.state);
+  //   };
 
-    initializeRoom();
+  //   initializeRoom();
 
-    return () => {
-      room?.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     room?.disconnect();
+  //   };
+  // }, []);
 
-  if (!room) {
-    return <div>Loading room...</div>;
-  }
-
+  // if (!room) {
+  //   return <div>Loading room...</div>;
+  // }
   console.log("유저의 정보", id, user_nickname);
   const current_id = id === null ? undefined : id;
   const current_user_nickname =
@@ -53,7 +57,14 @@ const UserLivePage = () => {
 
       <div>
         스크린
-        <Live_Player user={""} stream="" is_following={[""]} token="" />잘
+        {/* <LiveIndex user={""} stream="" is_following={[""]} token="" />잘 */}
+        <LiveKitRoom
+          token={token}
+          server_url={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+        >
+          쭈루룩삥퐁뚝뚝뚝
+          <Video host_name="" host_identity="" />
+        </LiveKitRoom>
         나오고 있나요 ??
       </div>
     </div>
