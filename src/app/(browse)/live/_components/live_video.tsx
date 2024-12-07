@@ -3,6 +3,9 @@ import { Participant, Track } from "livekit-client";
 import { Video } from "lucide-react";
 import React, { useRef } from "react";
 import { useTrack, useTracks } from "@livekit/components-react";
+// interface LiveVideoProps {
+//   participant: Participant ;
+// }
 interface LiveVideoProps {
   participant: Participant;
 }
@@ -21,7 +24,7 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
     });
   return (
     <div>
-      Live_Video
+      Live_Video!!!!!!!!!
       <div ref={wrapper_ref} className="relative h-full flex">
         <video ref={video_ref} width="100%" />
       </div>

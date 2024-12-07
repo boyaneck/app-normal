@@ -28,6 +28,7 @@ const useSigninAndLogout = () => {
             setSessionUserEmail(session?.user?.email);
             if (fetchedUserInfo) {
               const userInfo = {
+                user_id: fetchedUserInfo.user_id,
                 user_nickname: fetchedUserInfo.user_nickname,
                 avatar_url: fetchedUserInfo.avatar_url,
                 user_email: fetchedUserInfo.user_email,

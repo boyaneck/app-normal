@@ -6,28 +6,36 @@ import {
   useConnectionState,
   useTracks,
   useRemoteParticipant,
+  useParticipants,
 } from "@livekit/components-react";
 import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
+import LiveVideo from "./live_video";
+import Sample from "./sample";
 
 interface VideoProps {
-  host_name: string;
-  host_identity: string;
+  host_name: string | undefined;
+  host_identity: string | undefined;
 }
 
 const Video = ({ host_name, host_identity }: VideoProps) => {
-  const room = new Room();
-
+  const participants = useParticipants();
+  const object_host_participant = participants.find(
+    (participant) => participant.identity === host_identity
+  );
+  console.log("현재 스트리밍한 유저의 정보객체", object_host_participant);
   const connection_state = useConnectionState();
-  const participant = useRemoteParticipant(host_identity);
+  const host_participant = useRemoteParticipant(host_identity);
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
   ]).filter((track) => track.participant.identity === host_identity);
 
+  console.log("트랙을 한번 알아보자", tracks);
+
   let content;
 
-  if (!participant && connection_state === ConnectionState.Connected) {
+  if (!host_participant && connection_state === ConnectionState.Connected) {
     content = (
       <p>
         host is offline host is offline host is offline
@@ -37,21 +45,22 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
         </p>
       </p>
     );
-  } else if (!participant || tracks.length === 0) {
+  } else if (!host_participant || tracks.length === 0) {
     content = (
       <p>
-        Loading...
+        Loading... 이거 안나오나염 ??
         <p>
           <Loading_Video label={connection_state} />
         </p>
       </p>
     );
   } else {
-    content = <p>Live video</p>;
+    content = <p>Live video 가 지금 시작됩니다!!</p>;
   }
   return (
     <div className="aspect-video border-b group relative">
       Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`
+      <LiveVideo participant={""} />
     </div>
   );
 };

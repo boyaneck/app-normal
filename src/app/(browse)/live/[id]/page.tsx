@@ -1,50 +1,28 @@
 "use client";
 import { useViewrToken } from "@/hooks/useViewerToken";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Room } from "livekit-client";
-import {
-  LiveKitRoom,
-  RoomContext,
-  useConnectionState,
-} from "@livekit/components-react";
+import { LiveKitRoom, RoomContext } from "@livekit/components-react";
 import Video from "../_components/video";
+import Sample from "../_components/sample";
+import useUserStore from "@/store/user";
 const UserLivePage = () => {
   const search_params = useSearchParams();
-  const [room, setRoom] = useState<Room | null>(null);
-  const [connectionState, setConnectionState] = useState("");
   const id = search_params.get("user_id");
   const user_nickname = search_params.get("user_nickname");
+  const { user } = useUserStore((state) => state);
 
-  // useEffect(() => {
-  //   const initializeRoom = async () => {
-  //     const newRoom = new Room();
-  //     await newRoom.connect(process.env.NEXT_PUBLIC_LIVEKIT_WS_URL!, token); // Replace with valid token
-  //     setRoom(newRoom);
-  //     setConnectionState(newRoom.state);
-  //   };
-
-  //   initializeRoom();
-
-  //   return () => {
-  //     room?.disconnect();
-  //   };
-  // }, []);
-
-  // if (!room) {
-  //   return <div>Loading room...</div>;
-  // }
-  console.log("유저의 정보", id, user_nickname);
-  const current_id = id === null ? undefined : id;
-  const current_user_nickname =
-    user_nickname === null ? undefined : user_nickname;
+  console.log("현재 유저의 정보", user);
+  const current_host_id = id === null ? "유저없음" : id;
+  const current_host_nickname =
+    user_nickname === null ? "유저없음" : user_nickname;
 
   const { token, name, identity } = useViewrToken(
-    current_id,
-    current_user_nickname
+    user?.avatar_url,
+    user?.user_nickname
   );
 
-  console.log("다시하넙ㄴ ㅜ머가문제제인가요?", { token, name, identity });
+  console.log("자 토큰생성됨", { token, name, identity });
   useEffect(() => {}, []);
 
   if (!token || !name || !identity) {
@@ -63,7 +41,10 @@ const UserLivePage = () => {
           server_url={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
         >
           쭈루룩삥퐁뚝뚝뚝
-          <Video host_name="" host_identity="" />
+          <Video
+            host_name={current_host_nickname}
+            host_identity={current_host_id}
+          />
         </LiveKitRoom>
         나오고 있나요 ??
       </div>
