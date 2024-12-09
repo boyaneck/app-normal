@@ -8,7 +8,6 @@ import Image from "next/image";
 import useFollowingUserStore from "@/store/following_user";
 
 const Following_user = () => {
-  // const { setUser2, user2 } = useFollowedUserStore((state) => state);
   const { user } = useUserStore((state) => state);
   const [follow_user, setFollow_user] = useState<string[] | null>([]);
   const { setFollowingUser } = useFollowingUserStore((state) => state);
@@ -55,7 +54,7 @@ const Following_user = () => {
               <>
                 ㅠ
                 {following_users_info?.map((following_user: any, idx) => (
-                  <>
+                  <div key={idx}>
                     참
                     <div className="relative group">
                       <div className="text-gray-700 p-4 bg-gray-200">
@@ -111,7 +110,7 @@ const Following_user = () => {
                         </div>
                       </div>
                     )}
-                  </>
+                  </div>
                 ))}
               </>
             ) : (

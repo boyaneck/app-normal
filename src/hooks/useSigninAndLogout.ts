@@ -27,8 +27,17 @@ const useSigninAndLogout = () => {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
             setSessionUserEmail(session?.user?.email);
             if (fetchedUserInfo) {
+              console.log(
+                "로그인한 유저의 아이디",
+                fetchedUserInfo?.id,
+                fetchedUserInfo,
+                "뚜르릅",
+                fetchedUserInfo.user_email,
+                fetchedUserInfo.user_nickname,
+                fetchedUserInfo.id
+              );
               const userInfo = {
-                user_id: fetchedUserInfo.user_id,
+                user_id: fetchedUserInfo.id,
                 user_nickname: fetchedUserInfo.user_nickname,
                 avatar_url: fetchedUserInfo.avatar_url,
                 user_email: fetchedUserInfo.user_email,

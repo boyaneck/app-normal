@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ConnectionState, Room, Track } from "livekit-client";
+import { ConnectionState, Track } from "livekit-client";
 import {
   useConnectionState,
   useTracks,
@@ -11,19 +11,24 @@ import {
 import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
 import LiveVideo from "./live_video";
-import Sample from "./sample";
 
 interface VideoProps {
-  host_name: string | undefined;
-  host_identity: string | undefined;
+  host_name: string;
+  host_identity: string;
 }
 
 const Video = ({ host_name, host_identity }: VideoProps) => {
   const participants = useParticipants();
+  console.log("현재해당룸에 참여한 모든 유저의 정보", participants);
   const object_host_participant = participants.find(
     (participant) => participant.identity === host_identity
   );
-  console.log("현재 스트리밍한 유저의 정보객체", object_host_participant);
+  console.log(
+    "현재 스트리밍한 유저의 정보객체",
+    object_host_participant,
+    "그리고 ",
+    participants
+  );
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
   const tracks = useTracks([

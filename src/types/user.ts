@@ -4,4 +4,5 @@ declare interface userData {
   user_email: string;
   created_at: string;
   isLive: boolean;
+  user_id: string;
 }

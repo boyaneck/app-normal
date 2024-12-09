@@ -36,7 +36,6 @@ const Screen = () => {
     queryFn: getLiveUser,
   });
 
-  console.log("라이브유저의 정보", LiveUser);
   useEffect(() => {
     if (LiveUser) {
       setLiveUser(LiveUser);
