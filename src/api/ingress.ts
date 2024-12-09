@@ -15,23 +15,10 @@ import { revalidatePath } from "next/cache";
 import { insertIngress } from "./live";
 // import { TrackSource } from "@livekit/protocol";
 
-// const getUserEmailFromCookie = () => {
-//   const cookies = document.cookie.split("; ");
-//   const user_email_cookie = cookies.find((cookie) =>
-//     cookie.startsWith("user_email=")
-//   );
-//   return user_email_cookie ? user_email_cookie.split("=")[1] : undefined;
-// };
-// const roomService = new RoomServiceClient(
-//   process.env.LIVEKIT_API_URL!,
-//   process.env.LIVEKIT_API_KEY!,
-//   process.env.LIVEKIT_API_SECRET!
-// );
-
 // //api_url을 담아 ingress 생성
 const ingressClient = new IngressClient(
-  process.env.LIVEKIT_API_URL!
-  // process.env.LIVEKIT_API_SECRET!
+  process.env.LIVEKIT_API_URL!,
+  process.env.LIVEKIT_API_SECRET!
 );
 
 // export const resetIngress = async (host_identity: string) => {
@@ -49,28 +36,34 @@ const ingressClient = new IngressClient(
 //   }
 // };
 
-export const createIngress = async (ingressType: IngressInput) => {
+export const createIngress = async (
+  ingressType: IngressInput,
+  user: userData | null
+) => {
+  console.log("잉그레스 타입", ingressType);
   const options: CreateIngressOptions = {
-    name: "123",
-    roomName: "123",
-    participantName: "123",
-    participantIdentity: "123",
+    name: user?.user_nickname,
+    roomName: user?.user_id,
+    participantName: user?.user_nickname,
+    participantIdentity: user?.user_id,
   };
-  if (ingressType === IngressInput.WHIP_INPUT) {
-    options.bypassTranscoding = true;
-  } else {
-    options.video = {
-      source: TrackSource.CAMERA,
-    };
-    options.audio = {
-      source: TrackSource.MICROPHONE,
-      preset: IngressAudioEncodingPreset.OPUS_STEREO_96KBPS,
-    };
-  }
+  // if (ingressType === IngressInput.WHIP_INPUT) {
+  //   options.bypassTranscoding = true;
+  // } else {
+  //   options.video = {
+  //     source: TrackSource.CAMERA,
+  //   };
+  //   options.audio = {
+  //     source: TrackSource.MICROPHONE,
+  //     preset: IngressAudioEncodingPreset.OPUS_STEREO_96KBPS,
+  //   };
+  // }
+
   const ingress = await ingressClient.createIngress(ingressType, options);
-  if (!ingress || !ingress.url || !ingress.streamKey) {
-    throw new Error("Failed to create Ingress");
-  }
-  console.log("다만든 잉그레스 객체는?", ingress);
-  return ingress;
+  // if (!ingress || !ingress.url || !ingress.streamKey) {
+  //   throw new Error("Failed to create Ingress");
+  // }
+  // console.log("다만든 잉그레스 객체는?", ingress);
+  // return ingress;
+  console.log("잉그레스 클라이언트 엿보기", ingressClient);
 };
