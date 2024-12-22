@@ -3,7 +3,6 @@ import { getLiveUser } from "@/api";
 import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
-import { useViewrToken } from "@/hooks/useViewerToken";
 import { cn } from "@/lib/utils";
 import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";

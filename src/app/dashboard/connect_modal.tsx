@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { insertIngress } from "@/api/live";
+import useUserStore from "@/store/user";
 
 //IngressInput에 들어갈 각각의 형식에 맞는 수를 문자열로 변환한다.
 const RTMP = String(IngressInput.RTMP_INPUT);
@@ -31,12 +32,16 @@ const Connect_Modal = () => {
   const closeRef = useRef<ElementRef<"button">>(null);
   const [isPending, startTransition] = useTransition();
   const [ingressType, setIngressType] = useState<IngressType>(RTMP);
-
+  const { user } = useUserStore((state) => state);
+  console.log("왜 유저의 정보가 스튜디오에서 아난오는겆 ㅛ??", user);
   const onSubmit = () => {
-    // createIngress(parseInt(ingressType));
-    // yap();
     startTransition(() => {
-      createIngress(parseInt(ingressType))
+      if (user === null) {
+        alert("유저의 정보가 없습니다.! 로그인하고 이용해주세요");
+        return;
+      }
+      console.log("클릭시 유저와 함께 정보전달", user);
+      createIngress(parseInt(ingressType), user)
         .then(() => {
           console.log("Ingress create succeed");
           alert("Ingress가 만들어 졌습니다");
@@ -53,6 +58,12 @@ const Connect_Modal = () => {
     });
     console.log("startTransition이 끝났습니다.");
   };
+
+  const good = () => {
+    createIngress(parseInt(ingressType), user);
+    alert("sss");
+  };
+
   const ddd = () => {
     const user_id = "88560f0a-d2bd-47b0-a340-02ac2e3343aa";
     const user_id_string = user_id.toString();
@@ -78,6 +89,9 @@ const Connect_Modal = () => {
         {/* <Button>Generate connection</Button> */}
         <span className="border border-black">Generate Connection</span>
       </DialogTrigger>
+      <div>
+        <Button onClick={good}>new button</Button>
+      </div>
       <DialogContent>
         <DialogHeader>
           <DialogHeader>
@@ -113,6 +127,7 @@ const Connect_Modal = () => {
             Generate
           </Button>
         </div>
+        새로운버튼
       </DialogContent>
     </Dialog>
   );

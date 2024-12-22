@@ -8,11 +8,7 @@ import { getUserInfo, getUserInfoById } from "./user";
 import { supabaseForClient } from "@/supabase/supabase_client";
 
 //supabase에서 유저의 db가져오기
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest, NextResponse } from "next/server";
-import { updateSession } from "@/utils/supabase_middleware";
-import { createServer } from "http";
-import { createClient } from "@/utils/supabase_server";
+
 import { cookies } from "next/headers";
 
 // 수정된 createViewerToken 함수
@@ -32,11 +28,11 @@ export const createViewerToken = async (
   }
 
   // 스트리머의 아이디 정보 가져오기
-  // const host = await getUserInfoById(host_identity);
+  const host = await getUserInfoById(host_identity);
 
-  const is_host = current_user_info?.id;
+  const is_host = current_user_info?.id === host?.id;
   if (!host_identity) {
-    // throw new Error("User not Found");
+    throw new Error("host_user not Found");
   }
 
   // LiveKit 토큰 생성
@@ -44,8 +40,8 @@ export const createViewerToken = async (
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
     {
-      identity: host_identity,
-      name: host_nickname,
+      identity: is_host ? `host-${current_user_info.id}` : current_user_info.id,
+      name: current_user_email,
     }
   );
   token.addGrant({

@@ -1,25 +1,22 @@
 "use server";
-// "use client";
 import {
   IngressAudioEncodingPreset,
   IngressInput,
   IngressClient,
-  IngressInfo,
-  IngressVideoEncodingPreset,
   RoomServiceClient,
   type CreateIngressOptions,
 } from "livekit-server-sdk";
 
 import { TrackSource } from "livekit-server-sdk/dist/proto/livekit_models";
-import { revalidatePath } from "next/cache";
-import { insertIngress } from "./live";
 // import { TrackSource } from "@livekit/protocol";
 
-// //api_url을 담아 ingress 생성
-const ingressClient = new IngressClient(
+const roomServiceClient = new RoomServiceClient(
   process.env.LIVEKIT_API_URL!,
+  process.env.LIVEKIT_API_KEY!,
   process.env.LIVEKIT_API_SECRET!
 );
+// //api_url을 담아 ingress 생성
+const ingressClient = new IngressClient(process.env.LIVEKIT_API_URL!);
 
 // export const resetIngress = async (host_identity: string) => {
 //   const ingresses = await ingressClient.listIngress({
@@ -40,30 +37,37 @@ export const createIngress = async (
   ingressType: IngressInput,
   user: userData | null
 ) => {
-  console.log("잉그레스 타입", ingressType);
   const options: CreateIngressOptions = {
     name: user?.user_nickname,
     roomName: user?.user_id,
     participantName: user?.user_nickname,
     participantIdentity: user?.user_id,
   };
-  // if (ingressType === IngressInput.WHIP_INPUT) {
-  //   options.bypassTranscoding = true;
-  // } else {
-  //   options.video = {
-  //     source: TrackSource.CAMERA,
-  //   };
-  //   options.audio = {
-  //     source: TrackSource.MICROPHONE,
-  //     preset: IngressAudioEncodingPreset.OPUS_STEREO_96KBPS,
-  //   };
-  // }
+  if (ingressType === IngressInput.WHIP_INPUT) {
+    options.bypassTranscoding = true;
+  } else {
+    options.video = {
+      source: TrackSource.CAMERA,
+    };
+    options.audio = {
+      source: TrackSource.MICROPHONE,
+      preset: IngressAudioEncodingPreset.OPUS_STEREO_96KBPS,
+    };
+  }
 
-  const ingress = await ingressClient.createIngress(ingressType, options);
-  // if (!ingress || !ingress.url || !ingress.streamKey) {
-  //   throw new Error("Failed to create Ingress");
+  // try {
+  //   const ingress = await ingressClient.createIngress(ingressType);
+  //   console.log("되나 ??");
+  // } catch (error) {
+  //   console.log("오류메세지", error);
+  //   throw error;
   // }
-  // console.log("다만든 잉그레스 객체는?", ingress);
-  // return ingress;
-  console.log("잉그레스 클라이언트 엿보기", ingressClient);
+  const ingress = await ingressClient.createIngress(ingressType, options);
+  if (!ingress || !ingress.url || !ingress.streamKey) {
+    alert("잉그레스 객체가 잘 생성되지 않았음 ");
+    throw new Error("Failed to create Ingress");
+  }
+  console.log("다만든 잉그레스 객체는?", ingress);
+  return ingress;
+  console.log("콘솔이 몇번찍히려냐 ???");
 };

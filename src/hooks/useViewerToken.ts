@@ -17,7 +17,6 @@ export const useViewrToken = (
           host_identity,
           host_nickname
         );
-        console.log("ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ", viewer_token);
         setToken(viewer_token);
 
         const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
@@ -37,7 +36,6 @@ export const useViewrToken = (
       }
     };
     createToken();
-    console.log("여기가 정지선입니다!!!!", typeof host_identity);
   }, [host_identity]);
 
   return {
