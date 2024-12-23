@@ -3,6 +3,7 @@ import { Participant, RemoteParticipant, Track } from "livekit-client";
 import { Video } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import {
+  GridLayout,
   useConnectionState,
   useTrack,
   useTracks,

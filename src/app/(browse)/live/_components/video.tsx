@@ -32,51 +32,46 @@ interface VideoProps {
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
 
-  const object_host_participant = participants.find(
-    (participant) => participant.identity === host_identity
-  );
-
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-  console.log("이게 비동기라서 그런가 ??", connection_state);
   useEffect(() => {
-    console.log("호스트의 아이디는 ?", host_identity);
-    console.log("현재 room 연결 유무:", connection_state);
     console.log("호스트:", host_participant);
-    console.log("현재 접속한 유저저:", participants);
+    console.log("현재 접속한 유저:", participants);
   }, [connection_state, host_participant, participants]);
-  // const host_participant = useRemoteParticipant();
-  const real = host_participant !== undefined ? host_participant : "";
 
-  const host_id =
-    host_identity !== undefined ? host_participant : host_participant;
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
   ]).filter((track) => track.participant.identity === host_identity);
 
+  console.log("연결은? ??", connection_state);
   console.log("트랙은 ??", tracks);
   let content;
-  if (connection_state !== ConnectionState.Connected) {
+
+  // //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
+  // if (connection_state !== ConnectionState.Connected) {
+  if (false) {
     content = (
       <p>
-        Loading...
+        Loading... room이 생성중 잠시만 기다려주세요요
         <p>
           <Loading_Video label={connection_state} />
         </p>
       </p>
     );
-  } else if (!host_participant) {
+    // } else if (!host_participant) {
+  } else if (false) {
     content = (
       <p>
-        host is offline host is offline host is offline
+        호스트가 방송중이 아닙니다다
         <p className="font-extrabold">is Offline !!@</p>
         <p>
           <Offline_Video user_name={host_name} />
         </p>
       </p>
     );
-  } else if (tracks.length === 0) {
+  } else if (false) {
+    // } else if (tracks.length === 0) {
     content = (
       <p>
         Loading... 이거 안나오나염 ??
@@ -85,23 +80,19 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         </p>
       </p>
     );
-  } else {
+  } else if (true) {
     content = (
       <div>
+        에에에에에에 우소!!
         <LiveVideo participant={host_participant} />
-        <GridLayout
-          tracks={tracks}
-          style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
-        >
-          ParticipantTile
-        </GridLayout>
-        ;
+        쭈르륵쭈르륵 빵핑봉 ;
       </div>
     );
   }
+
   return (
     <div className="aspect-video border-b group relative border border-green-500">
-      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`
+      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`{content}
       {/* <LiveVideo participant={host_participant} /> */}
     </div>
   );

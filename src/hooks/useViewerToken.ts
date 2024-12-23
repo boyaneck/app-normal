@@ -3,8 +3,9 @@ import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
 
 export const useViewrToken = (
-  host_identity: string | undefined,
-  host_nickname: string | undefined
+  user_identity: string | undefined,
+  user_nickname: string | undefined,
+  current_host_id: string | undefined
 ) => {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
@@ -14,8 +15,8 @@ export const useViewrToken = (
     const createToken = async () => {
       try {
         const viewer_token = await createViewerToken(
-          host_identity,
-          host_nickname
+          user_identity,
+          user_nickname
         );
         setToken(viewer_token);
 
@@ -36,7 +37,7 @@ export const useViewrToken = (
       }
     };
     createToken();
-  }, [host_identity]);
+  }, [user_identity]);
 
   return {
     token,

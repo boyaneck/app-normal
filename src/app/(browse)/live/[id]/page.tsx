@@ -28,9 +28,11 @@ const UserLivePage = () => {
 
   //로그인유저만 아닌 비로그인 유저도 추가해야함
   const [roomName, setRoomName] = useState("");
+  //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewrToken(
-    user?.user_id,
-    user?.user_nickname
+    user?.user_id || current_host_id,
+    user?.user_nickname || current_host_nickname,
+    current_host_id
   );
 
   const roomer = "sssssssssssss";
@@ -41,11 +43,11 @@ const UserLivePage = () => {
   useEffect(() => {
     if (current_host_id) {
       setRoomName(current_host_id);
-      console.log("useRoomContext", useRoomContext);
-      console.log("useRoomInfo", useRoomInfo);
-      console.log("LiveKitRoom", LiveKitRoom);
-      console.log("유즈 라이브킷 룸", useLiveKitRoom);
-      console.log(" 룸 에 대한 정보1!!0", room);
+      // console.log("useRoomContext", useRoomContext);
+      // console.log("useRoomInfo", useRoomInfo);
+      // console.log("LiveKitRoom", LiveKitRoom);
+      // console.log("유즈 라이브킷 룸", useLiveKitRoom);
+      // console.log(" 룸 에 대한 정보1!!0", room);
     }
   }, []);
 
@@ -69,7 +71,7 @@ const UserLivePage = () => {
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          room={room}
+          // room={room}
           className="border border-purple-500 grid grid-cols-1 lg:gap-y-0 lg:grid-cols-3
           xl:grid-cols-3 2xl:grid-cols-6 h-full"
         >

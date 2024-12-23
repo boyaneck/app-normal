@@ -13,8 +13,8 @@ import { cookies } from "next/headers";
 
 // 수정된 createViewerToken 함수
 export const createViewerToken = async (
-  host_identity: string | undefined,
-  host_nickname: string | undefined
+  user_identity: string | undefined,
+  user_nickname: string | undefined
 ) => {
   const cookie_store = await cookies();
   const current_user_email = cookie_store.getAll()[0].value;
@@ -27,11 +27,11 @@ export const createViewerToken = async (
     current_user_info = { id, user_name };
   }
 
-  // 스트리머의 아이디 정보 가져오기
-  const host = await getUserInfoById(host_identity);
+  // 스트리머 혹은 현재 유저의 아이디 정보 가져오기
+  const host = await getUserInfoById(user_identity);
 
   const is_host = current_user_info?.id === host?.id;
-  if (!host_identity) {
+  if (!user_identity) {
     throw new Error("host_user not Found");
   }
 
@@ -45,7 +45,7 @@ export const createViewerToken = async (
     }
   );
   token.addGrant({
-    room: host_identity,
+    room: user_identity,
     roomJoin: true,
     canPublish: false,
     canPublishData: true,
