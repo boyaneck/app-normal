@@ -30,7 +30,8 @@ export const createViewerToken = async (
     try {
       const id = v4();
       const user_name = `게스트#${Math.floor(Math.random() * 1000)}`;
-      current_user_info = { id, user_name };
+      current_user_email = `게스트@#${Math.floor(Math.random() * 1000)}.com`;
+      current_user_info = { id, user_name, current_user_email };
       console.log("로그인 유저가 업습니다", current_user_info);
     } catch (error) {
       console.log(

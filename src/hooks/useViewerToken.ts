@@ -18,6 +18,10 @@ export const useViewrToken = (
           user_identity,
           user_nickname
         );
+        console.log(
+          "비로그인시에도 혹은 구글로그인에서도 토큰이 생성되나요 ?",
+          viewer_token
+        );
         setToken(viewer_token);
 
         const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
