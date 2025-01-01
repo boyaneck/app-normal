@@ -47,10 +47,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   console.log("연결은? ??", connection_state);
   console.log("트랙은 ??", tracks);
   let content;
-
-  // //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
-  // if (connection_state !== ConnectionState.Connected) {
-  if (false) {
+  //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
+  if (connection_state !== ConnectionState.Connected) {
     content = (
       <p>
         Loading... room이 생성중 잠시만 기다려주세요요
@@ -59,8 +57,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         </p>
       </p>
     );
-    // } else if (!host_participant) {
-  } else if (false) {
+  } else if (!host_participant) {
     content = (
       <p>
         호스트가 방송중이 아닙니다다
@@ -70,8 +67,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         </p>
       </p>
     );
-  } else if (false) {
-    // } else if (tracks.length === 0) {
+  } else if (tracks.length === 0) {
     content = (
       <p>
         Loading... 이거 안나오나염 ??
@@ -89,7 +85,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       </div>
     );
   }
-
+  // if (true) {
+  //   return (<div>ddddzzzd
+  //     <LiveVideo participant={host_participant}
+  //   </div>)
+  // }
   return (
     <div className="aspect-video border-b group relative border border-green-500">
       Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`{content}
