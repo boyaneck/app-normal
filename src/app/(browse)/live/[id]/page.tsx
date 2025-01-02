@@ -30,24 +30,19 @@ const UserLivePage = () => {
   const [roomName, setRoomName] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewrToken(
-    user?.user_id || current_host_id,
+    user?.user_id,
     user?.user_nickname || current_host_nickname,
     current_host_id
   );
-
-  const roomer = "sssssssssssss";
-  const { room } = useLiveKitRoom({
-    token,
-    serverUrl: process.env.NEXT_PUBLIC_LIVEKIT_WS_URL,
-  });
+  // const { room } = useLiveKitRoom({
+  //   token,
+  //   serverUrl: process.env.NEXT_PUBLIC_LIVEKIT_WS_URL,
+  // });
   useEffect(() => {
     if (current_host_id) {
       setRoomName(current_host_id);
-      // console.log("useRoomContext", useRoomContext);
-      // console.log("useRoomInfo", useRoomInfo);
-      // console.log("LiveKitRoom", LiveKitRoom);
-      // console.log("유즈 라이브킷 룸", useLiveKitRoom);
-      // console.log(" 룸 에 대한 정보1!!0", room);
+
+      console.log(" 룸 에 대한 정보1!!0", current_host_id);
     }
   }, []);
 
