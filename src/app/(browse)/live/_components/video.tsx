@@ -1,56 +1,75 @@
 "use client";
 
-import React from "react";
-import { ConnectionState, Track } from "livekit-client";
+import React, { useEffect } from "react";
+import {
+  ConnectionState,
+  Track,
+  Participant,
+  Room,
+  ConnectionCheck,
+  RemoteParticipant,
+} from "livekit-client";
 import {
   useConnectionState,
   useTracks,
   useRemoteParticipant,
   useParticipants,
+  useRoomInfo,
+  UseRoomInfoOptions,
+  GridLayout,
+  ParticipantTile,
 } from "@livekit/components-react";
 import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
 import LiveVideo from "./live_video";
+import { Button } from "@/components/ui/button";
 
 interface VideoProps {
   host_name: string;
   host_identity: string;
+  token: string;
 }
-
-const Video = ({ host_name, host_identity }: VideoProps) => {
+const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
-  console.log("현재해당룸에 참여한 모든 유저의 정보", participants);
-  const object_host_participant = participants.find(
-    (participant) => participant.identity === host_identity
-  );
-  console.log(
-    "현재 스트리밍한 유저의 정보객체",
-    object_host_participant,
-    "그리고 ",
-    participants
-  );
+
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
+  useEffect(() => {
+    console.log("넘겨준 호스트 id", host_identity);
+    console.log("호스트:", host_participant);
+    console.log("현재 접속한 유저:", participants);
+    console.log("넘겨준 호스트 아이디", host_identity);
+  }, [connection_state, host_participant, participants]);
+
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
   ]).filter((track) => track.participant.identity === host_identity);
 
-  console.log("트랙을 한번 알아보자", tracks);
-
+  console.log("연결은? ??", connection_state);
+  console.log("트랙은 ??", tracks);
   let content;
-
-  if (!host_participant && connection_state === ConnectionState.Connected) {
+  //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
+  if (connection_state !== ConnectionState.Connected) {
     content = (
       <p>
-        host is offline host is offline host is offline
+        Loading... room이 생성중 잠시만 기다려주세요요
+        <p>
+          <Loading_Video label={connection_state} />
+        </p>
+      </p>
+    );
+  } else if (!host_participant) {
+    content = (
+      <p>
+        호스트가 방송중이 아닙니다다
         <p className="font-extrabold">is Offline !!@</p>
         <p>
           <Offline_Video user_name={host_name} />
         </p>
       </p>
     );
-  } else if (!host_participant || tracks.length === 0) {
+  } else if (tracks.length === 0) {
     content = (
       <p>
         Loading... 이거 안나오나염 ??
@@ -59,13 +78,24 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
         </p>
       </p>
     );
-  } else {
-    content = <p>Live video 가 지금 시작됩니다!!</p>;
+  } else if (true) {
+    content = (
+      <div>
+        에에에에에에 우소!!
+        <LiveVideo participant={host_participant} />
+        쭈르륵쭈르륵 빵핑봉 ;
+      </div>
+    );
   }
+  // if (true) {
+  //   return (<div>ddddzzzd
+  //     <LiveVideo participant={host_participant}
+  //   </div>)
+  // }
   return (
-    <div className="aspect-video border-b group relative">
-      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`
-      <LiveVideo participant={""} />
+    <div className="aspect-video border-b group relative border border-green-500">
+      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`{content}
+      {/* <LiveVideo participant={host_participant} /> */}
     </div>
   );
 };

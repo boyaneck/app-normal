@@ -26,16 +26,10 @@ const useSigninAndLogout = () => {
         if (session) {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
             setSessionUserEmail(session?.user?.email);
+            console.log("세션나와랴 얍얍얍", session.user?.email);
+            console.log("도대체 뭐가 ?", fetchedUserInfo);
             if (fetchedUserInfo) {
-              console.log(
-                "로그인한 유저의 아이디",
-                fetchedUserInfo?.id,
-                fetchedUserInfo,
-                "뚜르릅",
-                fetchedUserInfo.user_email,
-                fetchedUserInfo.user_nickname,
-                fetchedUserInfo.id
-              );
+              console.log("잘 페치드 되어지는데 왜 ??", fetchedUserInfo);
               const userInfo = {
                 user_id: fetchedUserInfo.id,
                 user_nickname: fetchedUserInfo.user_nickname,

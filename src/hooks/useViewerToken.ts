@@ -3,21 +3,27 @@ import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
 
 export const useViewrToken = (
-  host_identity: string | undefined,
-  host_nickname: string | undefined
+  user_identity: string | undefined,
+  user_nickname: string | undefined,
+  current_host_id: string | undefined
 ) => {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
   const [identity, setIdentity] = useState("");
 
   useEffect(() => {
+    console.log("토큰으로 현재 스트리머 아이디 보네기", current_host_id);
     const createToken = async () => {
       try {
         const viewer_token = await createViewerToken(
-          host_identity,
-          host_nickname
+          user_identity,
+          user_nickname,
+          current_host_id
         );
-        console.log("ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ", viewer_token);
+        console.log(
+          "비로그인시에도 혹은 구글로그인에서도 토큰이 생성되나요 ?",
+          viewer_token
+        );
         setToken(viewer_token);
 
         const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
@@ -37,8 +43,7 @@ export const useViewrToken = (
       }
     };
     createToken();
-    console.log("여기가 정지선입니다!!!!", typeof host_identity);
-  }, [host_identity]);
+  }, [user_identity]);
 
   return {
     token,

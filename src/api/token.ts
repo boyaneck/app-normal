@@ -2,54 +2,76 @@
 
 import { AccessToken } from "livekit-server-sdk";
 import { v4 } from "uuid";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 import { getUserInfo, getUserInfoById } from "./user";
-import { supabaseForClient } from "@/supabase/supabase_client";
 
 //supabase에서 유저의 db가져오기
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextRequest, NextResponse } from "next/server";
-import { updateSession } from "@/utils/supabase_middleware";
-import { createServer } from "http";
-import { createClient } from "@/utils/supabase_server";
+
 import { cookies } from "next/headers";
 
 // 수정된 createViewerToken 함수
 export const createViewerToken = async (
-  host_identity: string | undefined,
-  host_nickname: string | undefined
+  user_identity: string | undefined,
+  user_nickname: string | undefined,
+  current_host_id: string | undefined
 ) => {
   const cookie_store = await cookies();
-  const current_user_email = cookie_store.getAll()[0].value;
+
   let current_user_info;
-  try {
-    current_user_info = await getUserInfo(current_user_email);
-  } catch (error) {
-    const id = v4();
-    const user_name = `guest#${Math.floor(Math.random() * 1000)}`;
-    current_user_info = { id, user_name };
+  let current_user_email;
+  //현재 유저의 로그인 유무 확인
+  if (cookie_store.getAll().length >= 1) {
+    try {
+      current_user_email = cookie_store.getAll()[0].value;
+      current_user_info = await getUserInfo(current_user_email);
+    } catch (error) {
+      console.log("해당 방에 접속시 유저의 쿠키에 오류가 생겼습니다.", error);
+    }
+  } else {
+    try {
+      const id = v4();
+      const user_nickname = `게스트#${Math.floor(Math.random() * 1000)}`;
+      current_user_email = `게스트@#${Math.floor(Math.random() * 1000)}.com`;
+      current_user_info = { id, user_nickname, current_user_email };
+      console.log("로그인 유저가 업습니다", current_user_info);
+    } catch (error) {
+      console.log(
+        "해당 방에 접속시 유저의 쿠키가 존재하지 않으며, 오류가 생겼습니다.",
+        error
+      );
+    }
   }
 
-  // 스트리머의 아이디 정보 가져오기
-  // const host = await getUserInfoById(host_identity);
+  // 스트리머 혹은 현재 유저의 아이디 정보 가져오기
+  const host = await getUserInfoById(current_host_id);
 
-  const is_host = current_user_info?.id;
-  if (!host_identity) {
-    // throw new Error("User not Found");
+  const is_host = current_user_info?.id === host?.id;
+  console.log(
+    "이거는 false가 나와야 하는거 아니냐 ???",
+    is_host,
+    "현재유저",
+    user_identity,
+    "스트리머",
+    current_host_id
+  );
+  if (!user_identity) {
+    throw new Error("host_user not Found");
   }
 
+  console.log("구글 로그인시 유저의 정보는??", current_user_info);
+  console.log("구글 로그인시 유저의 이메일은 ???", current_user_email);
+  console.log("현재 로그인된 사람 호스트유무 확인", is_host);
   // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
     {
-      identity: host_identity,
-      name: host_nickname,
+      identity: is_host ? `host-${current_user_info.id}` : current_user_info.id,
+      name: current_user_email,
     }
   );
   token.addGrant({
-    room: host_identity,
+    room: user_identity,
     roomJoin: true,
     canPublish: false,
     canPublishData: true,
