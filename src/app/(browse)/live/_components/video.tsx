@@ -44,7 +44,9 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
-  ]).filter((track) => track.participant.identity === host_identity);
+  ]).filter(
+    (track) => track.participant.identity === host_participant?.identity
+  );
 
   console.log("연결은? ??", connection_state);
   console.log("트랙은 ??", tracks);
