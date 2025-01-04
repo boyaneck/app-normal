@@ -30,8 +30,8 @@ export const createViewerToken = async (
   } else {
     try {
       const id = v4();
-      const user_nickname = `게스트#${Math.floor(Math.random() * 1000)}`;
-      current_user_email = `게스트@#${Math.floor(Math.random() * 1000)}.com`;
+      const user_nickname = `게스트${Math.floor(Math.random() * 1000)}`;
+      current_user_email = `게스트@${Math.floor(Math.random() * 1000)}.com`;
       current_user_info = { id, user_nickname, current_user_email };
       console.log("로그인 유저가 업습니다", current_user_info);
     } catch (error) {
@@ -46,21 +46,11 @@ export const createViewerToken = async (
   const host = await getUserInfoById(current_host_id);
 
   const is_host = current_user_info?.id === host?.id;
-  console.log(
-    "이거는 false가 나와야 하는거 아니냐 ???",
-    is_host,
-    "현재유저",
-    user_identity,
-    "스트리머",
-    current_host_id
-  );
-  if (!user_identity) {
-    throw new Error("host_user not Found");
-  }
 
-  console.log("구글 로그인시 유저의 정보는??", current_user_info);
-  console.log("구글 로그인시 유저의 이메일은 ???", current_user_email);
-  console.log("현재 로그인된 사람 호스트유무 확인", is_host);
+  // if (!user_identity) {
+  //   throw new Error("host_user not Found");
+  // }
+
   // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
@@ -70,8 +60,9 @@ export const createViewerToken = async (
       name: current_user_email,
     }
   );
+  console.log("토큰은 과연 누구의 것인가 ??", token);
   token.addGrant({
-    room: user_identity,
+    room: current_host_id,
     roomJoin: true,
     canPublish: false,
     canPublishData: true,

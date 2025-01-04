@@ -31,18 +31,18 @@ const UserLivePage = () => {
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewrToken(
     user?.user_id,
-    user?.user_nickname || current_host_nickname,
+    user?.user_nickname,
     current_host_id
   );
-  // const { room } = useLiveKitRoom({
-  //   token,
-  //   serverUrl: process.env.NEXT_PUBLIC_LIVEKIT_WS_URL,
-  // });
+
   useEffect(() => {
     if (current_host_id) {
       setRoomName(current_host_id);
 
-      console.log(" 룸 에 대한 정보1!!0", current_host_id);
+      console.log(
+        " 현재 페이지 이동시 해당 호스트의 아이디디",
+        current_host_id
+      );
     }
   }, []);
 
@@ -55,6 +55,9 @@ const UserLivePage = () => {
     );
   }
 
+  console.log("호스트 닉네임 여기", current_host_nickname);
+  console.log("호스트 아이디 여기", current_host_id);
+  console.log("자 토큰  여기", token);
   return (
     <div>
       <button className="border border-red-300 ">버튼 얍</button>
