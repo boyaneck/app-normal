@@ -3,6 +3,7 @@ import { getLiveUser } from "@/api";
 import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
+import { useScreen } from "@/hooks/useScreen";
 import { cn } from "@/lib/utils";
 import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
@@ -10,6 +11,9 @@ import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import Video from "../../live/_components/video";
+import { LiveKitRoom } from "@livekit/components-react";
+import { useViewrToken } from "@/hooks/useViewerToken";
 
 interface User {
   id: string;
@@ -26,6 +30,9 @@ const Screen = () => {
     typeof user?.user_email === "string" ? user?.user_email : "";
   const { collapsed } = useSidebarStore();
   const { followMutation } = useFollow();
+  const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
+  const [tokens, setTokens] = useState<{ [userId: string]: string | null }>({});
+
   const {
     data: LiveUser,
     error,
@@ -45,12 +52,26 @@ const Screen = () => {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
+  const callit = async (user_id: string, user_nickname: string | undefined) => {
+    const { token } = useViewrToken(
+      user?.user_id,
+      user?.user_nickname,
+      user_id
+    );
+
+    setTokens((prev) => ({
+      ...prev,
+      [user_id]: token,
+    }));
+  };
   const onHandlerRouter = (
     user_id: string,
     user_nickname: string | undefined
   ) => {
     router.push(`/live/+?user_id=${user_id}&user_nickname=${user_nickname}`);
   };
+
+  // const {} = useScreen();
 
   const user_email = user?.user_email === undefined ? "" : user.user_email;
   const follow = (target_user_email: string, user_id: string) => {
@@ -72,6 +93,13 @@ const Screen = () => {
               onHandlerRouter(user.id, user.user_nickname);
               alert(user.user_nickname);
             }}
+            onMouseOver={(e) => {
+              setHoveredUserId(user.id);
+              setTimeout(() => {
+                callit(user.id, user.user_nickname);
+              }, 1000);
+            }}
+            onMouseOut={() => setHoveredUserId(null)}
           >
             {/* 스크린 컨테이너 */}
             <div className="h-40 bg-gray-200 mb-4 rounded-md flex items-center justify-center">
@@ -80,10 +108,29 @@ const Screen = () => {
                   onClick={() => {
                     follow(user.user_email, user.id);
                   }}
+                  className="border border-red-500"
                 />
-                스크린!!
                 {user.user_nickname}
               </span>
+              {hoveredUserId === user.id && tokens[user.id] && (
+                <LiveKitRoom
+                  video={true}
+                  audio={true}
+                  token={tokens[user.id]}
+                  serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+                  // room={room}
+                  className="border border-purple-500 grid grid-cols-1 lg:gap-y-0 lg:grid-cols-3
+                                        xl:grid-cols-3 2xl:grid-cols-6 h-full"
+                >
+                  <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-5 lg:overflow-y-auto hidden-scrollbar">
+                    <Video
+                      host_name={user.user_nickname}
+                      host_identity={user.id}
+                      token={tokens[user.id]}
+                    />
+                  </div>
+                </LiveKitRoom>
+              )}
             </div>
 
             {/* 아바타와 제목이 왼쪽 정렬 */}

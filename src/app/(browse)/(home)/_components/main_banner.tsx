@@ -13,8 +13,8 @@ const Main_banner = () => {
     }
   };
   return (
-    <div className="h-[500px]">
-      Main_banner
+    <div className="h-[500px] border border-green-500">
+      Main_bannersss
       <div>
         <button
           className="hover cursor-pointer border border-red-300"
