@@ -1,18 +1,14 @@
 "use client";
 import { getLiveUser } from "@/api";
-import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
-import { useScreen } from "@/hooks/useScreen";
 import { useViewrToken } from "@/hooks/useViewerToken";
-import { cn } from "@/lib/utils";
-import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import React, { EventHandler, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
 
 interface User {
@@ -39,16 +35,10 @@ const Screen = () => {
     queryFn: getLiveUser,
   });
 
-  // const useee = useRef({ id: "" });
-  // console.log("USE REF 확인", useee);
-  useEffect(() => {
-    if (LiveUser) {
-      setLiveUser(LiveUser);
-    }
-  }, [LiveUser]);
-
   const [host_id, setHost_id] = useState("");
-  const [host_nickname, setHost_nickname] = useState<string | undefined>("");
+  const [host_nickname, setHost_nickname] = useState<string | undefined>(
+    "유저없음"
+  );
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
   const { token, identity, name } = useViewrToken(
     host_id,
@@ -56,16 +46,20 @@ const Screen = () => {
     user?.user_id
   );
 
-  console.log("휘뚜루 마뚜루", host_id, host_nickname, chkPreviewForToken);
-  useEffect(() => {});
+  useEffect(() => {
+    if (LiveUser) {
+      setLiveUser(LiveUser);
+    }
+
+    setChkPreviewForToken(token);
+    console.log("떳냐 ???????????", token);
+    console.log("맞냐 ?????????", chkPreviewForToken);
+  }, [LiveUser, token]);
 
   if (isLoading) {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
-  //token를 이용해해 preview를 check
-
-  const onPreviewHandler = () => {};
   const callit = (
     user_id: string,
     user_nickname: string | undefined,
@@ -74,9 +68,8 @@ const Screen = () => {
     console.log("뿡밧풍커리");
     setHost_id(user_id);
     setHost_nickname(user_nickname);
-    setChkPreviewForToken(token);
-    alert("토큰은" + token);
   };
+  console.log("그 이후의 토큰", name, identity);
 
   const onHandlerRouter = (
     user_id: string,
@@ -84,6 +77,7 @@ const Screen = () => {
   ) => {
     router.push(`/live/+?user_id=${user_id}&user_nickname=${user_nickname}`);
   };
+
   const user_email = user?.user_email === undefined ? "" : user.user_email;
   const follow = (target_user_email: string, user_id: string) => {
     followMutation.mutate({
@@ -125,9 +119,9 @@ const Screen = () => {
                     }, 1000);
                   }}
                   onMouseLeave={() => {
-                    setHost_id("");
-                    setHost_nickname("");
-                    setChkPreviewForToken("");
+                    // setHost_id("");
+                    // setHost_nickname("");
+                    // setChkPreviewForToken("");
                   }}
                   className="border border-red-500"
                 />
