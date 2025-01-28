@@ -36,9 +36,10 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const host_participant = useRemoteParticipant(host_identity);
   useEffect(() => {
     console.log("넘겨준 호스트 id", host_identity);
+    console.log("호스트 닉네임", host_name);
+    console.log("토큰", token);
     console.log("호스트:", host_participant);
     console.log("현재 접속한 유저:", participants);
-    console.log("넘겨준 호스트 아이디", host_identity);
   }, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([

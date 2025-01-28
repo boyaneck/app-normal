@@ -13,6 +13,9 @@ export const useViewrToken = (
 
   useEffect(() => {
     console.log("토큰으로 현재 스트리머 아이디 보네기", current_host_id);
+    if (!current_host_id) {
+      return;
+    }
     const createToken = async () => {
       try {
         const viewer_token = await createViewerToken(
@@ -20,10 +23,7 @@ export const useViewrToken = (
           user_nickname,
           current_host_id
         );
-        console.log(
-          "비로그인시에도 혹은 구글로그인에서도 토큰이 생성되나요 ?",
-          viewer_token
-        );
+
         setToken(viewer_token);
 
         const decoded_token = jwtDecode(viewer_token) as JwtPayload & {
@@ -43,7 +43,7 @@ export const useViewrToken = (
       }
     };
     createToken();
-  }, [user_identity]);
+  }, [user_identity, current_host_id]);
 
   return {
     token,

@@ -1,4 +1,3 @@
-import Video from "@/app/(browse)/live/_components/video";
 import React from "react";
 
 const LiveScreen = () => {
