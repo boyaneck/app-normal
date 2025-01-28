@@ -3,7 +3,6 @@ import { supabaseForClient } from "@/supabase/supabase_client";
 import Image from "next/image";
 import React, { useState } from "react";
 const Signin = () => {
-  const [arbre, setArbre] = useState("");
   const getGoogleSocialLogin = async () => {
     try {
       await supabaseForClient.auth.signInWithOAuth({

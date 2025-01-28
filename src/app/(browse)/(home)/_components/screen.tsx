@@ -4,16 +4,16 @@ import { toggleFollow } from "@/api/follow";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
 import { useScreen } from "@/hooks/useScreen";
+import { useViewrToken } from "@/hooks/useViewerToken";
 import { cn } from "@/lib/utils";
 import useFollowedUserStore from "@/store/following_user";
 import { useSidebarStore } from "@/store/sidebar_store";
 import useUserStore from "@/store/user";
+import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { EventHandler, useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
-import { LiveKitRoom } from "@livekit/components-react";
-import { useViewrToken } from "@/hooks/useViewerToken";
 
 interface User {
   id: string;
@@ -30,9 +30,6 @@ const Screen = () => {
     typeof user?.user_email === "string" ? user?.user_email : "";
   const { collapsed } = useSidebarStore();
   const { followMutation } = useFollow();
-  const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
-  const [tokens, setTokens] = useState<{ [userId: string]: string | null }>({});
-
   const {
     data: LiveUser,
     error,
@@ -42,37 +39,51 @@ const Screen = () => {
     queryFn: getLiveUser,
   });
 
+  // const useee = useRef({ id: "" });
+  // console.log("USE REF 확인", useee);
   useEffect(() => {
     if (LiveUser) {
       setLiveUser(LiveUser);
     }
   }, [LiveUser]);
 
+  const [host_id, setHost_id] = useState("");
+  const [host_nickname, setHost_nickname] = useState<string | undefined>("");
+  const [chkPreviewForToken, setChkPreviewForToken] = useState("");
+  const { token, identity, name } = useViewrToken(
+    host_id,
+    host_nickname,
+    user?.user_id
+  );
+
+  console.log("휘뚜루 마뚜루", host_id, host_nickname, chkPreviewForToken);
+  useEffect(() => {});
+
   if (isLoading) {
     return <div>데이터 가져오는 중입니다</div>;
   }
 
-  const callit = async (user_id: string, user_nickname: string | undefined) => {
-    const { token } = useViewrToken(
-      user?.user_id,
-      user?.user_nickname,
-      user_id
-    );
+  //token를 이용해해 preview를 check
 
-    setTokens((prev) => ({
-      ...prev,
-      [user_id]: token,
-    }));
+  const onPreviewHandler = () => {};
+  const callit = (
+    user_id: string,
+    user_nickname: string | undefined,
+    e: React.MouseEvent<HTMLElement>
+  ) => {
+    console.log("뿡밧풍커리");
+    setHost_id(user_id);
+    setHost_nickname(user_nickname);
+    setChkPreviewForToken(token);
+    alert("토큰은" + token);
   };
+
   const onHandlerRouter = (
     user_id: string,
     user_nickname: string | undefined
   ) => {
     router.push(`/live/+?user_id=${user_id}&user_nickname=${user_nickname}`);
   };
-
-  // const {} = useScreen();
-
   const user_email = user?.user_email === undefined ? "" : user.user_email;
   const follow = (target_user_email: string, user_id: string) => {
     followMutation.mutate({
@@ -82,6 +93,7 @@ const Screen = () => {
     });
     alert("팔로우가 되었습니다");
   };
+
   return (
     <div className="grid grid-cols-4 gap-2">
       {liveuser.length > 0 ? (
@@ -93,44 +105,50 @@ const Screen = () => {
               onHandlerRouter(user.id, user.user_nickname);
               alert(user.user_nickname);
             }}
-            onMouseOver={(e) => {
-              setHoveredUserId(user.id);
-              setTimeout(() => {
-                callit(user.id, user.user_nickname);
-              }, 1000);
-            }}
-            onMouseOut={() => setHoveredUserId(null)}
           >
+            <div className="border border-green-400">이 div 엘리먼트 참조</div>
             {/* 스크린 컨테이너 */}
             <div className="h-40 bg-gray-200 mb-4 rounded-md flex items-center justify-center">
               <span className="text-xl font-semibold text-gray-700">
+                <div className="border border-red-500"></div>
                 <Button
                   onClick={() => {
                     follow(user.user_email, user.id);
                   }}
+                  onMouseEnter={(e) => {
+                    setTimeout(() => {
+                      callit(user.id, user.user_nickname, e);
+                      // useee.current = {
+                      //   ...useee.current,
+                      //   id: user.id,
+                      // };
+                    }, 1000);
+                  }}
+                  onMouseLeave={() => {
+                    setHost_id("");
+                    setHost_nickname("");
+                    setChkPreviewForToken("");
+                  }}
                   className="border border-red-500"
                 />
+                <div className="border border-green-400"></div>
+                스크린!!
+                {token === chkPreviewForToken && user.id === host_id && (
+                  <LiveKitRoom
+                    video={true}
+                    audio={true}
+                    token={token}
+                    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+                  >
+                    <Video
+                      host_name={name}
+                      host_identity={identity}
+                      token={token}
+                    />
+                  </LiveKitRoom>
+                )}
                 {user.user_nickname}
               </span>
-              {hoveredUserId === user.id && tokens[user.id] && (
-                <LiveKitRoom
-                  video={true}
-                  audio={true}
-                  token={tokens[user.id]}
-                  serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-                  // room={room}
-                  className="border border-purple-500 grid grid-cols-1 lg:gap-y-0 lg:grid-cols-3
-                                        xl:grid-cols-3 2xl:grid-cols-6 h-full"
-                >
-                  <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-5 lg:overflow-y-auto hidden-scrollbar">
-                    <Video
-                      host_name={user.user_nickname}
-                      host_identity={user.id}
-                      token={tokens[user.id]}
-                    />
-                  </div>
-                </LiveKitRoom>
-              )}
             </div>
 
             {/* 아바타와 제목이 왼쪽 정렬 */}
