@@ -12,7 +12,6 @@ export const useViewrToken = (
   const [identity, setIdentity] = useState("");
 
   useEffect(() => {
-    console.log("토큰으로 현재 스트리머 아이디 보네기", current_host_id);
     if (!current_host_id) {
       return;
     }

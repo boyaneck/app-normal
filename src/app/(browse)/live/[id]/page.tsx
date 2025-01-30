@@ -11,12 +11,6 @@ import {
 } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
-import {
-  Room,
-  ConnectionCheck,
-  ConnectionState,
-  RoomEvent,
-} from "livekit-client";
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("user_id");
