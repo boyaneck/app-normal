@@ -34,13 +34,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
 
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-  useEffect(() => {
-    console.log("넘겨준 호스트 id", host_identity);
-    console.log("호스트 닉네임", host_name);
-    console.log("토큰", token);
-    console.log("호스트:", host_participant);
-    console.log("현재 접속한 유저:", participants);
-  }, [connection_state, host_participant, participants]);
+  useEffect(() => {}, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
     Track.Source.Camera,
@@ -49,8 +43,6 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     (track) => track.participant.identity === host_participant?.identity
   );
 
-  console.log("연결은? ??", connection_state);
-  console.log("트랙은 ??", tracks);
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
   if (connection_state !== ConnectionState.Connected) {
@@ -75,7 +67,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   } else if (tracks.length === 0) {
     content = (
       <p>
-        Loading... 이거 안나오나염 ??
+        {host_participant?.identity}
+        ///////
         <p>
           <Loading_Video label={connection_state} />
         </p>
@@ -84,9 +77,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   } else if (true) {
     content = (
       <div>
-        에에에에에에 우소!!
         <LiveVideo participant={host_participant} />
-        쭈르륵쭈르륵 빵핑봉 ;
       </div>
     );
   }
@@ -97,7 +88,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   // }
   return (
     <div className="aspect-video border-b group relative border border-green-500">
-      Video 컴포넌트인데 아무것도 안나옴 ?<div>ddddddddd</div>`{content}
+      {content}
       {/* <LiveVideo participant={host_participant} /> */}
     </div>
   );

@@ -20,7 +20,6 @@ interface User {
 }
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
-  const router = useRouter();
   const { user } = useUserStore((state) => state);
   const current_user_email =
     typeof user?.user_email === "string" ? user?.user_email : "";
@@ -35,25 +34,24 @@ const Screen = () => {
     queryFn: getLiveUser,
   });
 
+  const router = useRouter();
   const [host_id, setHost_id] = useState("");
   const [host_nickname, setHost_nickname] = useState<string | undefined>(
     "유저없음"
   );
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
   const { token, identity, name } = useViewrToken(
-    host_id,
-    host_nickname,
-    user?.user_id
+    user?.user_nickname,
+    user?.user_id,
+    host_id
   );
-
+  1;
   useEffect(() => {
     if (LiveUser) {
       setLiveUser(LiveUser);
     }
-
+    alert("그럼 뜨냐 ???");
     setChkPreviewForToken(token);
-    console.log("떳냐 ???????????", token);
-    console.log("맞냐 ?????????", chkPreviewForToken);
   }, [LiveUser, token]);
 
   if (isLoading) {
@@ -65,11 +63,10 @@ const Screen = () => {
     user_nickname: string | undefined,
     e: React.MouseEvent<HTMLElement>
   ) => {
-    console.log("뿡밧풍커리");
+    console.log("뿡밧풍커리", user_id, user_nickname);
     setHost_id(user_id);
     setHost_nickname(user_nickname);
   };
-  console.log("그 이후의 토큰", name, identity);
 
   const onHandlerRouter = (
     user_id: string,
@@ -128,18 +125,20 @@ const Screen = () => {
                 <div className="border border-green-400"></div>
                 스크린!!
                 {token === chkPreviewForToken && user.id === host_id && (
-                  <LiveKitRoom
-                    video={true}
-                    audio={true}
-                    token={token}
-                    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-                  >
-                    <Video
-                      host_name={name}
-                      host_identity={identity}
+                  <span className="border border-red-400 w-[200px]">
+                    <LiveKitRoom
+                      video={true}
+                      audio={true}
                       token={token}
-                    />
-                  </LiveKitRoom>
+                      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+                    >
+                      <Video
+                        host_name={name}
+                        host_identity={identity}
+                        token={chkPreviewForToken}
+                      />
+                    </LiveKitRoom>
+                  </span>
                 )}
                 {user.user_nickname}
               </span>
