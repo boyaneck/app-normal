@@ -12,13 +12,9 @@ export const useViewrToken = (
   const [identity, setIdentity] = useState("");
 
   useEffect(() => {
-    console.log("user_identity", user_identity);
-    console.log("user_nickname", user_nickname);
-    console.log("current_host_id", current_host_id);
     if (!current_host_id) {
       return;
     }
-    console.log("여기 타나요 ?");
     const createToken = async () => {
       try {
         const viewer_token = await createViewerToken(

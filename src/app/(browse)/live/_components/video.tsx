@@ -31,7 +31,6 @@ interface VideoProps {
 }
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
-
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
   useEffect(() => {}, [connection_state, host_participant, participants]);
@@ -42,6 +41,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   ]).filter(
     (track) => track.participant.identity === host_participant?.identity
   );
+  console.log("participants", participants);
+  console.log("connection_state", connection_state);
+  console.log("host_participant.identity", host_participant?.identity);
+  console.log("host_participant", host_participant);
+  console.log("tracks", tracks);
 
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때

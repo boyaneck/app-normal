@@ -39,13 +39,14 @@ const Screen = () => {
   const [host_nickname, setHost_nickname] = useState<string | undefined>(
     "유저없음"
   );
+
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
   const { token, identity, name } = useViewrToken(
     user?.user_nickname,
     user?.user_id,
     host_id
   );
-  1;
+
   useEffect(() => {
     if (LiveUser) {
       setLiveUser(LiveUser);
@@ -135,7 +136,7 @@ const Screen = () => {
                       <Video
                         host_name={name}
                         host_identity={identity}
-                        token={chkPreviewForToken}
+                        token={token}
                       />
                     </LiveKitRoom>
                   </span>
