@@ -41,17 +41,9 @@ const UserLivePage = () => {
   }, []);
 
   if (!token || !name || !identity) {
-    return (
-      <div>
-        Cannot watch the stream 토큰이 없을 경우 근데 비로그인 유저도 볼 수
-        있어야 하는거 아닌가 ?
-      </div>
-    );
+    return <div>Cannot watch the stream</div>;
   }
 
-  console.log("호스트 닉네임 여기", current_host_nickname);
-  console.log("호스트 아이디 여기", current_host_id);
-  console.log("자 토큰  여기", token);
   return (
     <div>
       <button className="border border-red-300 ">버튼 얍</button>

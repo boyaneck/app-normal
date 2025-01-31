@@ -19,6 +19,7 @@ export const createViewerToken = async (
 
   let current_user_info;
   let current_user_email;
+  let current_user_nickname;
   //현재 유저의 로그인 유무 확인
   if (cookie_store.getAll().length >= 1) {
     try {
@@ -42,7 +43,7 @@ export const createViewerToken = async (
     }
   }
 
-  // 스트리머 혹은 현재 유저의 아이디 정보 가져오기
+  // 스트리머의 모든 정보 가져오기
   const host = await getUserInfoById(current_host_id);
 
   const is_host = current_user_info?.id === host?.id;
