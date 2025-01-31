@@ -36,14 +36,12 @@ const Screen = () => {
 
   const router = useRouter();
   const [host_id, setHost_id] = useState("");
-  const [host_nickname, setHost_nickname] = useState<string | undefined>(
-    "유저없음"
-  );
+  const [host_nickname, setHost_nickname] = useState<string>("유저없음");
 
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
   const { token, identity, name } = useViewrToken(
-    user?.user_nickname,
     user?.user_id,
+    user?.user_nickname,
     host_id
   );
 
@@ -61,7 +59,7 @@ const Screen = () => {
 
   const callit = (
     user_id: string,
-    user_nickname: string | undefined,
+    user_nickname: string,
     e: React.MouseEvent<HTMLElement>
   ) => {
     console.log("뿡밧풍커리", user_id, user_nickname);
@@ -134,8 +132,8 @@ const Screen = () => {
                       serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
                     >
                       <Video
-                        host_name={name}
-                        host_identity={identity}
+                        host_name={host_nickname}
+                        host_identity={host_id}
                         token={token}
                       />
                     </LiveKitRoom>

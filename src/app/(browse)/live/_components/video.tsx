@@ -41,6 +41,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   ]).filter(
     (track) => track.participant.identity === host_participant?.identity
   );
+  console.log("host_name", host_name, "host_identity", host_identity);
   console.log("participants", participants);
   console.log("connection_state", connection_state);
   console.log("host_participant.identity", host_participant?.identity);

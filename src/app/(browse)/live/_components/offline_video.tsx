@@ -3,7 +3,7 @@ import { WifiOff } from "lucide-react";
 import React from "react";
 
 interface OfflineVideoProps {
-  user_name: string;
+  user_name: string | undefined;
 }
 
 const Offline_Video = ({ user_name }: OfflineVideoProps) => {
