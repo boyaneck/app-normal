@@ -1,22 +1,24 @@
-import { createIngress } from "@/api";
+import { createIngress, getLiveUser } from "@/api";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
-import React from "react";
+import React, { useState } from "react";
 import Video from "../../live/_components/video";
 import { useViewrToken } from "@/hooks/useViewerToken";
+import { useQuery } from "@tanstack/react-query";
 
 const Main_banner = () => {
+  const [live_user, set_live_user] = useState<User[]>([]);
   const { user } = useUserStore((state) => state);
+  const {
+    data: LiveUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["LiveUser"],
+    queryFn: getLiveUser,
+  });
 
-  // const { token } = useViewrToken(user?.user_id, user?.user_nickname, "");
-  const onyva = () => {
-    try {
-      createIngress(1, user);
-      alert("s");
-    } catch (error) {
-      alert("에러가발생했어요!");
-    }
-  };
+  const { token } = useViewrToken("Guest", "Guest", "");
 
   return (
     <div
@@ -37,22 +39,14 @@ const Main_banner = () => {
           xl:grid-cols-3 2xl:grid-cols-6 h-full"
         >
           <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-5 lg:overflow-y-auto hidden-scrollbar">
-             <Video
+            <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-           />
+            />
           </div>
         </LiveKitRoom>
       )} */}
-      <div>
-        <button
-          className="hover cursor-pointer border border-red-300"
-          onClick={onyva}
-        >
-          dd
-        </button>
-      </div>
     </div>
   );
 };
