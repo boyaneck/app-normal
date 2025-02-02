@@ -11,13 +11,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
 
-interface User {
-  id: string;
-  name: string;
-  user_email: string;
-  user_nickname?: string;
-  avatar_url: string;
-}
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
   const { user } = useUserStore((state) => state);
@@ -36,7 +29,9 @@ const Screen = () => {
 
   const router = useRouter();
   const [host_id, setHost_id] = useState("");
-  const [host_nickname, setHost_nickname] = useState<string>("유저없음");
+  const [host_nickname, setHost_nickname] = useState<string | undefined>(
+    "유저없음"
+  );
 
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
   const { token, identity, name } = useViewrToken(
@@ -59,7 +54,7 @@ const Screen = () => {
 
   const callit = (
     user_id: string,
-    user_nickname: string,
+    user_nickname: string | undefined,
     e: React.MouseEvent<HTMLElement>
   ) => {
     console.log("뿡밧풍커리", user_id, user_nickname);
@@ -114,10 +109,11 @@ const Screen = () => {
                       // };
                     }, 1000);
                   }}
-                  onMouseLeave={() => {
+                  onMouseOut={() => {
                     // setHost_id("");
                     // setHost_nickname("");
                     // setChkPreviewForToken("");
+                    // alert("마우스 때기 ");
                   }}
                   className="border border-red-500"
                 />
@@ -134,7 +130,7 @@ const Screen = () => {
                       <Video
                         host_name={host_nickname}
                         host_identity={host_id}
-                        token={token}
+                        token={chkPreviewForToken}
                       />
                     </LiveKitRoom>
                   </span>

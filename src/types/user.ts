@@ -6,3 +6,11 @@ declare interface userData {
   isLive: boolean;
   user_id: string;
 }
+
+declare interface User {
+  id: string;
+  name: string;
+  user_email: string;
+  user_nickname?: string;
+  avatar_url: string;
+}

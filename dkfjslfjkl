@@ -1,0 +1,1313 @@
+[33mcommit 20c63ea57049d8df126448d28122895fbf5ac16a[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/home[m[33m, [m[1;31morigin/feature/home[m[33m)[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Feb 1 05:00:41 2025 +0900
+
+    [CHORES] Video 컴포넌트의 인수를 호스트의 정보가 아닌 해당 유저의 정보로 넘겨주는 오류 수정
+
+[33mcommit 8604c7e6b6f2c19e47c28ddd94cc6177f7860d6b[m
+Merge: ddfd582 ac441b0
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Jan 30 23:06:56 2025 +0900
+
+    Merge pull request #51 from boyaneck/feature/home
+    
+    Feature/home: [CHORES] Hover시 host 아이디와 remoteParticipant의 불일치 오류 발생
+
+[33mcommit ac441b01e07b891ce5243c0a7fa2013f86a3a8f8[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 30 23:05:35 2025 +0900
+
+    [CHORES] hover할 경우에만 토큰의 host id와 remoteParticipant와 일치하지 않는 오류 찾는중
+
+[33mcommit 36eb5ca6df7b1037a0a7d12b0a6b569268b46d75[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 30 22:38:47 2025 +0900
+
+    [CHORES] useViewerToken의 host_id의  매개변수 순서가 잘못되어있었음 1번->3번째로 변경
+
+[33mcommit ddfd582bd0b55f3512eb19e48cc373f120d6a0cd[m
+Merge: 929aade b4d24a7
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Jan 28 23:50:59 2025 +0900
+
+    Merge pull request #50 from boyaneck/feature/home
+    
+    handling on async function "UseViewerToken"
+
+[33mcommit b4d24a7ee0988e8c53539553f4ee7e35d3f85f09[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jan 28 23:49:14 2025 +0900
+
+    [CHORES] 스트리밍 미리보기 기능 작업중: token 비동기 처리 오류
+
+[33mcommit 13a944a29c2c89cff572a9a24de124631b995c9f[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jan 28 20:12:49 2025 +0900
+
+    [CHORES] 해당 스트리밍 호버시 미리보기 기능 작업중
+
+[33mcommit 089649932b0eb8fe85d4ece1de3a564d2ae0fdbe[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 9 05:14:50 2025 +0900
+
+    [CHORES] 해당 방송 마우스 HOVER시 동영상 작동 기능 진행중
+
+[33mcommit 929aade67180a5b39799a78cf4e8e7bb798ff62a[m
+Merge: c2ab4b9 fd18ac5
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Jan 4 23:35:54 2025 +0900
+
+    Merge pull request #49 from boyaneck/feature/home
+    
+    [CHORES] addgrant의 room 값이 현재 로그인한 유저로 설정되어있음 -> 해당 스트리머의 아이 변경
+
+[33mcommit fd18ac56208fee9a67773639cd0e199c8fd72780[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Jan 4 20:24:13 2025 +0900
+
+    [CHORES] addgrant의 room 값이 현재 로그인한 유저로 설정되어있음 -> 해당 스트리머의 아이 변경
+
+[33mcommit c2ab4b960852d0770dca090d7cc17da3687e9d4a[m
+Merge: 137eae6 5253351
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Jan 2 23:41:55 2025 +0900
+
+    Merge pull request #48 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 5253351a00ebf35d3b2993a5bcffdad23c910865[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 2 23:41:18 2025 +0900
+
+    [CHORES] local유저와 remote 유저가 동일할때만 방송이 송출되는 오류 수정중
+
+[33mcommit ea4cf09785a9d4a852b463cb5e4b4b72de8f346d[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 2 04:55:09 2025 +0900
+
+    [CHORES] 비로그인 유저도 입장시 라이브방송 시청가능
+
+[33mcommit 61c0b4ba370ebb98fea8b51f5fc5faed239c8ff8[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jan 2 04:36:45 2025 +0900
+
+    [CHORES] token.ts에서 잘못된 else if 문 -> else 로 변경하여 비로그인시 임시의 id,name 설정 오류 수정
+
+[33mcommit 7b375eee5a7b62623dd39f00c5055c4bd3e9a842[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 23 23:32:04 2024 +0900
+
+    [CHORE] 처음에는 연결되었으나, 몇 초후 끊키는 현상 발생
+
+[33mcommit fa5bc56578a09007e52ac6c229afb9bb55c184f7[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 23 07:08:41 2024 +0900
+
+    [CHORE] 유저로 로그인하여 방송중인 방에 입장하여도, 같은 room 에 입장하지 않는 오류로 인해 token 생성시 현재 유저일때와 호스트 일때를 구분하여 토큰을 생성하도록 수정
+
+[33mcommit 137eae6fe7664145fdd7e6148eb4cfd3608ce1be[m
+Merge: 91fda5e ecea4df
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Dec 9 23:43:35 2024 +0900
+
+    Merge pull request #47 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit ecea4dff016f16adf0980829f443b08ccbb9cc6d[m
+Merge: cc860f2 91fda5e
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 9 23:42:28 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit cc860f201d58d981086454ea3002c60c8deaf97f[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 9 23:42:21 2024 +0900
+
+    [CHORE] 원인:OBS 작동시 비디오가 생기지 않
+    음  해결방법추론:1. LivekitRoom 안에서 useConnectionState에 제대로된 정보가 오지 않아  관련 오류 해결 요
+    구  2.Ingress 생성시 현재 로그인한 유저의 정보와 생성시 보낸 정보와 일치 X
+    결론: 두가지를 확인하여 문제해결할것!
+
+[33mcommit 4f4d3666d1dd081704ba0ea0d7b6a231cca39eda[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Dec 8 03:49:24 2024 +0900
+
+    [CHORE] 해당 라이브방에 입장하는 유저와 라이브 중인 유저의 id와 nickname을 잘못 기입 + zustand에 라이브시 필요한 user_id를 추가함
+
+[33mcommit 91fda5e0a8728fcc27c3ed4286fff7b18dd8a9ab[m
+Merge: 41a1226 f1d2f94
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Dec 6 23:18:50 2024 +0900
+
+    Merge pull request #46 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit f1d2f94ebb79db3b24c578ac6dbc59905f585da8[m
+Merge: 453aa6b 41a1226
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Dec 6 23:18:23 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 453aa6bdd88b2cf50b8fd4da3586c19c8a03f763[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Dec 6 19:36:24 2024 +0900
+
+    [CHORE] RoomProvided 문제 해결 -> LivekitRoom 컴포넌트 안에서 useConnectionState를 사용해야함
+
+[33mcommit 41a122680e7180d48941b3aee8de29cb44322560[m
+Merge: d889da6 37f48d6
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Dec 4 22:24:41 2024 +0900
+
+    Merge pull request #45 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 37f48d6fc070b0d8f64fd8d8775c712ddf30d4d3[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Dec 4 22:24:09 2024 +0900
+
+    [CHORE] room 객체를 생성해 useConnectionState에 인수로 넣으려고 했으나, RoomProvider를 사용하는 것도 생각중
+
+[33mcommit a5783d4be6fa8112d566c185d3d7561c5c1c1d41[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Dec 4 22:03:36 2024 +0900
+
+    [CHORE] livekit provider 관련 오류 수정중
+
+[33mcommit 6f632a36001f905d85df329fa5208249abb48f64[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Dec 3 05:10:31 2024 +0900
+
+    [CHORE] 우선은 token 까지 생성
+
+[33mcommit d889da63e236b785c400f9b7727c0bc9eb7149b1[m
+Merge: 6e12c38 62d67f3
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Dec 3 05:03:33 2024 +0900
+
+    Merge pull request #44 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 62d67f3899b49710f4b8c0001b4d59180bea01ec[m
+Merge: dbf6208 6e12c38
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Dec 3 05:02:56 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit dbf620858f8172f14f9135a33a91db698bdb7fa6[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Dec 3 04:47:56 2024 +0900
+
+    [CHORE] router.push에서 경로 오류 수정 완료 + Query String 잘 넘어감
+
+[33mcommit a24fe290b113c80da8801bbd6397f51ce48680ee[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Dec 3 04:42:06 2024 +0900
+
+    [CHORE] Query String을 통해 id와 nickname 넘기기
+
+[33mcommit 6e12c38b1f495cf84ad35cf2717f3361b3e23e1a[m
+Merge: d9b019c 507b275
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Dec 2 05:31:04 2024 +0900
+
+    Merge pull request #43 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 507b2759ca21dc18ca04e523af551d88989c85fe[m
+Merge: e78a79e d9b019c
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 2 05:29:49 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit e78a79ea7d5bf5f8e3cb7440bd9bb48841bb7ba6[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Dec 2 05:29:44 2024 +0900
+
+    [CHORE] 홈의 라이브 화면 클릭시 해당 스트리머의 라이브 페이지로 넘어감,[해야할것] = 동시에 토큰 생성 + 스트리밍
+
+[33mcommit d9b019c4eca73e81d3a9937fd289108818d2ecd1[m
+Merge: 222917b ce61570
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Nov 29 23:36:54 2024 +0900
+
+    Merge pull request #42 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit ce61570be2b9ac202f1d0d825a88e6da189dcd5b[m
+Merge: 23107b9 222917b
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Nov 29 23:35:58 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 23107b9a607a4d001358e576ac74af1c43472363[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Nov 29 23:35:50 2024 +0900
+
+    [CHORE] 하 이걸못한다고?? 잘 해보자...서버에서 유저의 정보 받아오기
+
+[33mcommit 4a0b5d70973149ed9e39486d088a9bcfd72e7622[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Nov 29 01:37:09 2024 +0900
+
+    [CHORE] auth-helper를 이용해 세션정보 얻기위해 설치
+
+[33mcommit 222917bf46cb5252bb4698737aa9ff30f290d7d1[m
+Merge: 9f9ace4 470558b
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Nov 27 23:52:35 2024 +0900
+
+    Merge pull request #41 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 470558b1ff5308112abeb69040baf9f467f56d96[m
+Merge: c73bd2b 9f9ace4
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 27 23:52:07 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit c73bd2b8a4a8e01def1f46d7c208eed62c7be7dd[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 27 23:52:00 2024 +0900
+
+    [CHORE] 단순 API 오류와, 현재 토큰이 생성되지 않는 문제 찾는중
+
+[33mcommit 9f9ace49b405a051ddf81c766f616fefc3759b5c[m
+Merge: 7935c7b b85ee54
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Nov 26 23:47:22 2024 +0900
+
+    Merge pull request #40 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit b85ee5461c43e097a07d117c68fbbec129ecd53b[m
+Merge: 3c58503 7935c7b
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Nov 26 23:43:02 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 3c58503dc05e05a06f38af4915839edade1e1c53[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Nov 26 23:42:57 2024 +0900
+
+    [CHORE] 라이브 스트리밍 관련 디렉터리 구조 변경 및 useViewrToken 수정중
+
+[33mcommit 7935c7b60a5213bd0aea51d90d70e2a9f263e7e6[m
+Merge: c7f966e d467ecf
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Nov 25 23:53:29 2024 +0900
+
+    Merge pull request #39 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit d467ecff30a83baa931a46bbaa2c5bd19b28dcdb[m
+Merge: f54c32a c7f966e
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 25 23:53:01 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit f54c32ae605aefe3a4740c962a73999bb0b64a99[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 25 23:52:56 2024 +0900
+
+    [CHORE] 비디오 화면 컴포넌트 생성중 , 현재 제대로 작동은 안됨, 수정 필요함
+
+[33mcommit 485ac14beaf6bc8ff4edff35fbb0d3f47725caa9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Nov 24 07:02:57 2024 +0900
+
+    [CHORE] 권장되는 supabase/ssr 를 설치
+
+[33mcommit 1c15f3df2476b007801fe6da26e4d0ec0d9f8a14[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Nov 24 07:01:33 2024 +0900
+
+    [CHORE] auth-helpers-nextjs는 현재 권장되지 않는 라이브러리이므로 삭제
+
+[33mcommit e64345646f3a7910c7c7ffc72a5bfbd3bf60567d[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Nov 24 06:52:44 2024 +0900
+
+    [CHORE] 토큰생성시 유저의 정보를 서버에서 가져오기 위해 supabase/auth-helpers-nextjs 설치
+
+[33mcommit c7f966e0f8bf857944631e68f046340c5aef3f23[m
+Merge: b1d21ac 8d2e287
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Nov 23 22:49:45 2024 +0900
+
+    Merge pull request #38 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 8d2e287b0fa8c498100f4e4dcc4f90ed2e4512ec[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Nov 23 22:48:34 2024 +0900
+
+    [CHORE] token 생성 코드 수정
+
+[33mcommit 75fd3d677555dd1b7f944f3162c6df9981571f54[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Nov 21 00:26:50 2024 +0900
+
+    [BUILD] token 생성시 필요한 방의 id를 위한 uuid, type/uuid 설치
+
+[33mcommit b1d21ac0a4e83a6f392c13cb0ea7baf8fedb367e[m
+Merge: 1f29d91 2f15d60
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Nov 20 23:51:35 2024 +0900
+
+    Merge pull request #37 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 2f15d6083a29a9af00f85f8e0241963c1b81f35e[m
+Merge: 7302413 1f29d91
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 20 23:48:46 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 730241318b0044ec78d5eccdb91093d8f1cc2367[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 20 23:48:41 2024 +0900
+
+    [CHORE] viertoken 관련 로직 생성중
+
+[33mcommit 6e276f24c240c6177326b0a5319aa18f1f699498[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 20 22:50:59 2024 +0900
+
+    [CHORE] 스트리밍 방에 입장 허가 토큰 생성을 위해 jwt-decode 라이브러리 설치
+
+[33mcommit c32e096a3f480ee8af9f878479d8b255e1bfcdb1[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Nov 20 22:41:27 2024 +0900
+
+    [CHROE] Stream_Player와 creator 페이지 기본 틀 생성
+
+[33mcommit 1f29d9162ce6ab0a9cadd3def36d0306e51892ef[m
+Merge: df732cf 1f30a96
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Nov 18 23:56:12 2024 +0900
+
+    Merge pull request #36 from boyaneck/feature/home
+    
+    [CHORE] 툴박스 및 관련 기본 아이콘 추가
+
+[33mcommit 1f30a9641d6d516fed83f50731d38f2f0eaa9247[m
+Merge: 38cf4e5 df732cf
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 18 23:55:03 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 38cf4e5969769188797b004a0425b5d780245729[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 18 23:54:55 2024 +0900
+
+    [CHORE] 툴박스 및 관련 기본 아이콘 추가
+
+[33mcommit 8e0602337ab1f6f6777e0f6a71d0bd8e044c2a08[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 18 22:04:27 2024 +0900
+
+    [FEAT]  왼쪽 상단 -> 오른쪽 하단으로 생기는 tooltip 완성
+
+[33mcommit 481a8783e3eaaa193569ac357fe17744996e1dbd[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 18 06:21:57 2024 +0900
+
+    [UPDATE] tooltip 효과 1차완료
+
+[33mcommit df732cf75df7a2e6ebc44648667739678ec62f54[m
+Merge: 2858acb c8966dd
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Nov 18 06:09:10 2024 +0900
+
+    Merge pull request #35 from boyaneck/feature/home
+    
+    [UPDATE] 팔로우한 스트리머의 is_live가 true일때는 live표시 빨간불이 false 일때는 아무런 효과 X
+
+[33mcommit c8966ddb5429c21ae930ef30cbb79eafdda1f42c[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Nov 18 06:07:50 2024 +0900
+
+    [UPDATE] 팔로우한 스트리머의 is_live가 true일때는 live표시 빨간불이 false 일때는 아무런 효과 X
+
+[33mcommit 2858acb5fc5469d14f92db17b191bdb82cfb65f4[m
+Merge: 7244ba0 7c7b8ae
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Nov 8 23:48:14 2024 +0900
+
+    Merge pull request #34 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 7c7b8aea23f39be07d201d645107b7a9a8a0a12a[m
+Merge: b216494 7244ba0
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Nov 8 23:43:12 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit b216494e779c9b1ff5f5bb47165d42a75a54860b[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Nov 8 23:42:36 2024 +0900
+
+    [UPDATE] Ingress 생성시 생기는 오류 해결
+
+[33mcommit 7244ba050e8a27ed1458c25ee1b468ac87e31d94[m
+Merge: 3c70ff3 5ecaa51
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Oct 30 23:29:11 2024 +0900
+
+    Merge pull request #33 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 5ecaa511a97dd4b1b9e80f16e86f211c4e01427e[m
+Merge: b5df1cb 3c70ff3
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Oct 30 23:28:40 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit b5df1cb5361c7661eb808e86feac1c9be5fc335b[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Oct 30 23:28:36 2024 +0900
+
+    [MODIFY] 1.첫 Ingress 생성시 환경변수를 인식하지 못하는 에러를 못잡고 있음 . 2.새로고침시 local에서 특정 layout을 찾지 못해 에러가 생기는 문제를 해결중
+
+[33mcommit 3c70ff3345b648e8c2eda14f93aabf72ff55bd88[m
+Merge: 6046596 f0c832a
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Oct 28 22:11:20 2024 +0900
+
+    Merge pull request #32 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit f0c832a1170d0ff7714ea43e1261c00de423ca2d[m
+Merge: 82af693 6046596
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 28 22:10:51 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 82af6937ba1a52b7fa3a682b6cbdd8042809a1f8[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 28 22:10:47 2024 +0900
+
+    [개념공부] web-RTC에 대한 개념과 Ingress 사용에 어려움이 있어서 개념공부중
+
+[33mcommit 6046596d5ce3f4469dcb95c84e2c4a1d9b91f1fe[m
+Merge: 37b6de4 c48f26d
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Oct 27 23:17:45 2024 +0900
+
+    Merge pull request #31 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit c48f26d8f8338fb766d61e516d7b723d70d0eec0[m
+Merge: 77dc5ab 37b6de4
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 27 23:17:00 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 77dc5ab2c1dee4bed1de4cc216d01e9f697bb5c7[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 27 23:16:57 2024 +0900
+
+    [기술적고민] createIngress시 유저의 이메일을 가져오기 위해 로컬스토리지,쿠키,세션 사용 선택 결정에 대한 생각을 정
+    리
+
+[33mcommit 37b6de43b6dbe0f8edee214889cd221f92661585[m
+Merge: 298dab7 0988881
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Oct 26 23:46:57 2024 +0900
+
+    Merge pull request #30 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 098888192d25a0918286a00a2b734197d8b3dab4[m
+Merge: 6803056 298dab7
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 26 23:45:15 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 68030568800d651b4848763462586a128f3b2661[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 26 23:45:11 2024 +0900
+
+    [Library uninstalled] livekit 관련 라이브러리들이 설치게 제대로 되어 있지 않아, 1.해당 기능을 import 하지 못했음 2.설치가 되어있지 않아도 import가 되었는데 이는 캐시등에 저장되어 있었기에 가능했다고 추축 그래서 문제를 오랬동안 인지하지 못했음 ,
+
+[33mcommit 298dab701c3d0cd67a8878926e3249fba439b4c7[m
+Merge: 8148018 f7e5cab
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Oct 20 23:42:47 2024 +0900
+
+    Merge pull request #29 from boyaneck/feature/home
+    
+    Feature/home [코딩테스트]
+
+[33mcommit f7e5cabb9a5d879452ea50b149faf7b848032d53[m
+Merge: 16a63c4 8148018
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 20 23:41:47 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 16a63c4dab4dda10d050343cbb7d081246021539[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 20 23:41:42 2024 +0900
+
+    [코딩테스트]
+
+[33mcommit 814801833a2c9d4561e612ceead9266bd430ae05[m
+Merge: 5af5cf3 45b2f6d
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Oct 19 23:17:36 2024 +0900
+
+    Merge pull request #28 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 45b2f6d0250b9066e81cf687e953bde813f85206[m
+Merge: 9ba03b4 5af5cf3
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 19 23:16:48 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 9ba03b417eedb84bbc5f7f24cc2794e44e011a80[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 19 23:16:45 2024 +0900
+
+    [개념공부] 피그마를 통해 프로젝트 정리 및 스트리밍관련 공부
+
+[33mcommit 5af5cf390429161567fe2ae8f5f70d19a3c983c9[m
+Merge: 5954c6d 3152305
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Oct 17 23:54:45 2024 +0900
+
+    Merge pull request #27 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 31523053f4eb88e1862a39db3aa3a909ec7ceb04[m
+Merge: 923e369 5954c6d
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Oct 17 23:53:42 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 923e36924c105c5fd1baecff3e7804130228f00e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Oct 17 23:53:39 2024 +0900
+
+    [CREATE] ingress를 통해 streaming url과 key를 db에 넣고 livekit에 삽입하는 작업중
+
+[33mcommit 5954c6d1b0cf380f4f38afc0ea0e94d2621be951[m
+Merge: 7681407 fb7ec51
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Oct 16 23:35:53 2024 +0900
+
+    Merge pull request #26 from boyaneck/feature/home
+    
+    [개념공부] livekit과 Ingress 공부 및 Ingress와 livekit의 wephook 작업
+
+[33mcommit fb7ec5146aa53a7c3056237bf5aa80509dd8c118[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Oct 16 23:35:28 2024 +0900
+
+    [개념공부] livekit과 Ingress 공부 및 Ingress와 livekit의 wephook 작업
+
+[33mcommit 768140752db116f84c8b4bdc2bdb1c8f4dc04cac[m
+Merge: 7102703 75d5ace
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Oct 15 23:42:46 2024 +0900
+
+    Merge pull request #25 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 75d5aced58ed92225892c244770ef55f9601eca8[m
+Merge: 4f6c070 7102703
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 15 23:41:55 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 4f6c0705dd1bd88a23e70cfdb8c4d344a1a7fd18[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 15 23:41:47 2024 +0900
+
+    [개념] kubernetes와 Ingress 개념 공부 및 코테
+
+[33mcommit 71027033f7eb96b9a7919dd3391d99a6e63639dc[m
+Merge: d724926 7916516
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Oct 14 23:42:05 2024 +0900
+
+    Merge pull request #24 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 79165161d31f6396e520c2b7766e28e36c8bf033[m
+Merge: ac6fdcd d724926
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 14 23:41:09 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit ac6fdcd5c197757d0f599b9dad38dce53e595352[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 14 23:40:33 2024 +0900
+
+    [진행중] livekit 관련 설정 및 key component 생성
+
+[33mcommit d7249268d8adbc5d09e8a46696cf0c963c82b5e0[m
+Merge: cfe2b05 eb59223
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Oct 13 23:27:07 2024 +0900
+
+    Merge pull request #23 from boyaneck/feature/home
+    
+    [개발공부] 라이브 스트리밍을 위한 Ingress와 live-kit 공부
+
+[33mcommit eb5922346eb336a7aebdf3f12ee9eb1153a2cc70[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 13 23:26:19 2024 +0900
+
+    [개발공부] 라이브 스트리밍을 위한 Ingress와 live-kit 공부
+
+[33mcommit cfe2b059b29765be959dcbf66c747954d85e74b2[m
+Merge: 0707537 9a1b90f
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Oct 12 23:58:34 2024 +0900
+
+    Merge pull request #22 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 9a1b90fc808716270969bfb15e36ab822ed24bf6[m
+Merge: 11ed155 0707537
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 12 23:57:57 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 11ed1553237a7091a116ad6968aca0cc35ab975f[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 12 23:57:51 2024 +0900
+
+    [코테] 2문제 풀이
+
+[33mcommit 07075373bf6b5e3d23a13b66796c4fecdffc9333[m
+Merge: fa7c167 7b27bfa
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Oct 11 23:53:08 2024 +0900
+
+    Merge pull request #21 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 7b27bfaaab5db3a0782a03ad0a3ce30c94599191[m
+Merge: 3144bc4 fa7c167
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Oct 11 23:52:09 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 3144bc459e209c101e7b7f585247637674377d7e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Oct 11 23:52:04 2024 +0900
+
+    [완료] 팔로우 기능 supabse의 rpc 이용하여 완료
+
+[33mcommit fa7c16706d85508f1e025be7c96be5da5b101aa8[m
+Merge: dd3430f 6f2e837
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Oct 10 23:52:05 2024 +0900
+
+    Merge pull request #20 from boyaneck/feature/home
+    
+    rpc 이용한 팔로우/언팔로우 기능 진행중
+
+[33mcommit 6f2e837d9aaa1cd32ca412badff08adefe0fbcf2[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Oct 10 23:44:04 2024 +0900
+
+    rpc 이용한 팔로우/언팔로우 기능 진행중
+
+[33mcommit dd3430f153ed30985054795e7c03683f629f25c9[m
+Merge: 4a8736d 307c94b
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Oct 8 23:55:11 2024 +0900
+
+    Merge pull request #19 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 307c94b14d568ed05594de4c16395a5678793b13[m
+Merge: 0e1a5ae 4a8736d
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 8 23:54:24 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 0e1a5aee3bb8a85fe33cffcbe61a4e7370b8221e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 8 23:54:21 2024 +0900
+
+    로그인시 follow테이블에 record 체크 및 생성
+
+[33mcommit 4a8736d20bbf8a9accd59ef2aef859c0634864f2[m
+Merge: 8e96ad3 01a4b6b
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Oct 7 23:55:16 2024 +0900
+
+    Merge pull request #18 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit 01a4b6b2c9d146d50b54bb3c2fd985ca2dfc9f9f[m
+Merge: 01f320b 8e96ad3
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 7 23:54:14 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 01f320b519b65aa2c44342fefe3302fb5bbc8540[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Oct 7 23:53:46 2024 +0900
+
+    home화면 UI grid 작업 및 전반적인 UI 진행중
+
+[33mcommit 8e96ad39bb262460a73abc5915004010d4c3b195[m
+Merge: 2f9a0b7 dd7f9e9
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Oct 6 23:55:17 2024 +0900
+
+    Merge pull request #17 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit dd7f9e916836ed89fe0a34eb4ebf22d076fe1627[m
+Merge: f189631 2f9a0b7
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 6 23:53:20 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit f1896317d3eaf060595306391d15ebedc1138a11[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Oct 6 23:53:16 2024 +0900
+
+    정신차리고 시작하고 끝마치자!
+
+[33mcommit 2f9a0b74e295fc9d9c7b506b2a686b073944aec5[m
+Merge: c6442b8 dd7b7a2
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Oct 5 23:25:36 2024 +0900
+
+    Merge pull request #16 from boyaneck/feature/home
+    
+    Feature/home
+
+[33mcommit dd7b7a227434e472c61e7eaf3a98bbece5cb0d40[m
+Merge: c9bccf6 c6442b8
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 5 23:24:35 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit c9bccf6b1856e678d6f2872b7cb79fa9620266ae[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Oct 5 23:24:14 2024 +0900
+
+    코테 문제풀이
+
+[33mcommit c6442b8daced474c69e7e27db73828286fa3d036[m
+Merge: c623cc1 83f461c
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Oct 3 23:53:16 2024 +0900
+
+    Merge pull request #15 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 83f461c886f827c12327d60f78fe5900cb9b2bfe[m[33m ([m[1;31morigin/feature/SignAndLogout[m[33m, [m[1;32mfeature/SignAndLogout[m[33m)[m
+Merge: d9b524d c623cc1
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Oct 3 23:52:23 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit d9b524de2400b5f0ab7eba320d51201e135bc1f1[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Oct 3 23:52:19 2024 +0900
+
+    전체적인 오류 수정 중
+
+[33mcommit c623cc13fdb297d52170e3da7841499e54ecda3b[m
+Merge: d33dd42 6f3dabe
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Oct 1 23:18:25 2024 +0900
+
+    Merge pull request #14 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 6f3dabe77095e34beb47c4b4c189f0d8c4b35232[m
+Merge: b60b351 d33dd42
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 1 23:17:33 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit b60b35198deb8a154687bebdd5807f99c2ec1b13[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Oct 1 23:17:30 2024 +0900
+
+    딱히한게 없다....후..코테나 다시 하고, 그다음에  시작하자...
+
+[33mcommit d33dd42b84908eb68cc75e361266abeee2ca5b0f[m
+Merge: 05399f8 3066c7a
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Sep 30 23:49:35 2024 +0900
+
+    Merge pull request #13 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 3066c7a9a0a8949fd58205fa9d91fa10b907ab28[m
+Merge: 60c8016 05399f8
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 30 23:48:58 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 60c80166d49f965ecac5c6d63d9f4d9563f4a3b9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 30 23:48:54 2024 +0900
+
+    follow 기능 수정중
+
+[33mcommit 05399f838ccb0bc2d940efafc275fa80065df1b4[m
+Merge: ad5213c c337192
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Sep 29 23:46:46 2024 +0900
+
+    Merge pull request #12 from boyaneck/feature/SignAndLogout
+    
+    집중하자! follow 기능 api 수정중
+
+[33mcommit c3371929ed101b81b7ddca09439286770a7dfc6f[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Sep 29 23:46:12 2024 +0900
+
+    집중하자! follow 기능 api 수정중
+
+[33mcommit ad5213c18bf70ac73af9722f033932e47d2cc6ff[m
+Merge: 50a2e70 6758200
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Sep 27 23:32:45 2024 +0900
+
+    Merge pull request #11 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 6758200dc306fea581d2e3219f8d7afb3a850e26[m
+Merge: 8ca010b 50a2e70
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Sep 27 23:31:56 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 8ca010bfcd3de366cc03c588e63baf05d36f27c3[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Sep 27 23:31:52 2024 +0900
+
+    흠...supabase 테이블 수정 및 join문 생성하기
+
+[33mcommit 50a2e70a8b8909df26181092dd1a995cb507dc74[m
+Merge: 346c296 e03caa5
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Sep 26 23:27:11 2024 +0900
+
+    Merge pull request #10 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit e03caa5321aa5742062a676176cd3295c27c75b0[m
+Merge: 9712989 346c296
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Sep 26 23:26:29 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 97129893b758eed2214b39ac2a0d3c0ce151c731[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Sep 26 23:26:18 2024 +0900
+
+    수정한게 없고 구조를 어떻게 다시 짜야할지 구성만 했다. 다 시작하자
+
+[33mcommit 346c29666d349535106b3440ea62d4bdd067b701[m
+Merge: b4f4d61 0c61004
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Sep 25 23:57:14 2024 +0900
+
+    Merge pull request #9 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 0c6100429206b3b2e770ef923cdf0ce423ca217e[m
+Merge: 5a3f197 b4f4d61
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 25 23:56:06 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 5a3f19745091323c2d51bf214a71c3dd64b24a1e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 25 23:56:03 2024 +0900
+
+    Optimistic update 작업중
+
+[33mcommit b4f4d61dff3e5caee481fe92c37bd4e80005fa89[m
+Merge: 6b29876 90ea1c9
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Sep 24 23:53:02 2024 +0900
+
+    Merge pull request #8 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 90ea1c9a0c4f26385cc2394a55df769ab030c590[m
+Merge: f449642 6b29876
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 24 23:51:29 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit f449642918b0f0d3ae964570458990abc00bf4c9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 24 23:51:26 2024 +0900
+
+    Optimistic Update를 통한 follow 기능 작업중....하....지친다...
+
+[33mcommit 6b29876637cb7bca1af79c3ebd4937de47a53a1b[m
+Merge: eec6ee2 e622554
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Sep 23 23:33:00 2024 +0900
+
+    Merge pull request #7 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit e622554cabda2dd4b5f88e0224c54aed51e45149[m
+Merge: 25773bc eec6ee2
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 23 23:31:57 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 25773bc96a08831c6b8600cbfc171cfafcae2051[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 23 23:31:30 2024 +0900
+
+    follow 기능 부터 구현하기
+
+[33mcommit eec6ee29e403d5884ae19cfe43c66337ad4a5950[m
+Merge: e44a9a9 c1e29c6
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Sep 18 23:50:05 2024 +0900
+
+    Merge pull request #6 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit c1e29c61b3cf18f112cf85dc402977f08dc569c7[m
+Merge: 3efd78d e44a9a9
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 18 23:49:08 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 3efd78d395c6fdd017d5d99b659c6b09f20efc6f[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 18 23:49:04 2024 +0900
+
+    로그은 시 로그인 유저 정보 tooltip 작업시작
+
+[33mcommit e44a9a9aa785243f2b1673ab66e2b28c6a2b7255[m
+Merge: f78fd24 5420f38
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Sep 15 22:07:21 2024 +0900
+
+    Merge pull request #5 from boyaneck/feature/SignAndLogout
+    
+    로그인 UI 작업중
+
+[33mcommit 5420f38ef91646708883a31d3ed5cb63e6ad4b54[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Sep 15 22:03:05 2024 +0900
+
+    로그인 UI 작업중
+
+[33mcommit f78fd24cc769ef42d5100d005d4d03dc71c352b1[m[33m ([m[1;32mmain[m[33m)[m
+Merge: 25c3e9b 48273cb
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Sep 12 23:20:17 2024 +0900
+
+    Merge pull request #4 from boyaneck/feature/SignAndLogout
+    
+    zustand 로그인 오류 해결
+
+[33mcommit 48273cb42ff2676f3bea99326830014c27d345e9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Sep 12 23:19:22 2024 +0900
+
+    zustand 로그인 오류 해결
+
+[33mcommit 25c3e9b011058322cf364c7b3dc55109b1752f0b[m
+Merge: 9d6d0a8 048c421
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Sep 11 23:01:32 2024 +0900
+
+    Merge pull request #3 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit 048c421f0056914d7fe8a9999d25caba67f03666[m
+Merge: 4a89cc1 9d6d0a8
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 11 23:00:15 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit 4a89cc1fa79d0f12b0f85fc4570e7c56dd579864[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Sep 11 23:00:10 2024 +0900
+
+    supabase 유저 정보 get 에러 수정중
+
+[33mcommit 9d6d0a8be17aaea5d18a66ecca5524e124b2ae88[m
+Merge: b91fc25 b61210a
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Sep 10 23:29:53 2024 +0900
+
+    Merge pull request #2 from boyaneck/feature/SignAndLogout
+    
+    Feature/sign and logout
+
+[33mcommit b61210abafd701ea2647e8fbe43ddab923452a7e[m
+Merge: a88db89 b91fc25
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 10 23:26:40 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/SignAndLogout
+
+[33mcommit a88db89dcf3f6f975a7b71589cf4518d54e09980[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 10 23:24:32 2024 +0900
+
+    zustand에 넣을 유저정보 코드 작성중
+
+[33mcommit b91fc25131e7cb60103401af8bb5321bb729d8bf[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 9 22:29:37 2024 +0900
+
+    로그인 작업중 반드시 내일 끝낼것
+
+[33mcommit b72291e06ae9a380b6eafdbacdc040c3faef0658[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 9 22:27:57 2024 +0900
+
+    로그인 data fetching 및 zustand 관리 작업중
+
+[33mcommit afd9b9269f22521b8e78cfc2a15869632a41b0df[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Sep 5 22:24:39 2024 +0900
+
+    git push 체크
+
+[33mcommit 26bb30efc2496602c7b7636466d9662d74493c63[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Sep 5 22:23:50 2024 +0900
+
+    zustand로 회원정보 데이터 작업중
+
+[33mcommit e1cdd801168a91f2a6ffc1a8f864aee6a1329e29[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 3 23:24:58 2024 +0900
+
+    깃 테스트중
+
+[33mcommit 62b314d23e4ea0003b62469a51754c306edda646[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 3 23:19:57 2024 +0900
+
+    브랜치 feature/SignAndLogout pr 테스트
+
+[33mcommit e48ce54731ca5e76606d43185918c87c6f56481e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Sep 3 23:18:28 2024 +0900
+
+    로그인 zustand 관리 진행중
+
+[33mcommit 5536020c8ff84241ddb35e0ed699fc9d3c972b8c[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 2 23:51:49 2024 +0900
+
+    feature/SignAndLogout 브랜치 오류 점검중
+
+[33mcommit 7d2cd2271b8583aed19854f93aa11892747df0be[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 2 23:48:25 2024 +0900
+
+    깃 브랜치 오류 체크중
+
+[33mcommit 534fb12950f2df0aabf0a9c2cd7be600a6337df6[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 2 23:45:44 2024 +0900
+
+    깃 오류 테스투중
+
+[33mcommit a415150589ce0578e4e0a21bd83c138a9ded4aed[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Sep 2 23:44:36 2024 +0900
+
+    branch 변경 후 navbar 로그인 기능 작업중
+
+[33mcommit a6c3598350a442cfc92941bf43b01081ee6e64c0[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Aug 29 23:10:19 2024 +0900
+
+    branch 이동해서 작업하기
+
+[33mcommit f4604204c1b1e03f6dbdccd6604d6123e8fbdbe7[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Aug 27 23:23:50 2024 +0900
+
+    구글 소셜로그인 기능 완료
+
+[33mcommit fa04c37d25ca73c3e75d4c3fcbc1d5b4212765de[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Aug 26 23:16:16 2024 +0900
+
+    supabase 셋업
+
+[33mcommit 33ce6a9a536727ccb349734d66580ccade6079c9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Aug 22 23:20:54 2024 +0900
+
+    오늘은 코테만 하였다, 다음부터는 프로젝트를 위한 커밋을 할것...
+
+[33mcommit 970160f0f6264041255e67503cd5988ce87ff5f3[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Aug 21 23:24:22 2024 +0900
+
+    프로젝터 구조 수정중
+
+[33mcommit 68ebe0716f47ca21e6a1e852bd970f50196e63a5[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Aug 20 23:25:12 2024 +0900
+
+    supabase 연동 및 로그인 시작
+
+[33mcommit 8f5d20b6b8baa2efb68238f2f0cc3bb043638134[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Aug 19 23:31:52 2024 +0900
+
+    sidebar 진행중
+
+[33mcommit 5cdf3bc2edc50e6b46cdbca4daf6e14b6c89c2a2[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Aug 16 23:10:16 2024 +0900
+
+    오늘은 지친다...
+
+[33mcommit afb20de1371d5a6cab42c7db2cc192828f9e1c29[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Aug 15 22:02:21 2024 +0900
+
+    sidebar 작업중
+
+[33mcommit 175194702575f0f16676415c5b15a5c4419e23ee[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Aug 14 23:16:42 2024 +0900
+
+    navbar 와 sidebar 작업중
+
+[33mcommit f4117147a929c22f7ab7ad3ee360344690c50976[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Aug 12 23:24:28 2024 +0900
+
+    폴더 구조 구성중
+
+[33mcommit 1577f44c9c6ad3dc0da4524cbad09be4164c5bbe[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Aug 11 23:17:32 2024 +0900
+
+    코테문제풀이
+
+[33mcommit 362066eaee13390a06fc5aa4868e90733f4d746d[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Aug 9 18:43:38 2024 +0900
+
+    초기 프로젝트 폴더 구조 세팅
+
+[33mcommit 42484ced3d12561cf2afe7a0c6f15520f3ad477c[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Aug 8 19:14:18 2024 +0900
+
+    part1 강의 듣기
+
+[33mcommit 74d9c7361ae757a3b902b9657c5f4af50b25fe25[m
+Merge: a096622 c0f78f4
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Aug 7 16:41:13 2024 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal
+
+[33mcommit a096622f1187b7acc5cab443003031bf3750f132[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Aug 7 16:40:12 2024 +0900
+
+    start off
+
+[33mcommit c0f78f41c48f5b05b660d9a6bf659c2ff4710036[m
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Aug 7 16:33:55 2024 +0900
+
+    Initial commit
+
+[33mcommit 3651878478758bf8fae628bccaf07ec64236ce52[m[33m ([m[1;32mmaster[m[33m)[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Aug 1 19:22:39 2024 +0900
+
+    Initial commit from Create Next App

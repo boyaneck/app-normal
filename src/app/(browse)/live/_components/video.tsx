@@ -25,7 +25,7 @@ import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 
 interface VideoProps {
-  host_name: string;
+  host_name: string | undefined;
   host_identity: string;
   token: string;
 }
