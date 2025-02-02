@@ -45,32 +45,31 @@ const UserLivePage = () => {
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-12 h-screen">
-        {/* 사이드바 */}
-        <div className="col-span-2 bg-gray-200">사이드바</div>
-        {/* LiveKit Room */}
-        <div className="col-span-7 border border-red-500">
-          <LiveKitRoom
-            video={true}
-            audio={true}
-            token={token}
-            serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border border-purple-500 grid grid-cols-1 lg:gap-y-0 lg:grid-cols-3
-          xl:grid-cols-3 2xl:grid-cols-6 h-full"
-          >
-            <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-5 lg:overflow-y-auto hidden-scrollbar">
-              <Video
-                host_name={current_host_nickname}
-                host_identity={current_host_id}
-                token={token}
-              />
-            </div>
-          </LiveKitRoom>
-        </div>
-        {/* 채팅창 */}
-        <div className="col-span-3 bg-blue-200">채팅창</div>
+    <div className="grid grid-cols-12">
+      {/* 사이드바 */}
+      <div className="col-span-12 lg:col-span-2 bg-gray-200">사이드바</div>
+
+      {/* LiveKit Room */}
+      <div className="col-span-12 lg:col-span-7 border border-red-500">
+        <LiveKitRoom
+          video={true}
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+          className="border border-purple-500 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full"
+        >
+          <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-3 lg:overflow-y-auto hidden-scrollbar">
+            <Video
+              host_name={current_host_nickname}
+              host_identity={current_host_id}
+              token={token}
+            />
+          </div>
+        </LiveKitRoom>
       </div>
+
+      {/* 채팅창 */}
+      <div className="col-span-12 lg:col-span-3 bg-blue-200">채팅창</div>
     </div>
   );
 };
