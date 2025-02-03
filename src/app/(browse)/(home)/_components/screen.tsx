@@ -91,36 +91,29 @@ const Screen = () => {
               alert(user.user_nickname);
             }}
           >
-            <div className="border border-green-400">이 div 엘리먼트 참조</div>
             {/* 스크린 컨테이너 */}
-            <div className="h-40 bg-gray-200 mb-4 rounded-md flex items-center justify-center">
-              <span className="text-xl font-semibold text-gray-700">
-                <div className="border border-red-500"></div>
-                <Button
-                  onClick={() => {
-                    follow(user.user_email, user.id);
-                  }}
-                  onMouseEnter={(e) => {
-                    setTimeout(() => {
-                      callit(user.id, user.user_nickname, e);
-                      // useee.current = {
-                      //   ...useee.current,
-                      //   id: user.id,
-                      // };
-                    }, 1000);
-                  }}
-                  onMouseOut={() => {
-                    // setHost_id("");
-                    // setHost_nickname("");
-                    // setChkPreviewForToken("");
-                    // alert("마우스 때기 ");
-                  }}
-                  className="border border-red-500"
-                />
-                <div className="border border-green-400"></div>
-                스크린!!
-                {token === chkPreviewForToken && user.id === host_id && (
-                  <span className="border border-red-400 w-[200px]">
+            <div
+              className="relative h-40 bg-red-200 mb-4 rounded-md flex items-center justify-center"
+              onClick={() => {
+                follow(user.user_email, user.id);
+              }}
+              onMouseEnter={(e) => {
+                setTimeout(() => {
+                  callit(user.id, user.user_nickname, e);
+                }, 1000);
+              }}
+              onMouseOut={() => {
+                setHost_id("");
+                setHost_nickname("");
+                setChkPreviewForToken("");
+                alert("마우스 때기 ");
+              }}
+            >
+              {token === chkPreviewForToken && user.id === host_id && (
+                <div className="absolute top-0 left-0 w-full h-full">
+                  {/* span 대신 div 사용 */}
+                  <div className="absolute top-0 left-0 w-full h-full border border-red-400">
+                    {/* 자식 div에 border 지정 */}
                     <LiveKitRoom
                       video={true}
                       audio={true}
@@ -133,11 +126,14 @@ const Screen = () => {
                         token={chkPreviewForToken}
                       />
                     </LiveKitRoom>
-                  </span>
-                )}
-                {user.user_nickname}
+                  </div>
+                </div>
+              )}
+              <span className="absolute top-0 left-0 text-xl font-semibold text-gray-700 border border-red-500">
+                aaa
               </span>
             </div>
+            <div className="border border-green-400">제목</div>
 
             {/* 아바타와 제목이 왼쪽 정렬 */}
             <div className="flex flex-col items-start">
@@ -151,14 +147,6 @@ const Screen = () => {
                 )}
                 <h3 className="text-lg font-semibold">{user.user_nickname}</h3>
               </div>
-
-              {/* 이메일 */}
-              <span className="text-sm text-gray-600 mb-1">
-                {user.user_email}
-              </span>
-
-              {/* 카테고리 */}
-              <span className="text-xs text-gray-500">카테고리: {"없음"}</span>
             </div>
           </div>
         ))

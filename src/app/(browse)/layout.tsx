@@ -12,7 +12,7 @@ const layout = ({ children }: Props) => {
       {/* <Navbar /> */}
 
       <div className="grid border border-purple">
-        {/* <Sidebar /> */}
+        <Sidebar />
         {children}
         홈화면 레이아웃 개꿀ㅁ너ㅣㅏㅓ미어ㅣㅏㄴ머인머ㅣㅏ머아ㅣ
       </div>
