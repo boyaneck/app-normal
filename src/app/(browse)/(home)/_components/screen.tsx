@@ -44,7 +44,6 @@ const Screen = () => {
     if (LiveUser) {
       setLiveUser(LiveUser);
     }
-    alert("그럼 뜨냐 ???");
     setChkPreviewForToken(token);
   }, [LiveUser, token]);
 
@@ -102,7 +101,7 @@ const Screen = () => {
                   callit(user.id, user.user_nickname, e);
                 }, 1000);
               }}
-              onMouseOut={() => {
+              onMouseLeave={() => {
                 setHost_id("");
                 setHost_nickname("");
                 setChkPreviewForToken("");
