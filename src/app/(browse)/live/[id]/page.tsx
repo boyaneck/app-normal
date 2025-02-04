@@ -8,6 +8,7 @@ import {
   useRoomInfo,
   useRoomContext,
   RoomName,
+  useParticipants,
 } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
@@ -43,7 +44,6 @@ const UserLivePage = () => {
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
-
   return (
     <div className="grid grid-cols-12">
       {/* 사이드바 */}
@@ -68,7 +68,6 @@ const UserLivePage = () => {
         </LiveKitRoom>
       </div>
 
-      {/* 채팅창 */}
       <div className="col-span-12 lg:col-span-3 bg-blue-200">채팅창</div>
     </div>
   );

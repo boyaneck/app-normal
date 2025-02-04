@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ConnectionState,
   Track,
@@ -33,6 +33,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
+
+  const [total_viewer, set_total_viewer] = useState<number>();
   useEffect(() => {}, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
@@ -41,12 +43,9 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   ]).filter(
     (track) => track.participant.identity === host_participant?.identity
   );
-  console.log("host_name", host_name, "host_identity", host_identity);
-  console.log("participants", participants);
-  console.log("connection_state", connection_state);
-  console.log("host_participant.identity", host_participant?.identity);
-  console.log("host_participant", host_participant);
-  console.log("tracks", tracks);
+  useEffect(() => {
+    set_total_viewer(participants.length - 1);
+  }, [total_viewer]);
 
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
@@ -94,6 +93,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   return (
     <div className="aspect-video border-b group relative border border-green-500">
       {content}
+      <div>현재 모든 시청자 수 {total_viewer}</div>
       {/* <LiveVideo participant={host_participant} /> */}
     </div>
   );
