@@ -29,3 +29,8 @@ declare interface chat_props {
   created_at: string;
   chat_room_number: string;
 }
+
+declare interface chat_room_state {
+  isChatRoomOpened: boolean;
+  setIsChatRoomOpened: (isOpen: boolean) => void;
+}

@@ -9,3 +9,15 @@ const useChatRoomInfo = create<chat_room_info_state>((set) => ({
 }));
 
 export { useChatRoomInfo };
+
+const useCurrentChatRoomStore = create<currentChatRoomState>((set) => ({
+  currentChatRoomNumber: "",
+  setCurrentChatRoomNumber: (roomNumber: string) => {
+    console.log("쓰음", roomNumber), set({ currentChatRoomNumber: roomNumber });
+  },
+}));
+
+const useChatRoomOpenStore = create<chat_room_state>((set) => ({
+  isChatRoomOpened: false,
+  setIsChatRoomOpened: (isOpen: boolean) => set({ isChatRoomOpened: isOpen }),
+}));
