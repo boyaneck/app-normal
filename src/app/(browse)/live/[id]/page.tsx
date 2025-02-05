@@ -12,6 +12,8 @@ import {
 } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
+import ChatPage from "../../chat/page";
+import ChatRoom from "../../chat/chat_room";
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("user_id");
@@ -68,7 +70,10 @@ const UserLivePage = () => {
         </LiveKitRoom>
       </div>
 
-      <div className="col-span-12 lg:col-span-3 bg-blue-200">채팅창</div>
+      <div className="col-span-12 lg:col-span-3 bg-blue-200">
+        <ChatPage />
+        채팅창
+      </div>
     </div>
   );
 };
