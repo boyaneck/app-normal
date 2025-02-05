@@ -1,4 +1,9 @@
+import { getChatInfo } from "@/api/chat";
+import { useChatRoomInfo } from "@/store/chat_store";
+import useUserStore from "@/store/user";
+import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
 
 const ChatRoom = () => {
   const [message, setmessage] = useState("");
@@ -26,7 +31,7 @@ const ChatRoom = () => {
   console.log("data가 나오나 ?", chatInfo);
 
   useEffect(() => {
-    socket.on("receiveMessage", (messageInfo: propsMessageInfo) => {
+    socket.on("receiveMessage", (messageInfo: props_message_info) => {
       setReceiveMessageInfo((prev) => [...prev, messageInfo]);
     });
 
