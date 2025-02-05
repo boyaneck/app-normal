@@ -1,6 +1,11 @@
 import React from "react";
+import ChatRoom from "./chat_room";
 const ChatPage = () => {
-  return <div>ChatPage</div>;
+  return (
+    <div>
+      <ChatRoom />
+    </div>
+  );
   //Ingress 와 Livekit 공부ㅎ
 };
 
