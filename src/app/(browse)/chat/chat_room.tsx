@@ -1,4 +1,4 @@
-import { getChatInfo } from "@/api/chat";
+import { getChatInfo, insertChatInfo } from "@/api/chat";
 import { useChatRoomInfo } from "@/store/chat_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
@@ -82,35 +82,39 @@ const ChatRoom = () => {
     //방번호 보내기
   };
 
-  const currnetRoomInfo = rooms[chat_room_number];
+  const current_room_info = rooms[chat_room_number];
 
   //메세지 시간을 기준으로 구분하기
   //1. 첫번째로 오는 상대 메세지 체크 -> 상대의 첫번째  메세지에만 프로필 사진
-  const checkMessageTime = (currentIndex: number) => {
-    const currentMessageInfo = currnetRoomInfo[currentIndex];
-    const nextMessageInfo = currnetRoomInfo[currentIndex + 1];
-    const prevMessageInfo =
-      currentIndex === 0 ? false : currnetRoomInfo[currentIndex - 1];
+  const checkMessageTime = (current_index: number) => {
+    const current_message_info = current_room_info[current_index];
+    const next_message_info = current_room_info[current_index + 1];
+    const prev_message_info =
+      current_index === 0 ? false : current_room_info[current_index - 1];
 
     //일단 "나 일때"
     //1.첫번째 메시지인지 확인, 2.다음메세지의 이용자 닉네임이 나와 다른지= 마지막 메세지 유무
-    const isLastMessageInMinute =
-      currentIndex === currnetRoomInfo.length - 1 ||
-      currentMessageInfo.user_nickname !== nextMessageInfo.user_nickname
+    const is_last_message_in_minute =
+      current_index === current_room_info.length - 1 ||
+      current_message_info.user_nickname !== next_message_info.user_nickname
         ? true
         : false;
 
     //첫번째 메세지(각 유저의)
     //
-    const isFirstMessageInMinute =
-      currentIndex === 0
-        ? currentMessageInfo
-        : currnetRoomInfo[currentIndex - 1].user_nickname !==
-          currentMessageInfo.user_nickname
+    const is_first_message_in_minute =
+      current_index === 0
+        ? current_message_info
+        : current_room_info[current_index - 1].user_nickname !==
+          current_message_info.user_nickname
         ? true
         : false;
 
-    return { isFirstMessageInMinute, isLastMessageInMinute, prevMessageInfo };
+    return {
+      is_first_message_in_minute,
+      is_last_message_in_minute,
+      prev_message_info,
+    };
   };
   return (
     <div>
