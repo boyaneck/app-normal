@@ -1,8 +1,8 @@
 declare interface chat_room_info {}
 
 declare interface props_message_info {
-  user_nickname: string[] | null | undefined;
-  avatar_url: string | null;
+  user_nickname: string | undefined;
+  avatar_url: string | undefined;
   message: string | null;
   date: string;
   current_chat_room_number: string;
@@ -31,6 +31,11 @@ declare interface chat_props {
 }
 
 declare interface chat_room_state {
-  isChatRoomOpened: boolean;
-  setIsChatRoomOpened: (isOpen: boolean) => void;
+  is_chat_room_opened: boolean;
+  set_is_chat_room_opened: (isOpen: boolean) => void;
+}
+
+declare interface current_chatroom_state {
+  current_chat_roomnumber: string;
+  set_current_chat_roomnumber: (roomNumber: string) => void;
 }

@@ -32,7 +32,7 @@ export const getFollowingUsers = async (current_user_email: string) => {
 //해당 유저의 팔로잉한 유저 가져오기
 
 export const getFollowingUsersInfo = async (user_email: string[]) => {
-  console.log("무엇을 받아옵니까", user_email);
+  // console.log("무엇을 받아옵니까", user_email);
   const { data, error } = await supabaseForClient
     .from("live_information")
     .select("*")

@@ -16,7 +16,9 @@ export const useSocketStore = create<socket_state_props>((set, get) => ({
       });
       set({ socket });
 
-      socket.on("connected", () => {});
+      socket.on("connected", () => {
+        console.log("연결이 성공했습니다!");
+      });
 
       socket.on("disconnected", () => {
         set({ socket: null });
