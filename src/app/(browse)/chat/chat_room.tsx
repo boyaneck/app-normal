@@ -7,13 +7,24 @@ import io from "socket.io-client";
 import dayjs from "dayjs";
 import { useSocketStore } from "@/store/socket_store";
 import useCreateChat from "@/hooks/useChat";
-
+import Picker from "emoji-picker-react";
 const ChatRoom = () => {
-  const [message, set_message] = useState("");
   const [receive_message_info, set_receive_message_info] = useState<
     props_message_info[]
   >([]);
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emoji, set_emoji] = useState("");
+  const [input_value, set_input_value] = useState("");
+  const combined = emoji + input_value;
+
+  const [message, set_message] = useState("");
+  const message_input_ref = useRef<HTMLInputElement>(null);
+  const onEmojiClick = (event: any, emojiObject: any) => {
+    console.log("이모지", event.emoji);
+    set_message((prev) => prev + event.emoji);
+    message_input_ref.current?.focus(); // 포커스 유지 (선택적)
+  };
   const { createChatRoom } = useCreateChat();
   dayjs.locale("ko"); // 로케일 설정
 
@@ -24,8 +35,6 @@ const ChatRoom = () => {
     queryKey: ["getChatInfo"],
     queryFn: getChatInfo,
   });
-
-  console.log("유즈쿼리", chat_info);
 
   useEffect(() => {
     if (!socket) {
@@ -39,7 +48,6 @@ const ChatRoom = () => {
     }
     return () => {};
   }, [socket]);
-  const message_input_ref = useRef<HTMLInputElement>(null);
 
   let onHandlerSendMessage = () => {
     const input_message = message_input_ref.current?.value || "";
@@ -52,7 +60,7 @@ const ChatRoom = () => {
     const message_info = {
       user_nickname,
       avatar_url,
-      message: input_message,
+      message,
       date,
       id,
       email,
@@ -62,33 +70,33 @@ const ChatRoom = () => {
       roomnumber: "5",
       message_info,
     });
-
-    // insertChatInfo({
-    //   user_nickname,
-    //   avatar_url,
-    //   message,
-    //   date,
-    //   current_chat_room_number,
-    // });
-    // set_message(chat_room_number, [message_info]);
-    // set_receive_message_info([message_info]);
-    //방번호 보내기
+    set_message("");
   };
 
-  // const current_room_info = rooms[chat_room_number];
+  const msg = () => {
+    console.log("바뀌나요 ?");
+  };
 
+  const OnHandlerInput = (e: any) => {
+    set_message(e.target.value);
+  };
+
+  console.log("콘솔 확인하기,");
   return (
     <div className="flex flex-col">
       <section>s</section>
       <section>그 외의 유저들 </section>
       <input
         placeholder="메세지를 입력해주세요"
-        // value={message}
-        // onChange={(e) => set_message(e.target.value)}
         ref={message_input_ref}
+        value={message}
+        onChange={OnHandlerInput}
       ></input>
-
       <button onClick={onHandlerSendMessage}>전송</button>
+      <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+        이모지
+      </button>
+      {showEmojiPicker && <Picker onEmojiClick={onEmojiClick} />}
       {chat_info?.map((chat_info) => {
         return <div>{chat_info.message}</div>;
       })}
