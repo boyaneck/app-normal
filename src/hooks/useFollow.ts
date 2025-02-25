@@ -10,7 +10,8 @@ import { useEffect, useState } from "react";
 interface FollowProps {
   current_user_email: string;
   target_user_email: string;
-  user_id: string;
+  target_user_id: string;
+  current_user_id: string;
 }
 
 const useFollow = () => {
@@ -20,9 +21,15 @@ const useFollow = () => {
     mutationFn: ({
       current_user_email,
       target_user_email,
-      user_id,
+      target_user_id,
+      current_user_id,
     }: FollowProps) =>
-      toggleFollow(current_user_email, target_user_email, user_id),
+      toggleFollow(
+        current_user_email,
+        target_user_email,
+        target_user_id,
+        current_user_id
+      ),
     onMutate: async () => {
       console.log("onMutate 호출");
       await queryClient.cancelQueries({ queryKey: ["followUser"] });

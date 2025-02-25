@@ -17,6 +17,24 @@ import ChatRoom from "../../chat/chat_room";
 import SubInfo from "../sub/sub_info";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfoAboutLive } from "@/api";
+import { userInfo } from "os";
+
+interface live_info {
+  category: string | null;
+  id: string;
+  ingress_id: string;
+  is_live: boolean;
+  server_url: string;
+  stream_key: string;
+  title: string;
+  user_email: string;
+  user_id: string;
+  visitor: number;
+}
+
+interface sub_props {
+  live_information: live_info | undefined;
+}
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("user_id");
@@ -25,11 +43,12 @@ const UserLivePage = () => {
   const current_host_id = id === null ? "유저없음" : id;
   const current_host_nickname =
     user_nickname === null ? "유저없음" : user_nickname;
-  const { data } = useQuery({
-    queryKey: ["getUserInfoAboutLive"],
+  const { data: get_user_info_about_live } = useQuery({
+    queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
-  console.log("현재라이브중인 유저의 라이브 관련 정보", data);
+
+  const live_information = get_user_info_about_live?.live_information[0];
 
   //로그인유저만 아닌 비로그인 유저도 추가해야함
   const [room_name, set_room_name] = useState("");
@@ -87,7 +106,11 @@ const UserLivePage = () => {
           aaa
         </div>
         <div className=" col-span-7 border border-red-600 ">
-          <SubInfo />
+          <SubInfo
+            live_information={live_information}
+            current_host_id={current_host_id}
+            current_host_nickname={current_host_nickname}
+          />
         </div>
         <div className="col-span-1 border">뭐하ㅡㄴㄴ교</div>
       </div>

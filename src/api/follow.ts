@@ -6,11 +6,20 @@ import { supabaseForClient } from "@/supabase/supabase_client";
 export const toggleFollow = async (
   current_user_email: string,
   target_user_email: string,
-  user_id: string
+  target_user_id: string,
+  current_user_id: string
 ) => {
+  console.log(
+    "팔로우 확인하기",
+    "현재 유저" + current_user_email,
+    "상대 유저" + target_user_email,
+    " 지금 유저의 아이디 2" + target_user_id
+  );
   const { data, error } = await supabaseForClient.rpc("follow_user", {
     target_user_email,
     current_user_email,
+    target_user_id,
+    current_user_id,
   });
   if (error) console.log("");
 };

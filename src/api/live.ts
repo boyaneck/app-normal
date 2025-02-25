@@ -27,7 +27,7 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
     .from("users")
     .select(
       `
-      id, 
+       
       live_information (
         *    
       )
