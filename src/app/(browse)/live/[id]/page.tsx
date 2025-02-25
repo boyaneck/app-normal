@@ -14,6 +14,27 @@ import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import ChatRoom from "../../chat/chat_room";
+import SubInfo from "../sub/sub_info";
+import { useQuery } from "@tanstack/react-query";
+import { getUserInfoAboutLive } from "@/api";
+import { userInfo } from "os";
+
+interface live_info {
+  category: string | null;
+  id: string;
+  ingress_id: string;
+  is_live: boolean;
+  server_url: string;
+  stream_key: string;
+  title: string;
+  user_email: string;
+  user_id: string;
+  visitor: number;
+}
+
+interface sub_props {
+  live_information: live_info | undefined;
+}
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("user_id");
@@ -22,6 +43,12 @@ const UserLivePage = () => {
   const current_host_id = id === null ? "유저없음" : id;
   const current_host_nickname =
     user_nickname === null ? "유저없음" : user_nickname;
+  const { data: get_user_info_about_live } = useQuery({
+    queryKey: ["get_user_info_about_live"],
+    queryFn: () => getUserInfoAboutLive(current_host_id),
+  });
+
+  const live_information = get_user_info_about_live?.live_information[0];
 
   //로그인유저만 아닌 비로그인 유저도 추가해야함
   const [room_name, set_room_name] = useState("");
@@ -47,32 +74,45 @@ const UserLivePage = () => {
     return <div>Cannot watch the stream</div>;
   }
   return (
-    <div className="grid grid-cols-12">
-      {/* 사이드바 */}
-      <div className="col-span-12 lg:col-span-2 bg-gray-200">사이드바</div>
-
-      {/* LiveKit Room */}
-      <div className="col-span-12 lg:col-span-7 border border-red-500">
-        <LiveKitRoom
-          video={true}
-          audio={true}
-          token={token}
-          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          className="border border-purple-500 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full"
-        >
-          <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-3 lg:overflow-y-auto hidden-scrollbar">
-            <Video
-              host_name={current_host_nickname}
-              host_identity={current_host_id}
-              token={token}
-            />
-          </div>
-        </LiveKitRoom>
+    <div>
+      <div className="grid grid-cols-12">
+        {/* 사이드바 */}
+        <div className="col-span-12 lg:col-span-2 bg-gray-200">사이드바</div>
+        {/* LiveKit Room */}
+        <div className="col-span-12 lg:col-span-7 border border-red-500">
+          <LiveKitRoom
+            video={true}
+            audio={true}
+            token={token}
+            serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+            className="border border-purple-500 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full"
+          >
+            <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-3 lg:overflow-y-auto hidden-scrollbar">
+              <Video
+                host_name={current_host_nickname}
+                host_identity={current_host_id}
+                token={token}
+              />
+            </div>
+          </LiveKitRoom>
+        </div>
+        <div className="col-span-12 lg:col-span-3 bg-blue-200">
+          <ChatPage />
+          채팅창
+        </div>
       </div>
-
-      <div className="col-span-12 lg:col-span-3 bg-blue-200">
-        <ChatPage />
-        채팅창
+      <div className="grid grid-cols-12  bg-sky-300  ">
+        <div className="col-span-2 border border-red-40 bg-yellow-200 col-start-1">
+          aaa
+        </div>
+        <div className=" col-span-7 border border-red-600 ">
+          <SubInfo
+            live_information={live_information}
+            current_host_id={current_host_id}
+            current_host_nickname={current_host_nickname}
+          />
+        </div>
+        <div className="col-span-1 border">뭐하ㅡㄴㄴ교</div>
       </div>
     </div>
   );

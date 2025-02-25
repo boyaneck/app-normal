@@ -2,94 +2,113 @@ import { getChatInfo, insertChatInfo } from "@/api/chat";
 import { useChatRoomInfo } from "@/store/chat_store";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-
+import dayjs from "dayjs";
+import { useSocketStore } from "@/store/socket_store";
+import useCreateChat from "@/hooks/useChat";
+import Picker from "emoji-picker-react";
 const ChatRoom = () => {
-  // const [message, setmessage] = useState("");
-  // const [receiveMessageInfo, setReceiveMessageInfo] = useState<
-  //   props_message_info[]
-  // >([]);
-  // const [welcomeMessage, setWelcomeMessage] = useState("");
-  // const [messageInfo, setMessageInfo] = useState({});
-  // const { chatRoomInfo } = useChatRoomInfo();
-  // const socket = io("http://localhost:3001/room", {
-  //   transports: ["websocket"],
-  // });
-  // const userInfo = useUserStore((state) => state.user);
-  // const { currentChatRoomNumber } = useCurrentChatRoomStore();
-  // const chat_room_number = currentChatRoomNumber;
-  // const { isChatRoomOpened, setIsChatRoomOpened } = useChatRoomOpenStore(
-  //   (state) => state
-  // );
-  // const { rooms, setMessages } = useChatStore();
+  const [receive_message_info, set_receive_message_info] = useState<
+    props_message_info[]
+  >([]);
 
-  // const { data: chatInfo } = useQuery(
-  //   queryFn: getChatInfo,
-  // });
-  // console.log("data가 나오나 ?", chatInfo);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emoji, set_emoji] = useState("");
+  const [input_value, set_input_value] = useState("");
+  const combined = emoji + input_value;
 
-  // useEffect(() => {
-  //   socket.on("receiveMessage", (messageInfo: props_message_info) => {
-  //     setReceiveMessageInfo((prev) => [...prev, messageInfo]);
-  //   });
+  const [message, set_message] = useState("");
+  const message_input_ref = useRef<HTMLInputElement>(null);
+  const onEmojiClick = (event: any, emojiObject: any) => {
+    console.log("이모지", event.emoji);
+    set_message((prev) => prev + event.emoji);
+    message_input_ref.current?.focus(); // 포커스 유지 (선택적)
+  };
+  const { createChatRoom } = useCreateChat();
+  dayjs.locale("ko"); // 로케일 설정
 
-  //   return () => {};
-  // }, [socket, rooms]);
+  const user_info = useUserStore((state) => state.user);
+  const { socket, connect_socket, disconnect_socket } = useSocketStore();
 
-  // socket.on("welcomeMessage", (welcomeMsg) => {
-  //   setWelcomeMessage(welcomeMsg);
-  // });
+  const { data: chat_info } = useQuery<props_message_info[]>({
+    queryKey: ["getChatInfo"],
+    queryFn: getChatInfo,
+  });
 
-  // let onHandlerSendMessage = () => {
-  //   const user_nickname = userInfo?.user_nickname;
+  useEffect(() => {
+    if (!socket) {
+      connect_socket();
+    }
+    if (socket) {
+      socket?.on("receive_message", (message_info) => {
+        console.log("서버로 부터 온 메세지", message_info);
+        set_receive_message_info((prev) => [...prev, message_info]);
+      });
+    }
+    return () => {};
+  }, [socket]);
 
-  //   // const user_nickname = "ITZY 유나"
-  //   const avatar_url = userInfo?.avatar_url;
-  //   const id = userInfo?.id;
-  //   const email = userInfo?.email;
-  //   const created_at = dayjs().toISOString();
-  //   console.log("유저닉네임이 배열인가요 아닌가요??", user_nickname);
-  //   const messageInfo = {
-  //     user_nickname,
-  //     avatar_url,
-  //     message,
-  //     created_at,
-  //     id,
-  //     email,
-  //     chat_room_number,
-  //   };
-  //   socket.emit("sendMessage", {
-  //     roomnumber: chat_room_number,
-  //     messageInfo,
-  //   });
-  //   alert(
-  //     "메시지전송" +
-  //       JSON.stringify(messageInfo) +
-  //       "유저이름" +
-  //       JSON.stringify(messageInfo.user_nickname)
-  //   );
-  //   insertChatInfo({
-  //     user_nickname,
-  //     avatar_url,
-  //     message,
-  //     created_at,
-  //     chat_room_number,
-  //   });
-  //   setMessages(chat_room_number, [messageInfo]);
-  //   console.log("아니 시발 진짜 왜 안됨", user_nickname);
-  //   //방번호 보내기
-  // };
+  let onHandlerSendMessage = () => {
+    const input_message = message_input_ref.current?.value || "";
+    const user_nickname = user_info?.user_nickname;
+    const avatar_url = user_info?.avatar_url;
+    const id = user_info?.user_id;
+    const email = user_info?.user_email;
+    const date = dayjs().toISOString();
+    const current_chat_room_number = "5";
+    const message_info = {
+      user_nickname,
+      avatar_url,
+      message,
+      date,
+      id,
+      email,
+      current_chat_room_number,
+    };
+    socket?.emit("send_message", {
+      roomnumber: "5",
+      message_info,
+    });
+    set_message("");
+  };
 
-  // const current_room_info = rooms[chat_room_number];
+  const msg = () => {
+    console.log("바뀌나요 ?");
+  };
 
+  const OnHandlerInput = (e: any) => {
+    set_message(e.target.value);
+  };
+
+  console.log("콘솔 확인하기,");
   return (
-    <div>
+    <div className="flex flex-col">
       <section>s</section>
       <section>그 외의 유저들 </section>
-      ChatRoom 입니다 안녕하세요
-      <input placeholder="메세지를 입력해주세요"></input>
-      <button>전송</button>
+      <input
+        placeholder="메세지를 입력해주세요"
+        ref={message_input_ref}
+        value={message}
+        onChange={OnHandlerInput}
+      ></input>
+      <button onClick={onHandlerSendMessage}>전송</button>
+      <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+        이모지
+      </button>
+      {showEmojiPicker && <Picker onEmojiClick={onEmojiClick} />}
+      {chat_info?.map((chat_info) => {
+        return <div>{chat_info.message}</div>;
+      })}
+      <div>
+        {receive_message_info.map((message_info) => {
+          return (
+            <div>
+              {message_info.user_nickname}:{message_info.message}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
