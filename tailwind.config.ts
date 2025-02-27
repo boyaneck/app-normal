@@ -10,11 +10,20 @@ module.exports = {
       },
       animation: {
         "spin-wave": "spin-wave 3s linear infinite",
+        bounce: "bounce 1s ease-in-out infinite",
       },
       keyframes: {
         "spin-wave": {
           "0%": { transform: "rotate(0deg)", borderColor: "red" },
           "100%": { transform: "rotate(360deg)", borderColor: "transparent" },
+        },
+        bounce: {
+          "0%, 100%": {
+            transform: "translateY(0)",
+          },
+          "50%": {
+            transform: "translateY(-25%)",
+          },
         },
       },
     },

@@ -28,6 +28,7 @@ interface VideoProps {
   host_name: string | undefined;
   host_identity: string;
   token: string;
+  className?: string;
 }
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
@@ -91,7 +92,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   //   </div>)
   // }
   return (
-    <div className="aspect-video border-b group relative border border-green-500">
+    <div className="aspect-video group relative w-full border border-red-300">
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
       {/* <LiveVideo participant={host_participant} /> */}
