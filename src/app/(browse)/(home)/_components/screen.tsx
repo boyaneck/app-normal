@@ -16,7 +16,7 @@ const Screen = () => {
   const { user } = useUserStore((state) => state);
   const current_user_email =
     typeof user?.user_email === "string" ? user?.user_email : "";
-  console.log("홈화면에서 유저의 아이디 확인해보기 ", user?.user_id);
+  const current_user_id = user?.user_id !== undefined ? user.user_id : "";
   const { collapsed } = useSidebarStore();
   const { followMutation } = useFollow();
   const {
@@ -75,6 +75,7 @@ const Screen = () => {
   const follow = (target_user_email: string, target_user_id: string) => {
     followMutation.mutate({
       current_user_email: user_email,
+      current_user_id,
       target_user_email,
       target_user_id,
     });

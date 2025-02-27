@@ -37,12 +37,14 @@ interface sub_props {
 }
 const UserLivePage = () => {
   const search_params = useSearchParams();
-  const id = search_params.get("user_id");
-  const user_nickname = search_params.get("user_nickname");
+  const id = search_params.get("host_id");
+  const host_nickname = search_params.get("user_nickname");
+  const host_email = search_params.get("host_email");
   const { user } = useUserStore((state) => state);
   const current_host_id = id === null ? "유저없음" : id;
   const current_host_nickname =
-    user_nickname === null ? "유저없음" : user_nickname;
+    host_nickname === null ? "유저없음" : host_nickname;
+  const current_host_email = host_email === null ? "유저없음" : host_email;
   const { data: get_user_info_about_live } = useQuery({
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
@@ -75,44 +77,54 @@ const UserLivePage = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 p-4">
         {/* 사이드바 */}
-        <div className="col-span-12 lg:col-span-2 bg-gray-200">사이드바</div>
+        <div className="col-span-12 lg:col-span-2 bg-pink-400">사이드바</div>
         {/* LiveKit Room */}
-        <div className="col-span-12 lg:col-span-7 border border-red-500">
+        <div className="col-span-12 lg:col-span-7 relative group h-full">
+          {/* Video 컨테이너 */}
           <LiveKitRoom
-            video={true}
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border border-purple-500 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full"
+            className="border grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full relative"
           >
-            <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-3 lg:overflow-y-auto hidden-scrollbar">
-              <Video
-                host_name={current_host_nickname}
-                host_identity={current_host_id}
-                token={token}
-              />
+            <div className="space-y-4 lg:col-span-7 xl:col-span-7 lg:overflow-y-auto hidden-scrollbar">
+              <div className="relative">
+                {/* Video 컴포넌트를 감싸는 div, relative 추가 */}
+                <Video
+                  host_name={current_host_nickname}
+                  host_identity={current_host_id}
+                  token={token}
+                  className="transition-opacity duration-200 group-hover:opacity-70 group-hover:filter group-hover:grayscale" // 호버 효과
+                />
+                <div className="absolute bottom-2 right-0 w-full flex justify-center overflow-hidden h-0 group-hover:h-12 transition-all duration-300">
+                  {/* 동그라미 컨테이너 */}
+                  <div className="w-2 h-2 bg-red rounded"></div>
+                </div>
+                <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {/* 네모 박스 컨테이너 */}
+                  <div className="w-2 h-2 bg-black rounded"></div>
+                  <div className="w-2 h-2 bg-black rounded"></div>
+                  <div className="w-2 h-2 bg-black rounded"></div>
+                  <div className="w-2 h-2 bg-black rounded"></div>
+                </div>
+              </div>
             </div>
           </LiveKitRoom>
+
+          {/* SubInfo 래퍼 */}
+
+          <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+            <div className="w-24 h-24 rounded-full overflow-hidden">
+              <SubInfo
+                live_information={live_information}
+                current_host_id={current_host_id}
+                current_host_email={current_host_nickname}
+              />
+            </div>
+          </div>
         </div>
-        <div className="col-span-12 lg:col-span-3 bg-blue-200">
-          <ChatPage />
-          채팅창
-        </div>
-      </div>
-      <div className="grid grid-cols-12  bg-sky-300  ">
-        <div className="col-span-2 border border-red-40 bg-yellow-200 col-start-1">
-          aaa
-        </div>
-        <div className=" col-span-7 border border-red-600 ">
-          <SubInfo
-            live_information={live_information}
-            current_host_id={current_host_id}
-            current_host_nickname={current_host_nickname}
-          />
-        </div>
-        <div className="col-span-1 border">뭐하ㅡㄴㄴ교</div>
       </div>
     </div>
   );

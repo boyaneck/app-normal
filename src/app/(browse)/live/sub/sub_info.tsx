@@ -34,6 +34,7 @@ const SubInfo = ({
     user?.user_email !== undefined ? user.user_email : "";
   const host_email = current_host_email !== undefined ? current_host_email : "";
   const host_id = current_host_id !== undefined ? current_host_id : "";
+  const current_user_id = user?.user_id !== undefined ? user.user_id : "";
   const live_info = live_information;
   console.log(typeof live_information);
 
@@ -42,6 +43,7 @@ const SubInfo = ({
       current_user_email,
       target_user_email: host_email,
       target_user_id: host_id,
+      current_user_id,
     });
     alert("팔로우완료");
   };
