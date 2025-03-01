@@ -77,37 +77,37 @@ const UserLivePage = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-12 p-4">
+      <div className="grid grid-cols-12  bg-sky-300 h-[70vh]">
         {/* 사이드바 */}
-        <div className="col-span-12 lg:col-span-2 bg-pink-400">사이드바</div>
+        <div className="col-span-12 lg:col-span-2 ">사이드바</div>
         {/* LiveKit Room */}
-        <div className="col-span-12 lg:col-span-7 relative group h-full">
+        <div
+          className=" col-span-12 lg:col-span-9 relative group
+        full"
+        >
           {/* Video 컨테이너 */}
           <LiveKitRoom
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 h-full relative"
+            className="border grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 relative"
           >
-            <div className="space-y-4 lg:col-span-7 xl:col-span-7 lg:overflow-y-auto hidden-scrollbar">
+            <div className=" lg:col-span-7 xl:col-span-7  ">
               <div className="relative">
                 {/* Video 컴포넌트를 감싸는 div, relative 추가 */}
                 <Video
                   host_name={current_host_nickname}
                   host_identity={current_host_id}
                   token={token}
-                  className="transition-opacity duration-200 group-hover:opacity-70 group-hover:filter group-hover:grayscale" // 호버 효과
                 />
-                <div className="absolute bottom-2 right-0 w-full flex justify-center overflow-hidden h-0 group-hover:h-12 transition-all duration-300">
-                  {/* 동그라미 컨테이너 */}
-                  <div className="w-2 h-2 bg-red rounded"></div>
-                </div>
+
                 <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   {/* 네모 박스 컨테이너 */}
                   <div className="w-2 h-2 bg-black rounded"></div>
                   <div className="w-2 h-2 bg-black rounded"></div>
-                  <div className="w-2 h-2 bg-black rounded"></div>
-                  <div className="w-2 h-2 bg-black rounded"></div>
+                </div>
+                <div className="bg-gray-700 absolute top-0 top-[15vh] flex flex-col w-1/3 h-1/3 bg-transparent ">
+                  <ChatPage />
                 </div>
               </div>
             </div>
@@ -125,6 +125,10 @@ const UserLivePage = () => {
             </div>
           </div>
         </div>
+        {/* <div className="col-span-12 lg:col-span-3 bg-yellow-200">
+          채팅
+          <ChatPage />
+        </div> */}
       </div>
     </div>
   );
