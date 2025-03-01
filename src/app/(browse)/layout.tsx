@@ -11,7 +11,7 @@ const layout = ({ children }: Props) => {
     <div className="pt-28 border border-emerald-100  ">
       {/* <Navbar /> */}
 
-      <div className="grid border border-purple">
+      <div className="grid border border-purple bg-red-400">
         {/* <Sidebar /> */}
         {children}
         홈화면 레이아웃 개꿀ㅁ너ㅣㅏㅓ미어ㅣㅏㄴ머인머ㅣㅏ머아ㅣ
