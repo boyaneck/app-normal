@@ -264,13 +264,13 @@ const ChatRoom = () => {
     set_message("");
   };
 
-  const OnHandlerInput = (e) => {
+  const OnHandlerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     set_message(e.target.value);
   };
 
   const max_messages = 6;
 
-  const AnimatedMessage = ({ message, is_visible }) => {
+  const AnimatedMessage = ({ message, is_visible }: remove_message_props) => {
     return (
       <div className={is_visible ? "animate-fadeOutUp" : ""}>
         {message}:{is_visible}
@@ -296,7 +296,7 @@ const ChatRoom = () => {
     ]);
   };
 
-  const handlerAnimationEnd = (id) => {
+  const handlerAnimationEnd = (id: id_props) => {
     set_hearts((prevHearts) => prevHearts.filter((heart) => heart.id !== id));
   };
 
@@ -320,7 +320,7 @@ const ChatRoom = () => {
           top: y + "px", // px 단위 추가
         }}
       >
-        ❤️
+        ❤️[]
       </div>
     ) : null;
   };
