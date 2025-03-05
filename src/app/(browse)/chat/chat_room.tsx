@@ -279,28 +279,28 @@ const ChatRoom = () => {
   };
 
   const handleHeartClick = () => {
-    if (!heartButtonRef.current) return;
+    // if (!heartButtonRef.current) return;
 
-    const buttonRect = heartButtonRef.current.getBoundingClientRect();
-    const containerRect = heartButtonRef.current
-      .closest(".relative")
-      .getBoundingClientRect();
+    // const buttonRect = heartButtonRef.current.getBoundingClientRect();
+    // const containerRect = heartButtonRef.current
+    //   .closest(".relative")
+    //   .getBoundingClientRect();
 
-    const relativeX = buttonRect.left - containerRect.left;
-    const relativeY = buttonRect.top - containerRect.top;
+    // const relativeX = buttonRect.left - containerRect.left;
+    // const relativeY = buttonRect.top - containerRect.top;
 
-    const id = Date.now();
-    set_hearts((prevHearts) => [
-      ...prevHearts,
-      { id, x: relativeX, y: relativeY },
-    ]);
+    // const id = Date.now();
+    // set_hearts((prevHearts) => [
+    //   ...prevHearts,
+    //   { id, x: relativeX, y: relativeY },
+    // ]);
   };
 
   const handlerAnimationEnd = (id: id_props) => {
     set_hearts((prevHearts) => prevHearts.filter((heart) => heart.id !== id));
   };
 
-  const AnimatedHeart = ({ id, x, y }) => {
+  const AnimatedHeart = ({ id, x, y }:) => {
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
