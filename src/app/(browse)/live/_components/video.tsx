@@ -92,7 +92,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   //   </div>)
   // }
   return (
-    <div className="aspect-video group relative w-full border border-red-300">
+    <div className="aspect-video object-contain group relative w-full border border-red-300">
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
       {/* <LiveVideo participant={host_participant} /> */}
