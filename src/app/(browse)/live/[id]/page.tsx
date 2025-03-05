@@ -77,7 +77,7 @@ const UserLivePage = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-12  bg-sky-300 h-[70vh]">
+      <div className="grid grid-cols-12   h-[70vh] border border-sky-400 w-[80vw] ">
         {/* 사이드바 */}
         <div className="col-span-12 lg:col-span-2 ">사이드바</div>
         {/* LiveKit Room */}
@@ -90,15 +90,16 @@ const UserLivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 relative"
+            className="border border-red-500 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 relative"
           >
             <div className=" lg:col-span-7 xl:col-span-7  ">
-              <div className="relative">
+              <div className="relative max-width: 500px; max-height: 300px;">
                 {/* Video 컴포넌트를 감싸는 div, relative 추가 */}
                 <Video
                   host_name={current_host_nickname}
                   host_identity={current_host_id}
                   token={token}
+                  className="object-contain"
                 />
 
                 <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -106,7 +107,7 @@ const UserLivePage = () => {
                   <div className="w-2 h-2 bg-black rounded"></div>
                   <div className="w-2 h-2 bg-black rounded"></div>
                 </div>
-                <div className="bg-gray-700 absolute top-0 top-[15vh] flex flex-col w-1/3 h-1/3 bg-transparent ">
+                <div className="absolute top-[15vh] right-0 flex flex-col w-1/3 h-1/3 bg-transparent ">
                   <ChatPage />
                 </div>
               </div>

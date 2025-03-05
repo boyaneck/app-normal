@@ -8,71 +8,66 @@ module.exports = {
       colors: {
         main_color: "#69E2FF", // 커스텀 색상을 main_color로 지정
       },
-      // animation: {
-      //   "spin-wave": "spin-wave 3s linear infinite",
-      //   bounce: "bounce 1s ease-in-out infinite",
-      // },
-      // keyframes: {
-      //   "spin-wave": {
-      //     "0%": { transform: "rotate(0deg)", borderColor: "red" },
-      //     "100%": { transform: "rotate(360deg)", borderColor: "transparent" },
-      //   },
-      //   bounce: {
-      //     "0%, 100%": {
-      //       transform: "translateY(0)",
-      //     },
-      //     "50%": {
-      //       transform: "translateY(-25%)",
-      //     },
-      //   },
-      // },
+
       keyframes: {
         fadeOutUp: {
           from: { opacity: 1, transform: "translateY(0)" },
           to: { opacity: 0, transform: "translateY(-20px)" },
         },
+        // heartWave: {
+        //   // heart_wave 애니메이션 수정
+        //   "0%": {
+        //     opacity: 1,
+        //     transform: "translateY(0) translateX(0)",
+        //   },
+        //   "10%": {
+        //     transform: "translateY(-10px) translateX(3px)",
+        //   },
+
+        //   "20%": {
+        //     transform: "translateY(-20px) translateX(-3px)",
+        //   },
+        //   "30%": {
+        //     transform: "translateY(-40px) translateX(3px)",
+        //   },
+        //   "40%": {
+        //     transform: "translateY(-60px) translateX(-3px)",
+        //   },
+        //   "50%": {
+        //     transform: "translateY(-80px) translateX(3px)",
+        //   },
+        //   "60%": {
+        //     transform: "translateY(-100px) translateX(-3px)",
+        //   },
+        //   "70%": {
+        //     transform: "translateY(-120px) translateX(3px)",
+        //   },
+        //   "80%": {
+        //     transform: "translateY(-140px) translateX(-3px)",
+        //   },
+        //   "90%": {
+        //     transform: "translateY(-160px) translateX(0)",
+        //   },
+        //   "100%": {
+        //     opacity: 0,
+        //     transform: "translateY(-200px) translateX(0)",
+        //   },
+        // },
         heartWave: {
-          // heartWave 애니메이션 수정
           "0%": {
-            opacity: 1,
-            transform: "translateY(0) translateX(0)",
-          },
-          "10%": {
-            transform: "translateY(-10px) translateX(5px)",
-          },
-          "20%": {
-            transform: "translateY(-20px) translateX(-5px)",
-          },
-          "30%": {
-            transform: "translateY(-40px) translateX(10px)",
-          },
-          "40%": {
-            transform: "translateY(-60px) translateX(-10px)",
-          },
-          "50%": {
-            transform: "translateY(-80px) translateX(10px)",
-          },
-          "60%": {
-            transform: "translateY(-100px) translateX(-10px)",
-          },
-          "70%": {
-            transform: "translateY(-120px) translateX(10px)",
-          },
-          "80%": {
-            transform: "translateY(-140px) translateX(-10px)",
-          },
-          "90%": {
-            transform: "translateY(-160px) translateX(0)",
+            transform: "translate(-50%, -50%) scale(1)",
+            opacity: "1",
           },
           "100%": {
-            opacity: 0,
-            transform: "translateY(-200px) translateX(0)",
+            transform: "translate(-50%, -150%) scale(1.5)",
+            opacity: "0",
           },
         },
       },
       animation: {
         fadeOutUp: "fadeOutUp 0.3s ease-out forwards",
-        heartWave: "heartWave 0.8s linear forwards",
+        // heartWave: "heartWave 0.8s linear forwards",
+        heartWave: "heartWave 0.8s forwards",
       },
     },
   },
