@@ -96,7 +96,7 @@ const Screen = () => {
           >
             {/* 스크린 컨테이너 */}
             <div
-              className="relative h-40 bg-red-200 mb-4 rounded-md flex items-center justify-center"
+              className="relative h-40 mb-4 rounded-md flex items-center justify-center"
               onClick={() => {
                 follow(user.user_email, user.id);
               }}
