@@ -77,46 +77,46 @@ const UserLivePage = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-12   h-[70vh] border border-sky-400 w-[80vw] ">
+      <div className="grid grid-cols-12  bg-green-400 h-[60vh] border border-sky-400 w-[80vw] ">
         {/* 사이드바 */}
-        <div className="col-span-12 lg:col-span-2 ">사이드바</div>
+        <div className="col-span-12 bg-red-400 lg:col-span-2 ">사이드바</div>
         {/* LiveKit Room */}
         <div
           className=" col-span-12 lg:col-span-9 relative group
-        full"
+        full h-5/5"
         >
+          <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-full bg-black ">
+            <ChatPage />
+          </div>
           {/* Video 컨테이너 */}
-          <LiveKitRoom
+          {/* <LiveKitRoom
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border border-red-500 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 relative"
+            className="border bg-yellow-300 border-red-500 relative"
           >
-            <div className=" lg:col-span-7 xl:col-span-7  ">
+            <div className=" lg:col-span-2 xl:col-span-7  ">
               <div className="relative max-width: 500px; max-height: 300px;">
-                {/* Video 컴포넌트를 감싸는 div, relative 추가 */}
                 <Video
                   host_name={current_host_nickname}
                   host_identity={current_host_id}
                   token={token}
-                  className="object-contain"
+                  className="object-contain 
+                  "
                 />
 
                 <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  {/* 네모 박스 컨테이너 */}
                   <div className="w-2 h-2 bg-black rounded"></div>
                   <div className="w-2 h-2 bg-black rounded"></div>
                 </div>
-                <div className="absolute top-[15vh] right-0 flex flex-col w-1/3 h-1/3 bg-transparent ">
+                <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
                   <ChatPage />
                 </div>
               </div>
             </div>
-          </LiveKitRoom>
-
+          </LiveKitRoom> */}
           {/* SubInfo 래퍼 */}
-
-          <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+          {/* <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
             <div className="w-24 h-24 rounded-full overflow-hidden">
               <SubInfo
                 live_information={live_information}
@@ -124,12 +124,8 @@ const UserLivePage = () => {
                 current_host_email={current_host_nickname}
               />
             </div>
-          </div>
+          </div> */}
         </div>
-        {/* <div className="col-span-12 lg:col-span-3 bg-yellow-200">
-          채팅
-          <ChatPage />
-        </div> */}
       </div>
     </div>
   );
