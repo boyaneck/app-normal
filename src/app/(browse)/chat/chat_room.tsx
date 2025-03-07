@@ -172,7 +172,7 @@ const ChatRoom = () => {
           >
             🙂
             {show_emoji_picker && (
-              <div className="absolute bottom-full left-0 z-10 transform scale-75 translate-x-[-12.5%] translate-y-[12.5%]">
+              <div className="absolute bottom-full left-0 z-10 transform scale-75 translate-x-[-30%] translate-y-[12.5%]">
                 <Picker onEmojiClick={onEmojiClick} />
               </div>
             )}
