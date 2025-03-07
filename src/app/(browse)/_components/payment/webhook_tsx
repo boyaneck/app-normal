@@ -1,0 +1,47 @@
+//로컬서버에서 webhook 진행
+// pages/api/payment/webhook.ts
+
+
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { Iamport } from 'iamport-server-api';
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === 'POST') {
+    try {
+      const { imp_uid, merchant_uid } = req.body;
+
+      // 아임포트 API 설정
+      const iamport = new Iamport({
+        impKey: process.env.IMP_KEY,
+        impSecret: process.env.IMP_SECRET,
+      });
+
+      // 아임포트 결제 정보 조회
+      const paymentInfo = await iamport.payment.getByImpUid({
+        imp_uid: imp_uid,
+      });
+
+      const { amount, status } = paymentInfo.data;
+
+      // TODO: 결제 금액과 주문 금액 비교 (위변조 검증)
+
+      if (status === 'paid') {
+        // TODO: 결제 완료 처리 (DB 업데이트 등)
+        console.log(`[Webhook] Payment success: imp_uid=${imp_uid}, merchant_uid=${merchant_uid}, amount=${amount}`);
+        res.status(200).json({ message: 'Payment success' });
+      } else {
+        // TODO: 결제 실패 처리
+        console.error(`[Webhook] Payment failed: imp_uid=${imp_uid}, merchant_uid=${merchant_uid}, status=${status}`);
+        res.status(400).json({ message: 'Payment failed' });
+      }
+    } catch (error: any) {
+      console.error('[Webhook] Error:', error);
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  } else {
+    res.status(405).json({ message: 'Method Not Allowed' });
+  }
+}
