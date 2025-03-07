@@ -83,10 +83,12 @@ const UserLivePage = () => {
         {/* LiveKit Room */}
         <div
           className=" col-span-12 lg:col-span-9 relative group
-        full h-5/5"
+        full h-5/5 bg-sky-400"
         >
-          <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-full bg-black ">
-            <ChatPage />
+          <div className="absolute top-[12] right-0  w-2/5 h-4/6 bg-yellow-400 ">
+            <div className="h-full">
+              <ChatPage />
+            </div>
           </div>
           {/* Video 컨테이너 */}
           {/* <LiveKitRoom

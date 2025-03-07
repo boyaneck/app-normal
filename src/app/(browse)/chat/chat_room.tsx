@@ -79,7 +79,7 @@ const ChatRoom = () => {
     set_message(e.target.value);
   };
 
-  const max_messages = 6; // 최대 메시지 개수
+  const max_messages = 10; // 최대 메시지 개수
 
   const AnimatedMessage = ({ message, is_visible }: remove_message_props) => {
     return (
@@ -139,48 +139,100 @@ const ChatRoom = () => {
   };
 
   return (
-    <div className="grid grid-rows-5 h-full relative border bg-purple-500">
-      {/* {show_emoji_picker && <Picker onEmojiClick={onEmojiClick} />} */}
-      <span className="row-span-4">
-        <div ref={chatContainerRef} className="col-span-1 border">
-          {receive_message_info.map((message_info) => {
-            const isRemoving = message_remove === message_info;
-            return (
-              <AnimatedMessage
-                message={`${message_info.user_nickname}: ${message_info.message}`}
-                is_visible={isRemoving}
+    <div className="bg-red-400 h-full w-full grid grid-rows-10 relative">
+      <div className="bg-yellow-300 row-span-9">
+        {receive_message_info.map((message_info) => {
+          const isRemoving = message_remove === message_info;
+          return (
+            <AnimatedMessage
+              message={`${message_info.user_nickname}: ${message_info.message}`}
+              is_visible={isRemoving}
+            />
+          );
+        })}
+      </div>
+      <div className="bg-white row-span-1">
+        <span className="flex flex-row">
+          <input
+            placeholder="메세지를 입력해주세요"
+            ref={message_input_ref}
+            value={message}
+            onChange={onHandlerInput}
+            className=" bg-transparent border border-purple-400 w-2/3 "
+          ></input>
+          <button
+            onClick={onHandlerSendMessage}
+            className="hover hover:cursor-pointer"
+          >
+            전송
+          </button>
+          <button
+            className="relative"
+            onClick={() => set_show_emoji_picker(!show_emoji_picker)}
+          >
+            🙂
+            {show_emoji_picker && (
+              <div className="absolute bottom-full left-0 z-10 transform scale-75 translate-x-[-30%] translate-y-[12.5%]">
+                <Picker onEmojiClick={onEmojiClick} />
+              </div>
+            )}
+          </button>
+          <button className="relative" onClick={handleHeartClick}>
+            {hearts.map((heart) => (
+              <AnimatedHeart
+                key={heart?.id}
+                id={heart?.id}
+                onAnimationEnd={handlerAnimationEnd}
+                className="absolute bottom-full left-0"
               />
-            );
-          })}
-        </div>
-      </span>
-      <span className="row-span-1">
-        <span className="flex flex-wrap  ">
-          <span className="w-4/6">
-            <input
-              placeholder="메세지를 입력해주세요"
-              ref={message_input_ref}
-              value={message}
-              onChange={onHandlerInput}
-              className=" bg-transparent border w-full "
-            ></input>
-          </span>
-          <span className="w-1/6">
-            <button
-              onClick={onHandlerSendMessage}
-              className="hover hover:cursor-pointer"
-            >
-              전송
-            </button>
-          </span>
-          <span className="w-1/6">
-            <button onClick={() => set_show_emoji_picker(!show_emoji_picker)}>
-              이모지
-            </button>
-          </span>
+            ))}
+            ❤️
+          </button>
         </span>
-      </span>
-      {/* <span className="col-span-1 border border-black items-center bg-sky-200 flex">
+      </div>
+    </div>
+    // <div className="grid grid-rows-5 h-full w-full relative border bg-purple-500">
+    //   {/* {show_emoji_picker && <Picker onEmojiClick={onEmojiClick} />} */}
+    //   <span className="row-span-4">
+    //     <div ref={chatContainerRef} className="col-span-1 ">
+    //       {receive_message_info.map((message_info) => {
+    //         const isRemoving = message_remove === message_info;
+    //         return (
+    //           <AnimatedMessage
+    //             message={`${message_info.user_nickname}: ${message_info.message}`}
+    //             is_visible={isRemoving}
+    //           />
+    //         );
+    //       })}
+    //     </div>
+    //   </span>
+    //   <span className="row-span-1">
+    //     <span className="flex flex-wrap  ">
+    //       <span className="w-4/6">
+    //         <input
+    //           placeholder="메세지를 입력해주세요"
+    //           ref={message_input_ref}
+    //           value={message}
+    //           onChange={onHandlerInput}
+    //           className=" bg-transparent border w-full "
+    //         ></input>
+    //       </span>
+    //       <span className="w-1/6">
+    //         <button
+    //           onClick={onHandlerSendMessage}
+    //           className="hover hover:cursor-pointer"
+    //         >
+    //           전송
+    //         </button>
+    //       </span>
+    //       <span className="w-1/6">
+    //         <button onClick={() => set_show_emoji_picker(!show_emoji_picker)}>
+    //           🙂
+    //         </button>
+    //       </span>
+    //     </span>
+    //   </span>
+    /* <span className="col-span-1 border border-black items-center bg-sky-200 flex">
         <span>
           <input
             placeholder="메세지를 입력해주세요"
@@ -202,20 +254,20 @@ const ChatRoom = () => {
           </button>
           <button onClick={handleHeartClick}>❤️</button>
         </span>
-      </span> */}
-      <div className="relative">
-        <div className="border border-black">
-          {/* 하트 아이콘이 나타날 영역 */}
-          {hearts.map((heart) => (
-            <AnimatedHeart
-              key={heart?.id}
-              id={heart?.id}
-              onAnimationEnd={handlerAnimationEnd}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+      </span> */
+    //   <div className="relative">
+    //     <div className="border border-black">
+    //       {/* 하트 아이콘이 나타날 영역 */}
+    //       {hearts.map((heart) => (
+    //         <AnimatedHeart
+    //           key={heart?.id}
+    //           id={heart?.id}
+    //           onAnimationEnd={handlerAnimationEnd}
+    //         />
+    //       ))}
+    //     </div>
+    //   </div>
+    // </div>
   );
 };
 
