@@ -6,6 +6,7 @@ import useUserStore from "@/store/user";
 import { useSocketStore } from "@/store/socket_store";
 import Picker from "emoji-picker-react";
 import { animated_heart } from "@/types/chat";
+import PaymentPage from "../_components/payment/payment";
 
 const ChatRoom = () => {
   const [receive_message_info, set_receive_message_info] = useState<
@@ -188,6 +189,7 @@ const ChatRoom = () => {
             ))}
             ❤️
           </button>
+          <PaymentPage />
         </span>
       </div>
     </div>
