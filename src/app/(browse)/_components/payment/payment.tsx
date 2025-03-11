@@ -19,7 +19,7 @@ const PaymentPage = () => {
             pay_method: "card",
             merchant_uid: `payment-${crypto.randomUUID()}`,
             name: "노르웨이 회전 의자",
-            amount: 100,
+            amount: 10,
             buyer_email: "gildong@gmail.com",
             buyer_name: "홍길동",
             buyer_tel: "010-4242-4242",
