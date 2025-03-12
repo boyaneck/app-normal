@@ -20,7 +20,7 @@ const PaymentPage = () => {
             merchant_uid: `payment-${crypto.randomUUID()}`,
             name: "노르웨이 회전 의자",
             amount: 10,
-            buyer_email: "gildong@gmail.com",
+            buyer_email: "jinxx93@naver.com",
             buyer_name: "홍길동",
             buyer_tel: "010-4242-4242",
             buyer_addr: "서울특별시 강남구 신사동",
