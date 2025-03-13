@@ -14,8 +14,20 @@ const PaymentPage = () => {
         IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);
 
         IMP.request_pay(
+          // {
+          //   channelKey: "channel-key-01d6477b-f96a-43d4-88e5-62eedd636a0c",
+          //   pay_method: "card",
+          //   merchant_uid: `payment-${crypto.randomUUID()}`,
+          //   name: "노르웨이 회전 의자",
+          //   amount: 10,
+          //   buyer_email: "jinxx93@naver.com",
+          //   buyer_name: "홍길동",
+          //   buyer_tel: "010-4242-4242",
+          //   buyer_addr: "서울특별시 강남구 신사동",
+          //   buyer_postcode: "01181",
+          // },
           {
-            channelKey: "channel-key-01d6477b-f96a-43d4-88e5-62eedd636a0c",
+            pg: "tosspayments",
             pay_method: "card",
             merchant_uid: `payment-${crypto.randomUUID()}`,
             name: "노르웨이 회전 의자",
