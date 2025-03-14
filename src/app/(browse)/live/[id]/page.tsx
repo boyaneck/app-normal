@@ -77,13 +77,13 @@ const UserLivePage = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-12  bg-green-400 h-[60vh] border border-sky-400 w-[80vw] ">
+      <div className="grid grid-cols-12 h-[60vh] border border-sky-400 w-[80vw] ">
         {/* 사이드바 */}
         <div className="col-span-12 bg-red-400 lg:col-span-2 ">사이드바</div>
         {/* LiveKit Room */}
         <div
           className=" col-span-12 lg:col-span-9 relative group
-        full h-5/5 bg-sky-400"
+        full h-5/5 "
         >
           <div className="absolute top-[12] right-0  w-2/5 h-4/6 bg-yellow-400 ">
             <div className="h-full">
