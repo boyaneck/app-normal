@@ -126,7 +126,7 @@ const ChatRoom = () => {
     useEffect(() => {
       const timer = setTimeout(() => {
         set_is_visible(false);
-        onAnimationEnd({ id: id } as heart); // 애니메이션 종료 후 콜백 호출
+        onAnimationEnd({ id: id }); // 애니메이션 종료 후 콜백 호출
       }, 800); // 애니메이션 시간과 동일하게 설정
 
       return () => clearTimeout(timer);
@@ -193,6 +193,7 @@ const ChatRoom = () => {
         </span>
       </div>
     </div>
+
     // <div className="grid grid-rows-5 h-full w-full relative border bg-purple-500">
     //   {/* {show_emoji_picker && <Picker onEmojiClick={onEmojiClick} />} */}
     //   <span className="row-span-4">
