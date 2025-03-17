@@ -57,7 +57,6 @@ declare interface id_props {
   id: number;
 }
 
-declare interface sss {
-  onAnimationEnd: (heart: heart) => void;
-  id: number;
+export interface host_nickname_props {
+  host_nickname?: string;
 }

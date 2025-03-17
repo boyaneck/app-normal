@@ -5,10 +5,13 @@ import { getChatInfo } from "@/api/chat"; // 올바른 경로로 수정
 import useUserStore from "@/store/user";
 import { useSocketStore } from "@/store/socket_store";
 import Picker from "emoji-picker-react";
-import { animated_heart } from "@/types/chat";
+import { animated_heart, host_nickname_props } from "@/types/chat";
 import PaymentPage from "../_components/payment/payment";
 
-const ChatRoom = () => {
+interface Props {
+  current_host_nickname: string;
+}
+const ChatRoom = ({ current_host_nickname }: Props) => {
   const [receive_message_info, set_receive_message_info] = useState<
     chat_info_[]
   >([]);

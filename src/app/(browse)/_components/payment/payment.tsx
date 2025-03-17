@@ -81,22 +81,28 @@
 
 // export default PaymentPage;
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Modal from "@/components/ui/modal"; // 기존 Modal 컴포넌트
 import { motion } from "framer-motion";
 import { createPortal } from "react-dom"; // React 18에서 ReactDOM 대신 import
+import useUserStore from "@/store/user";
 
-const PaymentPage = () => {
+interface Props {
+  current_host_nickname: string | null;
+}
+const PaymentPage = ({ current_host_nickname }: Props) => {
+  const { user } = useUserStore();
+  const pay_ref = useRef<HTMLInputElement>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
-  const [isIamportLoaded, setIsIamportLoaded] = useState(false);
+  const [is_import_loaded, set_is_import_loaded] = useState(false);
   const [showPayment, setShowPayment] = useState(false); // 결제 진행 여부 상태 추가
-
+  const [payment, set_payment] = useState<number>(0);
   useEffect(() => {
     const iamport = document.createElement("script");
     iamport.src = "https://cdn.iamport.kr/v1/iamport.js";
 
     iamport.onload = () => {
-      setIsIamportLoaded(true);
+      set_is_import_loaded(true);
     };
 
     iamport.onerror = () => {
@@ -119,11 +125,12 @@ const PaymentPage = () => {
   };
 
   const pay = () => {
-    if (!isIamportLoaded) {
+    if (!is_import_loaded) {
       alert("아임포트 스크립트 로딩중입니다. 잠시 후 다시 시도해주세요.");
       return;
     }
 
+    console.log("가격은 ?", pay_ref?.current?.value);
     const { IMP } = window as Window as any;
     if (IMP) {
       IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);
@@ -133,13 +140,13 @@ const PaymentPage = () => {
           pg: "tosspayments",
           pay_method: "card",
           merchant_uid: `payment-${crypto.randomUUID()}`,
-          name: "노르웨이 회전 의자",
-          amount: 10,
+          name: current_host_nickname + "에게 후원",
+          amount: pay_ref?.current?.value,
           buyer_email: "jinxx93@naver.com",
-          buyer_name: "홍길동",
+          buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
-          buyer_addr: "서울특별시 강남구 신사동",
-          buyer_postcode: "01181",
+          // buyer_addr: "서울특별시 강남구 신사동",
+          // buyer_postcode: "01181",
         },
         function (response: any) {
           if (response.success) {
@@ -191,6 +198,10 @@ const PaymentPage = () => {
           exit="exit"
         >
           <p>결제를 진행하시겠습니까?</p>
+          <div>결제창 만들기</div>
+          <div>{current_host_nickname} 유저에게 입금됩니다.</div>
+          <input placeholder="금액을 입력하세요" ref={pay_ref}></input>
+
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={pay} // 결제 진행 함수 호출
