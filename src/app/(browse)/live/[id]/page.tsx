@@ -38,7 +38,7 @@ interface sub_props {
 const UserLivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("host_id");
-  const host_nickname = search_params.get("user_nickname");
+  const host_nickname = search_params.get("host_nickname");
   const host_email = search_params.get("host_email");
   const { user } = useUserStore((state) => state);
   const current_host_id = id === null ? "유저없음" : id;
@@ -72,6 +72,8 @@ const UserLivePage = () => {
     }
   }, []);
 
+  console.log("자 호스트 닉네임일ㄸ래", host_nickname);
+
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
@@ -87,7 +89,8 @@ const UserLivePage = () => {
         >
           <div className="absolute top-[12] right-0  w-2/5 h-4/6 bg-yellow-400 ">
             <div className="h-full">
-              <ChatPage />
+              {/* <ChatPage host_nickname={host_nickname}  /> */}
+              <ChatPage current_host_nickname={current_host_nickname} />
             </div>
           </div>
           {/* Video 컨테이너 */}

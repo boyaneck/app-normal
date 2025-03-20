@@ -1,13 +1,18 @@
 import React from "react";
 import ChatRoom from "./chat_room";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-const ChatPage = () => {
+
+interface Props {
+  current_host_nickname: string;
+}
+
+const ChatPage = ({ current_host_nickname }: Props) => {
   const query_client = new QueryClient();
 
   return (
     <>
       <QueryClientProvider client={query_client}>
-        <ChatRoom />
+        <ChatRoom current_host_nickname={current_host_nickname} />
       </QueryClientProvider>
     </>
   );
