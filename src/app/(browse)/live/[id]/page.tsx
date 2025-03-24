@@ -80,34 +80,34 @@ const UserLivePage = () => {
   return (
     <div className="grid grid-cols-12 h-[60vh] w-[80vw] ">
       <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div>
-      <div className=" col-span-12 lg:col-span-9   ">
+      <div className=" col-span-12 lg:col-span-9  relative ">
         <ChatPage current_host_nickname={current_host_nickname} />
-        {/* <LiveKitRoom
-            audio={true}
-            token={token}
-            serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="border bg-yellow-300 border-red-500 relative"
-          >
-            <div className=" lg:col-span-2 xl:col-span-7  ">
-              <div className="relative max-width: 500px; max-height: 300px;">
-                <Video
-                  host_name={current_host_nickname}
-                  host_identity={current_host_id}
-                  token={token}
-                  className="object-contain 
+        <LiveKitRoom
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+          className="border bg-yellow-300 border-red-500 relative"
+        >
+          <div className=" lg:col-span-2 xl:col-span-7  ">
+            <div className="relative max-width: 500px; max-height: 300px;">
+              <Video
+                host_name={current_host_nickname}
+                host_identity={current_host_id}
+                token={token}
+                className="object-contain 
                   "
-                />
+              />
 
-                <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <div className="w-2 h-2 bg-black rounded"></div>
-                  <div className="w-2 h-2 bg-black rounded"></div>
-                </div>
-                <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
-                  <ChatPage current_host_nickname={current_host_nickname} />
-                </div>
+              <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="w-2 h-2 bg-black rounded"></div>
+                <div className="w-2 h-2 bg-black rounded"></div>
+              </div>
+              <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
+                <ChatPage current_host_nickname={current_host_nickname} />
               </div>
             </div>
-          </LiveKitRoom> */}
+          </div>
+        </LiveKitRoom>
         {/* SubInfo 래퍼 */}
         {/* <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
             <div className="w-24 h-24 rounded-full overflow-hidden">
