@@ -1,4 +1,10 @@
 import { create } from "zustand";
+import {
+  chat_room_info,
+  chat_room_info_state,
+  chat_room_state,
+  current_chatroom_state,
+} from "../types/chat";
 
 const useChatRoomInfo = create<chat_room_info_state>((set) => ({
   chat_room_info: [],

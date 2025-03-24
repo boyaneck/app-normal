@@ -1,54 +1,51 @@
-"use client";
-
-import React, { useState } from "react";
-import StudioMainBanner from "./studio_main_banner";
+// StudioMainBanner.js (예시)
+import React from "react";
+import ManageRevenuePage from "../studio_sidebar/manage_revenue/page";
 import ManageViewerPage from "../studio_sidebar/manage_viewer/page";
+import AnalyzePage from "../studio_sidebar/analyze/page";
 
-const StudioPage = () => {
-  const [selectedMenu, setSelectedMenu] = useState(null);
+interface Props {
+  selected_menu: string;
+}
+const StudioMainBanner = ({ selected_menu }: Props) => {
+  let content;
 
-  const handleMenuClick = (menu: any) => {
-    setSelectedMenu(menu);
-  };
+  switch (selected_menu) {
+    case "manage_viewer":
+      content = (
+        <div>
+          <ManageViewerPage />
+        </div>
+      );
+      break;
+    case "manage_revenue":
+      content = (
+        <div>
+          수익관리
+          <ManageRevenuePage></ManageRevenuePage>
+        </div>
+      );
+      break;
+    case "analysis":
+      content = (
+        <div>
+          <AnalyzePage />
+        </div>
+      );
+      break;
+    case "notice":
+      content = <div>공지사항 내용</div>;
+      break;
+    default:
+      content = <div>스튜디오 메인 배너 내용</div>; // 기본 내용
+  }
 
   return (
-    <div className=" border border-black grid grid-cols-3 ">
-      <div className="border border-red-300">
-        <div
-          className="cursor-pointer hover:bg-gray-100 p-2"
-          onClick={() => handleMenuClick("viewer")}
-        >
-          시청자관리
-        </div>
-        <div
-          className="cursor-pointer hover:bg-gray-100 p-2"
-          onClick={() => handleMenuClick("revenue")}
-        >
-          수익관리
-        </div>
-        <div
-          className="cursor-pointer hover:bg-gray-100 p-2"
-          onClick={() => handleMenuClick("analytics")}
-        >
-          분석
-        </div>
-        <div
-          className="cursor-pointer hover:bg-gray-100 p-2"
-          onClick={() => handleMenuClick("notice")}
-        >
-          공지사항
-        </div>
-      </div>
-      <StudioMainBanner />
-      <div className="border border-green-400">
-        {selectedMenu === "viewer" ? (
-          <ManageViewerPage />
-        ) : (
-          <div>메인컨텐츠</div>
-        )}
-      </div>
+    <div className="border border-blue-400">
+      <div>스튜디오 메인 배너</div>
+      {content}
     </div>
   );
 };
 
-export default StudioPage;
+export default StudioMainBanner;

@@ -78,23 +78,11 @@ const UserLivePage = () => {
     return <div>Cannot watch the stream</div>;
   }
   return (
-    <div>
-      <div className="grid grid-cols-12 h-[60vh] border border-sky-400 w-[80vw] ">
-        {/* 사이드바 */}
-        <div className="col-span-12 bg-red-400 lg:col-span-2 ">사이드바</div>
-        {/* LiveKit Room */}
-        <div
-          className=" col-span-12 lg:col-span-9 relative group
-        full h-5/5 "
-        >
-          <div className="absolute top-[12] right-0  w-2/5 h-4/6 bg-yellow-400 ">
-            <div className="h-full">
-              {/* <ChatPage host_nickname={host_nickname}  /> */}
-              <ChatPage current_host_nickname={current_host_nickname} />
-            </div>
-          </div>
-          {/* Video 컨테이너 */}
-          {/* <LiveKitRoom
+    <div className="grid grid-cols-12 h-[60vh] w-[80vw] ">
+      <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div>
+      <div className=" col-span-12 lg:col-span-9   ">
+        <ChatPage current_host_nickname={current_host_nickname} />
+        {/* <LiveKitRoom
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
@@ -115,13 +103,13 @@ const UserLivePage = () => {
                   <div className="w-2 h-2 bg-black rounded"></div>
                 </div>
                 <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
-                  <ChatPage />
+                  <ChatPage current_host_nickname={current_host_nickname} />
                 </div>
               </div>
             </div>
           </LiveKitRoom> */}
-          {/* SubInfo 래퍼 */}
-          {/* <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+        {/* SubInfo 래퍼 */}
+        {/* <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
             <div className="w-24 h-24 rounded-full overflow-hidden">
               <SubInfo
                 live_information={live_information}
@@ -130,7 +118,6 @@ const UserLivePage = () => {
               />
             </div>
           </div> */}
-        </div>
       </div>
     </div>
   );

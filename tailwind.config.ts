@@ -14,45 +14,11 @@ module.exports = {
           from: { opacity: 1, transform: "translateY(0)" },
           to: { opacity: 0, transform: "translateY(-20px)" },
         },
-        // heartWave: {
-        //   // heart_wave 애니메이션 수정
-        //   "0%": {
-        //     opacity: 1,
-        //     transform: "translateY(0) translateX(0)",
-        //   },
-        //   "10%": {
-        //     transform: "translateY(-10px) translateX(3px)",
-        //   },
+        moneyFlap: {
+          "0%, 100%": { transform: "rotate(-3deg)" }, // 시작 및 끝: 약간 왼쪽으로 기울임
+          "50%": { transform: "rotate(3deg)" }, // 중간: 약간 오른쪽으로 기울임
+        },
 
-        //   "20%": {
-        //     transform: "translateY(-20px) translateX(-3px)",
-        //   },
-        //   "30%": {
-        //     transform: "translateY(-40px) translateX(3px)",
-        //   },
-        //   "40%": {
-        //     transform: "translateY(-60px) translateX(-3px)",
-        //   },
-        //   "50%": {
-        //     transform: "translateY(-80px) translateX(3px)",
-        //   },
-        //   "60%": {
-        //     transform: "translateY(-100px) translateX(-3px)",
-        //   },
-        //   "70%": {
-        //     transform: "translateY(-120px) translateX(3px)",
-        //   },
-        //   "80%": {
-        //     transform: "translateY(-140px) translateX(-3px)",
-        //   },
-        //   "90%": {
-        //     transform: "translateY(-160px) translateX(0)",
-        //   },
-        //   "100%": {
-        //     opacity: 0,
-        //     transform: "translateY(-200px) translateX(0)",
-        //   },
-        // },
         heartWave: {
           "0%": {
             transform: "translate(-50%, -50%) scale(1)",
@@ -66,6 +32,7 @@ module.exports = {
       },
       animation: {
         fadeOutUp: "fadeOutUp 0.3s ease-out forwards",
+        moneyFlap: "moneyFlap 0.2s ease-in-out infinite",
         // heartWave: "heartWave 0.8s linear forwards",
         heartWave: "heartWave 0.8s forwards",
       },
