@@ -1,4 +1,4 @@
-declare interface userData {
+export interface userData {
   user_nickname: string;
   avatar_url: string;
   user_email: string;
@@ -7,7 +7,7 @@ declare interface userData {
   user_id: string;
 }
 
-declare interface User {
+export interface User {
   id: string;
   name: string;
   user_email: string;

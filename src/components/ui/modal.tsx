@@ -74,14 +74,14 @@ interface modalProps {
   children: ReactNode;
 }
 
-const Modal = ({ isOpen, onClose, title, children }: modalProps) => {
-  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
+const Modal = ({ isOpen, onClose, title, children }:modalProps) => {
+  const [modal_root, set_modal_root] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     const root = document.createElement("div");
     root.setAttribute("id", "modal-root");
     document.body.appendChild(root);
-    setModalRoot(root);
+    set_modal_root(root);
 
     return () => {
       document.body.removeChild(root);
@@ -90,9 +90,9 @@ const Modal = ({ isOpen, onClose, title, children }: modalProps) => {
 
   const memoizedChildren = useCallback(() => children, [children]); // children이 변경될 때만 함수를 새로 생성
 
-  if (!isOpen || !modalRoot) return null;
+  if (!isOpen || !modal_root) return null;
 
-  const modalVariants = {
+  const modal_variants = {
     hidden: { scale: 0 },
     visible: {
       scale: 1,
@@ -114,7 +114,7 @@ const Modal = ({ isOpen, onClose, title, children }: modalProps) => {
       <motion.div
         className="bg-white rounded-2xl shadow-2xl w-4/5 max-w-md p-6"
         onClick={(e) => e.stopPropagation()}
-        variants={modalVariants}
+        variants={modal_variants}
         initial="hidden"
         animate="visible"
         exit="exit"
@@ -122,9 +122,7 @@ const Modal = ({ isOpen, onClose, title, children }: modalProps) => {
         layout // 레이아웃 변화 감지
       >
         <div className="flex justify-between items-center mb-5">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {title || "Modal Title"}
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">{title || "Modal Title"}</h2>
           <button
             className="text-gray-400 hover:text-gray-600 focus:outline-none"
             onClick={onClose}
@@ -146,11 +144,10 @@ const Modal = ({ isOpen, onClose, title, children }: modalProps) => {
             </svg>
           </button>
         </div>
-        <div className="text-gray-700">{memoizedChildren()}</div>{" "}
-        {/* 렌더링 최적화 */}
+        <div className="text-gray-700">{memoizedChildren()}</div> {/* 렌더링 최적화 */}
       </motion.div>
     </div>,
-    modalRoot
+    modal_root
   );
 };
 

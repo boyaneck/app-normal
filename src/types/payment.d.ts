@@ -1,4 +1,4 @@
-interface payment_props {
+export interface payment_props {
   amount: number;
   order_id: string;
   user_name: string;

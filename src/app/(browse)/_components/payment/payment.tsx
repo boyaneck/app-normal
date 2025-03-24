@@ -223,10 +223,10 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
   return (
     <div>
       <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-green-500 hover:bg-green-700 text-white font-bold rounded"
         onClick={openModal}
       >
-        결제 창 열기
+        <span className="hover:animate-moneyFlap">💰</span>
       </button>
 
       {is_modal_open && (

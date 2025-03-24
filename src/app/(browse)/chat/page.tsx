@@ -10,11 +10,9 @@ const ChatPage = ({ current_host_nickname }: Props) => {
   const query_client = new QueryClient();
 
   return (
-    <>
-      <QueryClientProvider client={query_client}>
-        <ChatRoom current_host_nickname={current_host_nickname} />
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={query_client}>
+      <ChatRoom current_host_nickname={current_host_nickname} />
+    </QueryClientProvider>
   );
   //Ingress 와 Livekit 공부ㅎ
 };
