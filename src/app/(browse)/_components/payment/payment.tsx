@@ -141,12 +141,13 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           pay_method: "card",
           merchant_uid: `payment-${crypto.randomUUID()}`,
           name: current_host_nickname + "에게 후원",
-          amount: pay_ref?.current?.value,
+          // amount: pay_ref?.current?.value,
+          amount: 10,
           buyer_email: "jinxx93@naver.com",
           buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
-          // buyer_addr: "서울특별시 강남구 신사동",
-          // buyer_postcode: "01181",
+          buyer_addr: "서울특별시 강남구 신사동",
+          buyer_postcode: "01181",
         },
         function (response: any) {
           if (response.success) {
