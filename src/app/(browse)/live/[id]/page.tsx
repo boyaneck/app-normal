@@ -81,7 +81,6 @@ const UserLivePage = () => {
     <div className="grid grid-cols-12 h-[60vh] w-[80vw] ">
       <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div>
       <div className=" col-span-12 lg:col-span-9  relative ">
-        <ChatPage current_host_nickname={current_host_nickname} />
         <LiveKitRoom
           audio={true}
           token={token}

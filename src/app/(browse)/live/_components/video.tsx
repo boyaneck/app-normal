@@ -8,6 +8,7 @@ import {
   Room,
   ConnectionCheck,
   RemoteParticipant,
+  RoomEvent,
 } from "livekit-client";
 import {
   useConnectionState,
@@ -34,9 +35,42 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
+  const [room, set_room] = useState<Room | null>(null);
 
   const [total_viewer, set_total_viewer] = useState<number>();
-  useEffect(() => {}, [connection_state, host_participant, participants]);
+  useEffect(() => {
+    const room = new Room();
+    const handlerParticipantConnected = (participant: RemoteParticipant) => {
+      if (participant.identity !== host_identity) {
+      }
+    };
+    const handlerParticipantDisconnected = (participant: RemoteParticipant) => {
+      if (participant.identity !== host_identity) {
+      }
+    };
+    room.on(RoomEvent.ParticipantConnected, handlerParticipantConnected);
+    room.on(RoomEvent.ParticipantDisconnected, handlerParticipantDisconnected);
+
+    const connectRoom = async () => {
+      try {
+        await room.connect("", token);
+        console.log("room.connect 확인하기");
+        set_total_viewer(participants.length - 1);
+      } catch (error) {}
+    };
+
+    connectRoom();
+    set_room(room);
+    return () => {
+      room.disconnect();
+      room.off(RoomEvent.ParticipantConnected, handlerParticipantConnected);
+      room.off(
+        RoomEvent.ParticipantDisconnected,
+        handlerParticipantDisconnected
+      );
+      console.log("Disconnected from livekit Room");
+    };
+  }, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
     Track.Source.Camera,
@@ -46,10 +80,10 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   );
   useEffect(() => {
     set_total_viewer(participants.length - 1);
-  }, [total_viewer]);
+  }, []);
 
   let content;
-  //서버와 연결은 되었는데 아직 room이 연결되지 않았을때때
+  //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
     content = (
       <p>
@@ -91,8 +125,13 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   //     <LiveVideo participant={host_participant}
   //   </div>)
   // }
+
+  let peak_viewers_minute = 0;
+  let peak_viewers_hour = 0;
+
+  // Room.on("participantConnected");
   return (
-    <div className="aspect-video object-contain group relative w-full border border-red-300">
+    <div className="aspect-video object-contain group relative w-full">
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
       {/* <LiveVideo participant={host_participant} /> */}
