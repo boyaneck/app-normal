@@ -39,37 +39,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
 
   const [total_viewer, set_total_viewer] = useState<number>();
   useEffect(() => {
-    const room = new Room();
-    const handlerParticipantConnected = (participant: RemoteParticipant) => {
-      if (participant.identity !== host_identity) {
-      }
-    };
-    const handlerParticipantDisconnected = (participant: RemoteParticipant) => {
-      if (participant.identity !== host_identity) {
-      }
-    };
-    room.on(RoomEvent.ParticipantConnected, handlerParticipantConnected);
-    room.on(RoomEvent.ParticipantDisconnected, handlerParticipantDisconnected);
-
-    const connectRoom = async () => {
-      try {
-        await room.connect("", token);
-        console.log("room.connect 확인하기");
-        set_total_viewer(participants.length - 1);
-      } catch (error) {}
-    };
-
-    connectRoom();
-    set_room(room);
-    return () => {
-      room.disconnect();
-      room.off(RoomEvent.ParticipantConnected, handlerParticipantConnected);
-      room.off(
-        RoomEvent.ParticipantDisconnected,
-        handlerParticipantDisconnected
-      );
-      console.log("Disconnected from livekit Room");
-    };
+    
+   
   }, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
