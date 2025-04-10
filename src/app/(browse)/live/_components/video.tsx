@@ -35,13 +35,9 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-  const [room, set_room] = useState<Room | null>(null);
 
   const [total_viewer, set_total_viewer] = useState<number>();
-  useEffect(() => {
-    
-   
-  }, [connection_state, host_participant, participants]);
+  useEffect(() => {}, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
     Track.Source.Camera,
