@@ -24,6 +24,7 @@ import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
 import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
+import { useSocketStore } from "@/store/socket_store";
 
 interface VideoProps {
   host_name: string | undefined;
@@ -32,11 +33,11 @@ interface VideoProps {
   className?: string;
 }
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
+  const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-
-  const [total_viewer, set_total_viewer] = useState<number>();
+  const [total_viewer, set_total_viewer] = useState<number>(0);
   useEffect(() => {}, [connection_state, host_participant, participants]);
 
   const tracks = useTracks([
@@ -47,8 +48,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   );
   useEffect(() => {
     set_total_viewer(participants.length - 1);
-  }, []);
+    const viewer_info_per_minute = setInterval(() => {}, 6000);
+  }, [host_participant, participants]);
 
+  console.log("현재 룸의 정보알아보기", participants);
+  console.log("현재 호스트는 누구 ? ", host_participant);
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
