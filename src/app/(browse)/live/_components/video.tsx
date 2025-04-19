@@ -24,6 +24,7 @@ import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
 import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
+import { useSocketStore } from "@/store/socket_store";
 
 interface VideoProps {
   host_name: string | undefined;
@@ -32,12 +33,11 @@ interface VideoProps {
   className?: string;
 }
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
+  const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-
-  const [total_viewer, set_total_viewer] = useState<number>();
-  useEffect(() => {}, [connection_state, host_participant, participants]);
+  const [total_viewer, set_total_viewer] = useState<number>(0);
 
   const tracks = useTracks([
     Track.Source.Camera,
@@ -45,10 +45,27 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   ]).filter(
     (track) => track.participant.identity === host_participant?.identity
   );
-  useEffect(() => {
-    set_total_viewer(participants.length - 1);
-  }, []);
+  const remote_participants = participants.filter(
+    (participant) => participant instanceof RemoteParticipant
+  );
+  const all_remote_participant = remote_participants.map(
+    (participant) => participant.identity
+  );
 
+  // 호스트를 제외한 방에 참가한 모든 유저
+  const remote_participant_except_host = all_remote_participant.filter(
+    (participant) => participant !== host_identity
+  );
+  useEffect(() => {
+    if (!socket) {
+      connect_socket();
+      console.log("소켓에 연결되었습니다.");
+    }
+    set_total_viewer(participants.length - 1);
+    socket?.emit("user_in_out", remote_participant_except_host);
+  }, [participants]);
+
+  console.log("현재 호스트는 누구 ? ", host_participant);
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
@@ -87,21 +104,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       </div>
     );
   }
-  // if (true) {
-  //   return (<div>ddddzzzd
-  //     <LiveVideo participant={host_participant}
-  //   </div>)
-  // }
 
-  let peak_viewers_minute = 0;
-  let peak_viewers_hour = 0;
-
-  // Room.on("participantConnected");
   return (
     <div className="aspect-video object-contain group relative w-full">
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
-      {/* <LiveVideo participant={host_participant} /> */}
     </div>
   );
 };
