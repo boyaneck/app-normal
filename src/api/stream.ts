@@ -50,3 +50,5 @@ export const stream_update = async (
       error.message
     );
 };
+
+export const viewer_per_minute_update = async () => {};

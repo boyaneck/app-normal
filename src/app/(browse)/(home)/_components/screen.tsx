@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
+import { User } from "@/types/user";
 
 const Screen = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
@@ -57,7 +58,6 @@ const Screen = () => {
     user_nickname: string | undefined,
     e: React.MouseEvent<HTMLElement>
   ) => {
-    console.log("뿡밧풍커리", user_id, user_nickname);
     setHost_id(user_id);
     setHost_nickname(user_nickname);
   };

@@ -63,9 +63,9 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     }
     set_total_viewer(participants.length - 1);
     socket?.emit("user_in_out", remote_participant_except_host);
-  }, [participants]);
-
-  console.log("현재 호스트는 누구 ? ", host_participant);
+  }, [total_viewer]);
+  let user_info = {};
+  console.log("호스트 제외한 유저 ? ", remote_participant_except_host);
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
