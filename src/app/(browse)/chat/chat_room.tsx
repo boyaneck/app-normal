@@ -100,7 +100,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             src={avatar_url}
             alt=""
           />
-          <span className="pl-1 pb-1 pt-2 relative top-1 text-xs">아이디</span>
+          <span className="pl-1 pb-1 pt-2 relative bottom-0.5 text-xs">
+            아이디
+          </span>
         </span>
 
         <div
@@ -164,8 +166,8 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   return (
-    <div className="flex h-full justify-end">
-      <div className="w-2/5 h-4/5 grid grid-rows-10 border  ">
+    <div className="flex h-full justify-end ">
+      <div className="w-5/6 h-4/5 grid grid-rows-10 border border-purple-400  ">
         <div className=" row-span-9 ">
           <div className="pl-4">
             {receive_message_info.map((message_info) => {

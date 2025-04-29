@@ -59,3 +59,11 @@ export interface id_props {
 export interface host_nickname_props {
   host_nickname?: string;
 }
+
+export interface handling_chat {
+  action: "kick_out" | "ban";
+  target_identity: string;
+  room_name: string;
+  duration_minutes: number;
+  reason: string;
+}
