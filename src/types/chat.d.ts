@@ -11,6 +11,10 @@ export interface chat_room_info {
   id: string;
   user_nickname: string;
   chat_room_number: string;
+  avatar_url: string;
+  message: string;
+  date: string;
+  id: string;
 }
 export interface chat_room_info_state {
   chat_room_info: chat_room_info[] | undefined;
@@ -24,10 +28,12 @@ export interface chat_room_info_state {
 
 export interface chat_props {
   user_nickname: string[] | undefined;
-  avatar_url: string | null | undefined;
+  avatar_url: string | undefined;
   message: string | null;
   created_at: string;
   chat_room_number: string;
+  id: string;
+  email: string;
 }
 
 export interface chat_room_state {
@@ -50,7 +56,10 @@ export interface heart {
 export interface remove_message_props {
   message: string;
   is_visible: boolean;
-  avatar_url: string;
+  avatar_url: string | undefined;
+  user_id: string;
+  user_nickname: string[] | undefined;
+  user_email: string;
 }
 export interface id_props {
   id: number;
@@ -66,4 +75,14 @@ export interface handling_chat {
   room_name: string;
   duration_minutes: number;
   reason: string;
+}
+
+export interface warning_chat {
+  user_id: string;
+  message: string;
+  user_nickname: string[] | undefined;
+  user_email: string;
+  reason: string;
+  // duration_type:''
+  // duration_value?:number
 }

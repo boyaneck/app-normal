@@ -4,11 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import Picker from "emoji-picker-react";
 import PaymentPage from "../_components/payment/payment";
 import useUserStore from "../../../store/user";
+import axios from "axios";
 import {
   animated_heart,
   chat_props,
   heart,
   remove_message_props,
+  warning_chat,
 } from "../../../types/chat";
 import { useSocketStore } from "@/store/socket_store";
 import { getChatInfo } from "@/api/chat";
@@ -27,13 +29,16 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   const { socket, connect_socket } = useSocketStore();
   const [message_remove, set_message_remove] = useState(null);
   const [hearts, set_hearts] = useState<heart[]>([]); // 하트 목록 상태
-  console.log("메세지 확인", message);
-  // useEffect(() => {
-  //   if (chatContainerRef.current) {
-  //     chatContainerRef.current.scrollTop =
-  //       chatContainerRef.current.scrollHeight;
-  //   }
-  // }, [receive_message_info]);
+  const [is_modal_open, set_is_modal_open] = useState(false);
+
+  const onHandlerOpenWarningModal = () => {
+    set_is_modal_open(true);
+  };
+  const onHandlerCloseWarningModal = () => {
+    set_is_modal_open(false);
+  };
+
+  const [is_warning_modal, set_is_warning_modal] = useState(false);
   useEffect(() => {
     if (!socket) {
       connect_socket();
@@ -86,14 +91,81 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   const max_messages = 6; // 최대 메시지 개수
-
+  const OnHandlerWarningUser = async ({
+    user_id,
+    user_nickname,
+    user_email,
+    message,
+    reason,
+  }: warning_chat) => {
+    const WARNING_USER_API_URL = process.env.WARNING_USER_API_URL as string;
+    set_is_modal_open(true);
+    const payload = {
+      action: "warn",
+      user_id,
+      user_nickname,
+      user_email,
+      message,
+    };
+    try {
+      const response = await axios.post(
+        NEXT_PUBLIC_WARNING_USER_API_URL,
+        payload
+      );
+    } catch (error) {}
+  };
   const AnimatedMessage = ({
     message,
     is_visible,
     avatar_url,
+    user_id,
+    user_nickname,
+    user_email,
   }: remove_message_props) => {
     return (
-      <>
+      <span
+        className="group cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
+        transition-all duration-200 ease-in-out
+        "
+        onClick={() => {
+          const reason = "dddd";
+          OnHandlerWarningUser({
+            user_id,
+            user_nickname,
+            user_email,
+            message,
+            reason,
+          });
+          set_is_modal_open(true);
+        }}
+      >
+        {is_modal_open && (
+          <>
+            <div className="border inset-0 border-black  fixed z-50 flex items-center justify-center bg-red-400 bg-opacity-30 backdrop-blur-sm">
+              <div className="bg-white-300 dark:bg-gray-800 dark:text-white border border-red-400">
+                on aimerait bien en avoir plus
+                <button className="absolute top-3 right-3 text-gray-500 ">
+                  button
+                </button>
+                <h2 className="text-xl font-semibold ">유저의 이름</h2>
+                <div className="w-10 h-10 rounded-full border border-black">
+                  image
+                </div>
+                <p>유저 아이디</p>
+                <p>유저 닉네임</p>
+                <p>
+                  <span className="font-medium">해당 유저가 쓴 메세지</span>
+                </p>
+                <div className="mt-6 border border-black flex justify-end ">
+                  <button className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
         <span>
           <img
             className="w-6 h-6 object-cover bg-gray-400 rounded-full inline-block "
@@ -104,7 +176,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             아이디
           </span>
         </span>
-
         <div
           className={
             is_visible ? "animate-fadeOutUp pt-1 text-sm" : "pt-1 text-sm"
@@ -112,7 +183,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
         >
           {message}
         </div>
-      </>
+      </span>
     );
   };
 
@@ -169,7 +240,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     <div className="flex h-full justify-end ">
       <div className="w-5/6 h-4/5 grid grid-rows-10 border border-purple-400  ">
         <div className=" row-span-9 ">
-          <div className="pl-4">
+          <div className="pl-4 ">
             {receive_message_info.map((message_info) => {
               const isRemoving = message_remove === message_info;
               return (
@@ -177,6 +248,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                   message={`${message_info.user_nickname}: ${message_info.message}`}
                   is_visible={isRemoving}
                   avatar_url={message_info.avatar_url}
+                  user_nickname={message_info.user_nickname}
+                  user_id={message_info.id}
+                  user_email={message_info.email}
                 />
               );
             })}
