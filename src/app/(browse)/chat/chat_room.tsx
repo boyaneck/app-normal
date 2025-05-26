@@ -14,6 +14,7 @@ import {
 } from "../../../types/chat";
 import { useSocketStore } from "@/store/socket_store";
 import { getChatInfo } from "@/api/chat";
+import clsx from "clsx";
 interface Props {
   current_host_nickname: string;
 }
@@ -30,7 +31,25 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   const [message_remove, set_message_remove] = useState(null);
   const [hearts, set_hearts] = useState<heart[]>([]); // 하트 목록 상태
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const [selected_option, set_selected_option] = useState<string | null>(null);
+  const [option_is_selected, set_option_is_selected] = useState(false);
+  const option_data = [
+    { id: "opt1", reason: "원치 않는 상업성 콘텐츠 또는 스팸" },
+    { id: "opt2", reason: "증오심 표현 또는 노골적인 폭력" },
+    { id: "opt3", reason: "테러 조장" },
+    { id: "opt4", reason: "괴롭힘 또는 폭력" },
+    { id: "opt5", reason: "자살 또는 자해" },
+    { id: "opt6", reason: "잘못된 정보" },
+    { id: "opt7", reason: "음란물" },
+  ];
 
+  const onHandlerSelectOption = (reason: string) => {
+    if (selected_option === reason) {
+      set_selected_option(null);
+    }
+    set_selected_option(reason);
+    console.log("이유를 대라!!!!!!!!", reason);
+  };
   const onHandlerOpenWarningModal = () => {
     set_is_modal_open(true);
   };
@@ -144,8 +163,13 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             <div className="border inset-0 border-black  fixed z-50 flex items-center justify-center bg-red-400 bg-opacity-30 backdrop-blur-sm">
               <div className="bg-white-300 dark:bg-gray-800 dark:text-white border border-red-400">
                 on aimerait bien en avoir plus
-                <button className="absolute top-3 right-3 text-gray-500 ">
-                  button
+                <button
+                  className="absolute top-3 right-3 text-gray-500  "
+                  onClick={() => {
+                    set_is_modal_open(false);
+                  }}
+                >
+                  button(X)
                 </button>
                 <h2 className="text-xl font-semibold ">유저의 이름</h2>
                 <div className="w-10 h-10 rounded-full border border-black">
@@ -156,10 +180,37 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                 <p>
                   <span className="font-medium">해당 유저가 쓴 메세지</span>
                 </p>
-                <div className="mt-6 border border-black flex justify-end ">
-                  <button className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500">
-                    Close
-                  </button>
+                <div className="space-y-2">
+                  {option_data.map((option) => (
+                    <div
+                      key={option.id}
+                      className={clsx(
+                        `hover:shadow-lg
+                         rounded-lg 
+                         border
+                       border-gray-300
+                       bg-white 
+                         cursor-pointer 
+                         transfrom transition-all duration-300 ease-in-out 
+                         text-sm`
+                        // {
+                        //   "hover:shoadow-lg": !selected_option,
+                        // },
+                        // {
+                        //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
+                        //     selected_option,
+                        //   "bg-blue-500 text-white shadow-xl z-20 ":
+                        //     selected_option,
+                        //   "font-medium": selected_option,
+                        // }
+                      )}
+                      onClick={() => {
+                        onHandlerSelectOption(option.reason);
+                      }}
+                    >
+                      {option.reason}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -302,5 +353,4 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     </div>
   );
 };
-
 export default ChatRoom;
