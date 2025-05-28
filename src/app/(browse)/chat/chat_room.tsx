@@ -33,6 +33,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   const [is_modal_open, set_is_modal_open] = useState(false);
   const [selected_option, set_selected_option] = useState<string | null>(null);
   const [option_is_selected, set_option_is_selected] = useState(false);
+  const [selected_warning_reason, set_selected_warning_reason] = useState<
+    string | null
+  >(null);
   const option_data = [
     { id: "opt1", reason: "원치 않는 상업성 콘텐츠 또는 스팸" },
     { id: "opt2", reason: "증오심 표현 또는 노골적인 폭력" },
@@ -47,6 +50,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     if (selected_option === reason) {
       set_selected_option(null);
     }
+
     set_selected_option(reason);
     console.log("이유를 대라!!!!!!!!", reason);
   };
@@ -117,7 +121,8 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     message,
     reason,
   }: warning_chat) => {
-    const WARNING_USER_API_URL = process.env.WARNING_USER_API_URL as string;
+    const WARNING_USER_API_URL = process.env
+      .NEXT_PUBLIC_WARNING_USER_API_URL as string;
     set_is_modal_open(true);
     const payload = {
       action: "warn",
@@ -127,11 +132,29 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
       message,
     };
     try {
-      const response = await axios.post(
-        NEXT_PUBLIC_WARNING_USER_API_URL,
-        payload
-      );
+      const response = await axios.post(WARNING_USER_API_URL, payload);
+      console.log("채팅 정지 관련 post", response);
     } catch (error) {}
+  };
+
+  const [selected_message_for_modal, set_selected_message_for_modal] =
+    useState<remove_message_props | null>(null);
+  const openMessageModal = ({
+    message,
+    is_visible,
+    avatar_url,
+    user_id,
+    user_nickname,
+    user_email,
+  }: remove_message_props) => {
+    set_selected_message_for_modal({
+      message,
+      is_visible,
+      avatar_url,
+      user_id,
+      user_nickname,
+      user_email,
+    });
   };
   const AnimatedMessage = ({
     message,
@@ -143,96 +166,39 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   }: remove_message_props) => {
     return (
       <span
-        className="group cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
-        transition-all duration-200 ease-in-out
-        "
+        className=""
         onClick={() => {
-          const reason = "dddd";
-          OnHandlerWarningUser({
+          openMessageModal({
+            message,
+            is_visible,
+            avatar_url,
             user_id,
             user_nickname,
             user_email,
-            message,
-            reason,
           });
           set_is_modal_open(true);
         }}
       >
-        {is_modal_open && (
-          <>
-            <div className="border inset-0 border-black  fixed z-50 flex items-center justify-center bg-red-400 bg-opacity-30 backdrop-blur-sm">
-              <div className="bg-white-300 dark:bg-gray-800 dark:text-white border border-red-400">
-                on aimerait bien en avoir plus
-                <button
-                  className="absolute top-3 right-3 text-gray-500  "
-                  onClick={() => {
-                    set_is_modal_open(false);
-                  }}
-                >
-                  button(X)
-                </button>
-                <h2 className="text-xl font-semibold ">유저의 이름</h2>
-                <div className="w-10 h-10 rounded-full border border-black">
-                  image
-                </div>
-                <p>유저 아이디</p>
-                <p>유저 닉네임</p>
-                <p>
-                  <span className="font-medium">해당 유저가 쓴 메세지</span>
-                </p>
-                <div className="space-y-2">
-                  {option_data.map((option) => (
-                    <div
-                      key={option.id}
-                      className={clsx(
-                        `hover:shadow-lg
-                         rounded-lg 
-                         border
-                       border-gray-300
-                       bg-white 
-                         cursor-pointer 
-                         transfrom transition-all duration-300 ease-in-out 
-                         text-sm`
-                        // {
-                        //   "hover:shoadow-lg": !selected_option,
-                        // },
-                        // {
-                        //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
-                        //     selected_option,
-                        //   "bg-blue-500 text-white shadow-xl z-20 ":
-                        //     selected_option,
-                        //   "font-medium": selected_option,
-                        // }
-                      )}
-                      onClick={() => {
-                        onHandlerSelectOption(option.reason);
-                      }}
-                    >
-                      {option.reason}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        <span>
-          <img
-            className="w-6 h-6 object-cover bg-gray-400 rounded-full inline-block "
-            src={avatar_url}
-            alt=""
-          />
-          <span className="pl-1 pb-1 pt-2 relative bottom-0.5 text-xs">
-            아이디
-          </span>
-        </span>
         <div
-          className={
-            is_visible ? "animate-fadeOutUp pt-1 text-sm" : "pt-1 text-sm"
-          }
+          className="group cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
+        transition-all duration-200 ease-in-out rounded-sm 
+        "
         >
-          {message}
+          <span>
+            <img
+              className="w-6 h-6 object-cover bg-gray-400 rounded-full inline-block "
+              src={avatar_url}
+              alt=""
+            />
+            <span className="pl-1 pb-1 pt-2  bottom-0.5 text-xs">아이디</span>
+          </span>
+          <div
+            className={
+              is_visible ? "animate-fadeOutUp pt-1 text-sm" : "pt-1 text-sm"
+            }
+          >
+            {message}
+          </div>
         </div>
       </span>
     );
@@ -287,11 +253,17 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     ) : null;
   };
 
+  const selectWarningOption = (reason: string) => {
+    if (selected_warning_reason === reason) set_selected_warning_reason("");
+    console.log("경고 사유", selected_warning_reason);
+    console.log("휘뚜루마뚜루");
+  };
+
   return (
     <div className="flex h-full justify-end ">
-      <div className="w-5/6 h-4/5 grid grid-rows-10 border border-purple-400  ">
+      <div className="w-5/6 h-4/5 grid grid-rows-10 border border-purple-400   ">
         <div className=" row-span-9 ">
-          <div className="pl-4 ">
+          <div className="pl-4 relative ">
             {receive_message_info.map((message_info) => {
               const isRemoving = message_remove === message_info;
               return (
@@ -305,6 +277,81 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                 />
               );
             })}
+            {is_modal_open && (
+              <div className="bg-white-300  border-red-400 absolute top-7 bg-red-300 w-4/5 h-4/5">
+                <button
+                  className="absolute top-3 right-3 text-gray-500  "
+                  onClick={() => {
+                    set_is_modal_open(false);
+                  }}
+                >
+                  취소 (x)
+                </button>
+
+                <span className="w-10 h-10 rounded-full border border-black"></span>
+                <span>ID:{selected_message_for_modal?.user_nickname} </span>
+                <div className="border border-black">
+                  {selected_message_for_modal?.message}를
+                </div>
+                <div className="space-y-2">
+                  <div
+                    className="hover:shadow-lg
+                         rounded-lg 
+                         border
+                       border-gray-300
+                       bg-white 
+                         cursor-pointer 
+                         transfrom transition-all duration-300 ease-in-out 
+                         text-sm"
+                  ></div>
+                  <div>
+                    {option_data.map((option) => (
+                      <div
+                        onClick={() => {
+                          selectWarningOption(option.reason);
+                          set_selected_warning_reason(option.reason);
+                        }}
+                        key={option.id}
+                        className={clsx(
+                          `hover:shadow-lg
+                          mt-2
+                     rounded-lg 
+                     border
+                   border-gray-300
+                   bg-white 
+                     cursor-pointer 
+                     transfrom transition-all duration-300 ease-in-out 
+                     text-sm`,
+                          {
+                            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-auto min-w-[200px] text-center shadow-xl":
+                              selected_warning_reason === option.reason,
+                          }
+                          // {
+                          //   "hover:shoadow-lg": !selected_option,
+                          // },
+                          // {
+                          //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
+                          //     selected_option,
+                          //   "bg-blue-500 text-white shadow-xl z-20 ":
+                          //     selected_option,
+                          //   "font-medium": selected_option,
+                          // }
+                        )}
+                      >
+                        {option.reason}
+                      </div>
+                    ))}
+                    {selected_warning_reason !== null ? (
+                      <span>
+                        <button>전송하기</button>
+                      </span>
+                    ) : (
+                      <span></span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="row-span-1">
