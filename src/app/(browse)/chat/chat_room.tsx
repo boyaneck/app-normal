@@ -254,9 +254,13 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   const selectWarningOption = (reason: string) => {
-    if (selected_warning_reason === reason) set_selected_warning_reason("");
-    console.log("경고 사유", selected_warning_reason);
-    console.log("휘뚜루마뚜루");
+    if (selected_warning_reason === reason) {
+      set_selected_warning_reason(null);
+    } else set_selected_warning_reason(reason);
+  };
+  const sendWarningInfo = () => {
+    if (selected_warning_reason === null) return;
+    //HTTP POST 로 보내기기
   };
 
   return (
@@ -309,7 +313,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                       <div
                         onClick={() => {
                           selectWarningOption(option.reason);
-                          set_selected_warning_reason(option.reason);
                         }}
                         key={option.id}
                         className={clsx(
@@ -323,8 +326,11 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                      transfrom transition-all duration-300 ease-in-out 
                      text-sm`,
                           {
-                            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-auto min-w-[200px] text-center shadow-xl":
+                            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl bg-blue-100 border-2 border-blue-500 cursor-pointer text-base font-semibold opacity-100":
                               selected_warning_reason === option.reason,
+                            "bg-green-300 pacity-0 max-h-0 -translate-y-full pointer-events-none mt-0 mb-0 pt-0 pb-0 overflow-hidden":
+                              selected_warning_reason !== option.reason &&
+                              selected_warning_reason !== null,
                           }
                           // {
                           //   "hover:shoadow-lg": !selected_option,
@@ -343,7 +349,13 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                     ))}
                     {selected_warning_reason !== null ? (
                       <span>
-                        <button>전송하기</button>
+                        <button
+                          onClick={() => {
+                            sendWarningInfo();
+                          }}
+                        >
+                          전송하기
+                        </button>
                       </span>
                     ) : (
                       <span></span>
