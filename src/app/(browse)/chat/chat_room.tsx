@@ -37,13 +37,26 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     string | null
   >(null);
   const option_data = [
-    { id: "opt1", reason: "원치 않는 상업성 콘텐츠 또는 스팸" },
+    {
+      id: "opt1",
+      reason: "원치 않는 상업성 콘텐츠 또는 스팸",
+    },
     { id: "opt2", reason: "증오심 표현 또는 노골적인 폭력" },
     { id: "opt3", reason: "테러 조장" },
     { id: "opt4", reason: "괴롭힘 또는 폭력" },
     { id: "opt5", reason: "자살 또는 자해" },
     { id: "opt6", reason: "잘못된 정보" },
     { id: "opt7", reason: "음란물" },
+  ];
+  const option_duration = [
+    "10분",
+    "30분",
+    "60분",
+    "12시간",
+    "24시간",
+    "7일",
+    "30일",
+    "영구",
   ];
 
   const onHandlerSelectOption = (reason: string) => {
@@ -53,12 +66,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
 
     set_selected_option(reason);
     console.log("이유를 대라!!!!!!!!", reason);
-  };
-  const onHandlerOpenWarningModal = () => {
-    set_is_modal_open(true);
-  };
-  const onHandlerCloseWarningModal = () => {
-    set_is_modal_open(false);
   };
 
   const [is_warning_modal, set_is_warning_modal] = useState(false);
@@ -139,23 +146,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
 
   const [selected_message_for_modal, set_selected_message_for_modal] =
     useState<remove_message_props | null>(null);
-  const openMessageModal = ({
-    message,
-    is_visible,
-    avatar_url,
-    user_id,
-    user_nickname,
-    user_email,
-  }: remove_message_props) => {
-    set_selected_message_for_modal({
-      message,
-      is_visible,
-      avatar_url,
-      user_id,
-      user_nickname,
-      user_email,
-    });
-  };
   const AnimatedMessage = ({
     message,
     is_visible,
@@ -168,7 +158,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
       <span
         className=""
         onClick={() => {
-          openMessageModal({
+          set_selected_message_for_modal({
             message,
             is_visible,
             avatar_url,
@@ -233,7 +223,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
       }, 300);
     }
   }, [receive_message_info]);
-
   const AnimatedHeart = ({ onAnimationEnd, id }: animated_heart) => {
     const [is_visible, set_is_visible] = useState(true);
 
@@ -258,14 +247,20 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
       set_selected_warning_reason(null);
     } else set_selected_warning_reason(reason);
   };
-  const sendWarningInfo = () => {
-    if (selected_warning_reason === null) return;
+  const sendSanctionInfo = async () => {
     //HTTP POST 로 보내기기
+    try {
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string,
+        selected_message_for_modal
+      );
+      console.log("채팅 정지 관련 post", response);
+    } catch (error) {}
   };
 
   return (
     <div className="flex h-full justify-end ">
-      <div className="w-5/6 h-4/5 grid grid-rows-10 border border-purple-400   ">
+      <div className="w-5/6 h-4/5 grid grid-rows-10 border ">
         <div className=" row-span-9 ">
           <div className="pl-4 relative ">
             {receive_message_info.map((message_info) => {
@@ -282,7 +277,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
               );
             })}
             {is_modal_open && (
-              <div className="bg-white-300  border-red-400 absolute top-7 bg-red-300 w-4/5 h-4/5">
+              <div className="bg-white-300  border-red-400 absolute top-7 bg-green-300 w-4/5 h-4/5 ">
                 <button
                   className="absolute top-3 right-3 text-gray-500  "
                   onClick={() => {
@@ -310,13 +305,24 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                   ></div>
                   <div>
                     {option_data.map((option) => (
-                      <div
-                        onClick={() => {
-                          selectWarningOption(option.reason);
-                        }}
-                        key={option.id}
-                        className={clsx(
-                          `hover:shadow-lg
+                      <>
+                        <div
+                          onClick={() => {
+                            selectWarningOption(option.reason);
+                            set_selected_message_for_modal((prev) => {
+                              if (prev === null) {
+                                return null;
+                              }
+                              const current = prev;
+                              return {
+                                ...current,
+                                reason: option.reason,
+                              };
+                            });
+                          }}
+                          key={option.id}
+                          className={clsx(
+                            `hover:shadow-lg
                           mt-2
                      rounded-lg 
                      border
@@ -325,43 +331,58 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                      cursor-pointer 
                      transfrom transition-all duration-300 ease-in-out 
                      text-sm`,
-                          {
-                            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl bg-blue-100 border-2 border-blue-500 cursor-pointer text-base font-semibold opacity-100":
-                              selected_warning_reason === option.reason,
-                            "bg-green-300 pacity-0 max-h-0 -translate-y-full pointer-events-none mt-0 mb-0 pt-0 pb-0 overflow-hidden":
-                              selected_warning_reason !== option.reason &&
-                              selected_warning_reason !== null,
-                          }
-                          // {
-                          //   "hover:shoadow-lg": !selected_option,
-                          // },
-                          // {
-                          //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
-                          //     selected_option,
-                          //   "bg-blue-500 text-white shadow-xl z-20 ":
-                          //     selected_option,
-                          //   "font-medium": selected_option,
-                          // }
+                            {
+                              "fixed top-1/2 left-1/2 -translate-x-1/4 -translate-y-1/4 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl bg-blue-100 border-2 border-blue-500 cursor-pointer text-base font-semibold opacity-100":
+                                selected_warning_reason === option.reason,
+                              "bg-green-300 pacity-0 max-h-0 -translate-y-full pointer-events-none mt-0 mb-0 pt-0 pb-0 overflow-hidden":
+                                selected_warning_reason !== option.reason &&
+                                selected_warning_reason !== null,
+                            }
+                            // {
+                            //   "hover:shoadow-lg": !selected_option,
+                            // },
+                            // {
+                            //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
+                            //     selected_option,
+                            //   "bg-blue-500 text-white shadow-xl z-20 ":
+                            //     selected_option,
+                            //   "font-medium": selected_option,
+                            // }
+                          )}
+                        >
+                          {option.reason}
+                        </div>
+                        {selected_warning_reason === option.reason && (
+                          <div>
+                            <div>
+                              {option_duration.map((duration, index) => (
+                                <option key={index} value={duration}>
+                                  {duration}
+                                </option>
+                              ))}
+                            </div>
+                            <p>선택된 기간: {}</p>
+                          </div>
                         )}
-                      >
-                        {option.reason}
-                      </div>
+                      </>
                     ))}
                     {selected_warning_reason !== null ? (
                       <span>
                         <button
                           onClick={() => {
-                            sendWarningInfo();
+                            sendSanctionInfo();
                           }}
+                          className="bg-red-300 absolute top-10"
                         >
                           전송하기
                         </button>
                       </span>
                     ) : (
-                      <span></span>
+                      <span>zzzzz</span>
                     )}
                   </div>
                 </div>
+                <span className="absolute bottom-2 w-auto">여기보세요</span>
               </div>
             )}
           </div>
