@@ -60,6 +60,7 @@ export interface remove_message_props {
   user_id: string;
   user_nickname: string[] | undefined;
   user_email: string;
+  reason?: string | null;
 }
 export interface id_props {
   id: number;
