@@ -73,37 +73,30 @@ const UserLivePage = () => {
   }, []);
 
   console.log("자 호스트 닉네임일ㄸ래", host_nickname);
-
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
   return (
-    <div className="grid grid-cols-12 h-[60vh] w-[80vw] ">
-      <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div>
-      <div className=" col-span-12 lg:col-span-9  relative ">
+    <div className="grid grid-cols-12   bg-pink-300 relative">
+      {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
+      <div className="col-span-11 h-5/6 col-start-2 border border-red-500">
         <LiveKitRoom
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          className="border bg-yellow-300 border-red-500 relative"
+          className="border bg-sky-300 border-red-500 "
         >
-          <div className=" lg:col-span-2 xl:col-span-7  ">
-            <div className="relative max-width: 500px; max-height: 300px;">
-              <Video
-                host_name={current_host_nickname}
-                host_identity={current_host_id}
-                token={token}
-                className="object-contain 
+          <div className="relative max-width: 500px; max-height: 300px;">
+            <Video
+              host_name={current_host_nickname}
+              host_identity={current_host_id}
+              token={token}
+              className="object-contain 
                   "
-              />
+            />
 
-              <div className="absolute top-0 right-0 flex flex-col space-y-1 p-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div className="w-2 h-2 bg-black rounded"></div>
-                <div className="w-2 h-2 bg-black rounded"></div>
-              </div>
-              <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
-                <ChatPage current_host_nickname={current_host_nickname} />
-              </div>
+            <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
+              <ChatPage current_host_nickname={current_host_nickname} />
             </div>
           </div>
         </LiveKitRoom>

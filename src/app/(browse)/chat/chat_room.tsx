@@ -180,11 +180,15 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
               src={avatar_url}
               alt=""
             />
-            <span className="pl-1 pb-1 pt-2  bottom-0.5 text-xs">아이디</span>
+            <span className="pl-1 pb-1 pt-2  bottom-0.5 text-xs text-white">
+              아이디
+            </span>
           </span>
           <div
             className={
-              is_visible ? "animate-fadeOutUp pt-1 text-sm" : "pt-1 text-sm"
+              is_visible
+                ? "animate-fadeOutUp pt-1 text-sm text-white"
+                : "pt-1 text-sm text-white"
             }
           >
             {message}
@@ -248,6 +252,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     } else set_selected_warning_reason(reason);
   };
   const sendSanctionInfo = async () => {
+    alert("전송");
     //HTTP POST 로 보내기기
     try {
       const response = await axios.post(
@@ -259,10 +264,11 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   return (
-    <div className="flex h-full justify-end ">
+    <div className="flex h-full justify-end border border-orange-500">
       <div className="w-5/6 h-4/5 grid grid-rows-10 border ">
-        <div className=" row-span-9 ">
-          <div className="pl-4 relative ">
+        <div className=" row-span-9 relative ">
+          {/* --채팅메세지 */}
+          <div className="pl-4 border border-red-400 ">
             {receive_message_info.map((message_info) => {
               const isRemoving = message_remove === message_info;
               return (
@@ -276,116 +282,93 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                 />
               );
             })}
-            {is_modal_open && (
-              <div className="bg-white-300  border-red-400 absolute top-7 bg-green-300 w-4/5 h-4/5 ">
-                <button
-                  className="absolute top-3 right-3 text-gray-500  "
-                  onClick={() => {
-                    set_is_modal_open(false);
-                  }}
-                >
-                  취소 (x)
-                </button>
+          </div>
+          {/* --채팅메세지 */}
+          {is_modal_open && (
+            //모달창
+            <div className="bg-white-300 absolute top-3  w-4/5 h-4/5 bg-white">
+              <button
+                className="absolute top-1 right-1 text-gray-500  "
+                onClick={() => {
+                  set_is_modal_open(false);
+                }}
+              >
+                (x)
+              </button>
 
-                <span className="w-10 h-10 rounded-full border border-black"></span>
-                <span>ID:{selected_message_for_modal?.user_nickname} </span>
-                <div className="border border-black">
-                  {selected_message_for_modal?.message}를
-                </div>
-                <div className="space-y-2">
-                  <div
-                    className="hover:shadow-lg
-                         rounded-lg 
-                         border
-                       border-gray-300
-                       bg-white 
-                         cursor-pointer 
-                         transfrom transition-all duration-300 ease-in-out 
-                         text-sm"
-                  ></div>
-                  <div>
-                    {option_data.map((option) => (
-                      <>
-                        <div
-                          onClick={() => {
-                            selectWarningOption(option.reason);
-                            set_selected_message_for_modal((prev) => {
-                              if (prev === null) {
-                                return null;
-                              }
-                              const current = prev;
-                              return {
-                                ...current,
-                                reason: option.reason,
-                              };
-                            });
-                          }}
-                          key={option.id}
-                          className={clsx(
-                            `hover:shadow-lg
-                          mt-2
+              <span className="w-10 h-10 rounded-full border border-black">
+                이미지
+              </span>
+              <span>ID:{selected_message_for_modal?.user_nickname} </span>
+              <div className=" ">{selected_message_for_modal?.message}</div>
+              <div className="space-y-2">
+                {option_data.map((option) => (
+                  <>
+                    <div
+                      onClick={() => {
+                        selectWarningOption(option.reason);
+                        set_selected_message_for_modal((prev) => {
+                          if (prev === null) {
+                            return null;
+                          }
+                          const current = prev;
+                          return {
+                            ...current,
+                            reason: option.reason,
+                          };
+                        });
+                      }}
+                      key={option.id}
+                      className={clsx(
+                        `
                      rounded-lg 
-                     border
-                   border-gray-300
                    bg-white 
                      cursor-pointer 
                      transfrom transition-all duration-300 ease-in-out 
-                     text-sm`,
-                            {
-                              "fixed top-1/2 left-1/2 -translate-x-1/4 -translate-y-1/4 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl bg-blue-100 border-2 border-blue-500 cursor-pointer text-base font-semibold opacity-100":
-                                selected_warning_reason === option.reason,
-                              "bg-green-300 pacity-0 max-h-0 -translate-y-full pointer-events-none mt-0 mb-0 pt-0 pb-0 overflow-hidden":
-                                selected_warning_reason !== option.reason &&
-                                selected_warning_reason !== null,
-                            }
-                            // {
-                            //   "hover:shoadow-lg": !selected_option,
-                            // },
-                            // {
-                            //   "fixed-top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2":
-                            //     selected_option,
-                            //   "bg-blue-500 text-white shadow-xl z-20 ":
-                            //     selected_option,
-                            //   "font-medium": selected_option,
-                            // }
-                          )}
-                        >
-                          {option.reason}
+                     `,
+                        {
+                          "absolute top-12 left-6 -translate x-2/4 translate-y-1/2 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl  cursor-pointer text-base font-semibold opacity-100":
+                            selected_warning_reason === option.reason,
+                          " pacity-0 max-h-0 -translate-y-full pointer-events-none overflow-hidden":
+                            selected_warning_reason !== option.reason &&
+                            selected_warning_reason !== null,
+                        }
+                      )}
+                    >
+                      {option.reason}
+                    </div>
+                    {selected_warning_reason === option.reason && (
+                      <div>
+                        <div>
+                          {option_duration.map((duration, index) => (
+                            <option key={index} value={duration}>
+                              {duration}
+                            </option>
+                          ))}
                         </div>
-                        {selected_warning_reason === option.reason && (
-                          <div>
-                            <div>
-                              {option_duration.map((duration, index) => (
-                                <option key={index} value={duration}>
-                                  {duration}
-                                </option>
-                              ))}
-                            </div>
-                            <p>선택된 기간: {}</p>
-                          </div>
-                        )}
-                      </>
-                    ))}
-                    {selected_warning_reason !== null ? (
-                      <span>
-                        <button
-                          onClick={() => {
-                            sendSanctionInfo();
-                          }}
-                          className="bg-red-300 absolute top-10"
-                        >
-                          전송하기
-                        </button>
-                      </span>
-                    ) : (
-                      <span>zzzzz</span>
+                        <p>선택된 기간: {}</p>
+                      </div>
                     )}
-                  </div>
-                </div>
-                <span className="absolute bottom-2 w-auto">여기보세요</span>
+                  </>
+                ))}
+                {selected_warning_reason !== null ? (
+                  <span>
+                    <button
+                      onClick={() => {
+                        sendSanctionInfo();
+                      }}
+                      className="bg-red-300 absolute top-10"
+                    >
+                      전송하기
+                    </button>
+                  </span>
+                ) : (
+                  <span>zzzzz</span>
+                )}
               </div>
-            )}
-          </div>
+              <span className="absolute bottom-2 w-auto">여기보세요</span>
+            </div>
+          )}
         </div>
         <div className="row-span-1">
           <span className="flex flex-row h-full">
