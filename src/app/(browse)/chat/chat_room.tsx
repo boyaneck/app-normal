@@ -15,6 +15,11 @@ import {
 import { useSocketStore } from "@/store/socket_store";
 import { getChatInfo } from "@/api/chat";
 import clsx from "clsx";
+import { max_messages, option_data, option_duration } from "@/utils/chat";
+import { AnimatedHeart } from "./_components/animated_heart";
+import { AnimatedMessage } from "./_components/animated_message";
+import { ChatInput } from "./_components/chat_input";
+import ChatSanction from "./_components/chat_sanction";
 interface Props {
   current_host_nickname: string;
 }
@@ -30,35 +35,15 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   const { socket, connect_socket } = useSocketStore();
   const [message_remove, set_message_remove] = useState(null);
   const [hearts, set_hearts] = useState<heart[]>([]); // 하트 목록 상태
-  const [is_modal_open, set_is_modal_open] = useState(false);
+
   const [selected_option, set_selected_option] = useState<string | null>(null);
   const [option_is_selected, set_option_is_selected] = useState(false);
   const [selected_warning_reason, set_selected_warning_reason] = useState<
     string | null
   >(null);
-  const option_data = [
-    {
-      id: "opt1",
-      reason: "원치 않는 상업성 콘텐츠 또는 스팸",
-    },
-    { id: "opt2", reason: "증오심 표현 또는 노골적인 폭력" },
-    { id: "opt3", reason: "테러 조장" },
-    { id: "opt4", reason: "괴롭힘 또는 폭력" },
-    { id: "opt5", reason: "자살 또는 자해" },
-    { id: "opt6", reason: "잘못된 정보" },
-    { id: "opt7", reason: "음란물" },
-  ];
-  const option_duration = [
-    "10분",
-    "30분",
-    "60분",
-    "12시간",
-    "24시간",
-    "7일",
-    "30일",
-    "영구",
-  ];
-
+  const [selected_message_for_modal, set_selected_message_for_modal] =
+    useState<remove_message_props | null>(null);
+  const [is_modal_open, set_is_modal_open] = useState(false);
   const onHandlerSelectOption = (reason: string) => {
     if (selected_option === reason) {
       set_selected_option(null);
@@ -88,12 +73,12 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     queryFn: getChatInfo,
   });
 
-  const onEmojiClick = (event: any, emojiObject: any) => {
+  const emojiClick = (event: any, emojiObject: any) => {
     set_message((prev) => prev + event.emoji);
     // message_input_ref.current?.focus();
   };
 
-  const onHandlerSendMessage = () => {
+  const sendMessage = () => {
     const user_nickname = user_info?.user_nickname;
     const avatar_url = user_info?.avatar_url;
     const id = user_info?.user_id;
@@ -116,11 +101,10 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     set_message("");
   };
 
-  const onHandlerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const chatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     set_message(e.target.value);
   };
 
-  const max_messages = 6; // 최대 메시지 개수
   const OnHandlerWarningUser = async ({
     user_id,
     user_nickname,
@@ -144,61 +128,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     } catch (error) {}
   };
 
-  const [selected_message_for_modal, set_selected_message_for_modal] =
-    useState<remove_message_props | null>(null);
-  const AnimatedMessage = ({
-    message,
-    is_visible,
-    avatar_url,
-    user_id,
-    user_nickname,
-    user_email,
-  }: remove_message_props) => {
-    return (
-      <span
-        className=""
-        onClick={() => {
-          set_selected_message_for_modal({
-            message,
-            is_visible,
-            avatar_url,
-            user_id,
-            user_nickname,
-            user_email,
-          });
-          set_is_modal_open(true);
-        }}
-      >
-        <div
-          className="group cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
-        transition-all duration-200 ease-in-out rounded-sm 
-        "
-        >
-          <span>
-            <img
-              className="w-6 h-6 object-cover bg-gray-400 rounded-full inline-block "
-              src={avatar_url}
-              alt=""
-            />
-            <span className="pl-1 pb-1 pt-2  bottom-0.5 text-xs text-white">
-              아이디
-            </span>
-          </span>
-          <div
-            className={
-              is_visible
-                ? "animate-fadeOutUp pt-1 text-sm text-white"
-                : "pt-1 text-sm text-white"
-            }
-          >
-            {message}
-          </div>
-        </div>
-      </span>
-    );
-  };
-
-  const handleHeartClick = () => {
+  const heartClick = () => {
     // 새로운 하트 추가
     const id = Date.now();
     console.log("하트의 타입은", typeof id);
@@ -208,7 +138,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   console.log("하트 확인하기", hearts);
-  const handlerAnimationEnd = ({ id }: heart) => {
+  const heartAnimationEnd = ({ id }: heart) => {
     //여기서 하트 카운트를 세고 ,
     set_hearts(([prev_hearts]) =>
       [prev_hearts].filter((heart) => heart?.id !== id)
@@ -227,24 +157,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
       }, 300);
     }
   }, [receive_message_info]);
-  const AnimatedHeart = ({ onAnimationEnd, id }: animated_heart) => {
-    const [is_visible, set_is_visible] = useState(true);
-
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        set_is_visible(false);
-        onAnimationEnd({ id: id }); // 애니메이션 종료 후 콜백 호출
-      }, 800); // 애니메이션 시간과 동일하게 설정
-
-      return () => clearTimeout(timer);
-    }, [onAnimationEnd]);
-
-    return is_visible ? (
-      <div className="animate-heartWave text--500 text-2xl absolute bottom-0 left-1/2 transform -translate-x-1/2">
-        ❤️
-      </div>
-    ) : null;
-  };
 
   const selectWarningOption = (reason: string) => {
     if (selected_warning_reason === reason) {
@@ -257,7 +169,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     try {
       const response = await axios.post(
         process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string,
-        selected_message_for_modal
+        selected_message_for_modal()
       );
       console.log("채팅 정지 관련 post", response);
     } catch (error) {}
@@ -279,6 +191,12 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
                   user_nickname={message_info.user_nickname}
                   user_id={message_info.id}
                   user_email={message_info.email}
+                  selected_message_for_modal={selected_message_for_modal}
+                  set_selected_message_for_modal={
+                    set_selected_message_for_modal
+                  }
+                  is_modal_open={is_modal_open}
+                  set_is_modal_open={set_is_modal_open}
                 />
               );
             })}
@@ -286,131 +204,33 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
           {/* --채팅메세지 */}
           {is_modal_open && (
             //모달창
-            <div className="bg-white-300 absolute top-3  w-4/5 h-4/5 bg-white">
-              <button
-                className="absolute top-1 right-1 text-gray-500  "
-                onClick={() => {
-                  set_is_modal_open(false);
-                }}
-              >
-                (x)
-              </button>
 
-              <span className="w-10 h-10 rounded-full border border-black">
-                이미지
-              </span>
-              <span>ID:{selected_message_for_modal?.user_nickname} </span>
-              <div className=" ">{selected_message_for_modal?.message}</div>
-              <div className="space-y-2">
-                {option_data.map((option) => (
-                  <>
-                    <div
-                      onClick={() => {
-                        selectWarningOption(option.reason);
-                        set_selected_message_for_modal((prev) => {
-                          if (prev === null) {
-                            return null;
-                          }
-                          const current = prev;
-                          return {
-                            ...current,
-                            reason: option.reason,
-                          };
-                        });
-                      }}
-                      key={option.id}
-                      className={clsx(
-                        `
-                     rounded-lg 
-                   bg-white 
-                     cursor-pointer 
-                     transfrom transition-all duration-300 ease-in-out 
-                     `,
-                        {
-                          "absolute top-12 left-6 -translate x-2/4 translate-y-1/2 z-20 min-w-[250px] p-6 rounded-xl text-center shadow-2xl  cursor-pointer text-base font-semibold opacity-100":
-                            selected_warning_reason === option.reason,
-                          " pacity-0 max-h-0 -translate-y-full pointer-events-none overflow-hidden":
-                            selected_warning_reason !== option.reason &&
-                            selected_warning_reason !== null,
-                        }
-                      )}
-                    >
-                      {option.reason}
-                    </div>
-                    {selected_warning_reason === option.reason && (
-                      <div>
-                        <div>
-                          {option_duration.map((duration, index) => (
-                            <option key={index} value={duration}>
-                              {duration}
-                            </option>
-                          ))}
-                        </div>
-                        <p>선택된 기간: {}</p>
-                      </div>
-                    )}
-                  </>
-                ))}
-                {selected_warning_reason !== null ? (
-                  <span>
-                    <button
-                      onClick={() => {
-                        sendSanctionInfo();
-                      }}
-                      className="bg-red-300 absolute top-10"
-                    >
-                      전송하기
-                    </button>
-                  </span>
-                ) : (
-                  <span>zzzzz</span>
-                )}
-              </div>
-              <span className="absolute bottom-2 w-auto">여기보세요</span>
-            </div>
+            <ChatSanction
+              set_is_modal_open={set_is_modal_open}
+              is_modal_open={is_modal_open}
+              set_selected_message_for_modal={set_selected_message_for_modal}
+              selected_message_for_modal={selected_message_for_modal}
+              selectWarningOption={selectWarningOption}
+              set_selected_warning_reason={set_selected_warning_reason}
+              selected_warning_reason={selected_warning_reason}
+            />
           )}
         </div>
         <div className="row-span-1">
-          <span className="flex flex-row h-full">
-            <input
-              placeholder="메세지를 입력해주세요"
-              ref={message_input_ref}
-              value={message}
-              onChange={onHandlerInput}
-              className=" bg-transparent border border-purple-400 w-2/3 h-full rounded-full"
-            ></input>
-            <button
-              onClick={onHandlerSendMessage}
-              className="hover hover:cursor-pointer"
-            >
-              전송
-            </button>
-            <button
-              className="relative"
-              onClick={() => set_show_emoji_picker(!show_emoji_picker)}
-            >
-              🙂
-              {show_emoji_picker && (
-                <div className="absolute bottom-full left-0 z-10 transform scale-75 translate-x-[-30%] translate-y-[12.5%]">
-                  <Picker onEmojiClick={onEmojiClick} />
-                </div>
-              )}
-            </button>
-            <button className="relative" onClick={handleHeartClick}>
-              {hearts.map((heart) => (
-                <AnimatedHeart
-                  key={heart?.id}
-                  id={heart?.id}
-                  onAnimationEnd={handlerAnimationEnd}
-                  // className="absolute bottom-full left-0"
-                />
-              ))}
-              ❤️
-            </button>
-            <span className="flex justify-center items-center ">
-              <PaymentPage current_host_nickname={current_host_nickname} />
-            </span>
-          </span>
+          <ChatInput
+            chatInput={chatInput}
+            sendMessage={sendMessage}
+            set_show_emoji_picker={set_show_emoji_picker}
+            show_emoji_picker={show_emoji_picker}
+            emojiClick={emojiClick}
+            heartClick={heartClick}
+            set_hearts={set_hearts}
+            hearts={hearts}
+            heartAnimationEnd={heartAnimationEnd}
+            current_host_nickname={current_host_nickname}
+            message={message}
+            set_message={set_message}
+          />
         </div>
       </div>
     </div>
