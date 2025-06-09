@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface chat_room_info {}
 
 export interface message_info_props {
@@ -86,4 +88,49 @@ export interface warning_chat {
   reason: string;
   // duration_type:''
   // duration_value?:number
+}
+
+export interface animated_component_props {
+  message: string;
+  is_visible: boolean;
+  avatar_url: string | undefined;
+  user_id: string;
+  user_nickname: string[] | undefined;
+  user_email: string;
+  reason?: string | null;
+  selected_message_for_modal: remove_message_props | null;
+  set_selected_message_for_modal: React.Dispatch<
+    React.SetStateAction<remove_message_props | null>
+  >;
+  is_modal_open: boolean;
+  set_is_modal_open: React.Dispatch<React.SetStateAction<booelan>>;
+}
+
+export interface chat_input_components_props {
+  chatInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  sendMessage: () => void;
+  set_show_emoji_picker: React.Dispatch<React.SetStateAction<boolean>>;
+  show_emoji_picker: boolean;
+  emojiClick: (event: any, emojiObject: any) => voiid;
+  heartClick: () => void;
+  set_hearts: React.Dispatch<React.SetStateAction<heart[]>>;
+  hearts: heart[];
+  heartAnimationEnd: (id: heart) => void;
+  current_host_nickname: string;
+  message: string;
+  set_message: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export interface chat_sanction_component_props {
+  set_is_modal_open: React.Dispatch<React.SetStateAction<boolean>>;
+  is_modal_open: boolean;
+  set_selected_message_for_modal: React.Dispatch<
+    React.SetStateAction<remove_message_props | null>
+  >;
+  selected_message_for_modal: remove_message_props | null;
+  selectWarningOption: (reason: string) => void;
+  set_selected_warning_reason: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
+  selected_warning_reason: string | null;
 }
