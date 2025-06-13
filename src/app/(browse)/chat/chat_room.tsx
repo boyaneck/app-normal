@@ -15,7 +15,7 @@ import {
 import { useSocketStore } from "@/store/socket_store";
 import { getChatInfo } from "@/api/chat";
 import clsx from "clsx";
-import { max_messages, option_data, option_duration } from "@/utils/chat";
+import { max_messages, option_data, sanction_duration } from "@/utils/chat";
 import { AnimatedHeart } from "./_components/animated_heart";
 import { AnimatedMessage } from "./_components/animated_message";
 import { ChatInput } from "./_components/chat_input";
@@ -168,8 +168,8 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     //HTTP POST 로 보내기기
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string,
-        selected_message_for_modal()
+        process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string
+        // selected_message_for_modal()
       );
       console.log("채팅 정지 관련 post", response);
     } catch (error) {}

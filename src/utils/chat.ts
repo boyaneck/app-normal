@@ -10,7 +10,7 @@ export const option_data = [
   { id: "opt6", reason: "잘못된 정보" },
   { id: "opt7", reason: "음란물" },
 ];
-export const option_duration = [
+export const sanction_duration = [
   "10분",
   "30분",
   "60분",
