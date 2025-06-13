@@ -1,12 +1,6 @@
-module.exports = (io) => {
-  const chat_room = io.of("/chat");
-
-  chat_room.on("connection", (socket) => {
-    console.log("Connected to room namespace");
-
-    socket.on("send_message", ({ message_info }) => {
-      console.log("Message received", message_info);
-      socket.emit("receive_message", message_info);
-    });
+module.exports = (socket, namespace_room) => {
+  socket.on("send_message", ({ message_info }) => {
+    console.log("메세지 정보 확인하기", message_info);
+    socket.emit("receive_message", message_info);
   });
 };
