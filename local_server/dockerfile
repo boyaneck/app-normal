@@ -1,0 +1,10 @@
+# Dockerfile
+
+FROM node:18-alpine
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+# .env 파일은 복사하지 않습니다. docker-compose.yml에서 주입합니다.
+EXPOSE 4000
+CMD [ "node", "src/app.js" ]
