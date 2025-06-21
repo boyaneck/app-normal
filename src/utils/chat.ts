@@ -10,14 +10,5 @@ export const option_data = [
   { id: "opt6", reason: "잘못된 정보" },
   { id: "opt7", reason: "음란물" },
 ];
-export const sanction_duration = [
-  "10분",
-  "30분",
-  "60분",
-  "12시간",
-  "24시간",
-  "7일",
-  "30일",
-  "영구",
-];
+export const sanction_duration = ["60분", "12시간", "24시간", "7일", "30일"];
 export const max_messages = 6;
