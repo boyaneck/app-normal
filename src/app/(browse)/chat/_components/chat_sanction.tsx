@@ -160,7 +160,7 @@ const ChatSanction = ({
               is_animating ? "opacity-100 delay-100" : "opacity-0"
             )}
           >
-            <div className="border border-black bg-gray-400 p-3 rounded-lg">
+            <div className="border border-black  p-3 rounded-lg">
               <h2 className="text-center text-sm font-bold text-black">
                 {animating_item.item.reason}
               </h2>
@@ -183,7 +183,7 @@ const ChatSanction = ({
                       "bg-gray-50 border-red-200 hover:bg-red-100":
                         selected_duration !== duration,
                       // is_animating 상태에 따라 나타나고 사라짐
-                      "opacity-100 translate-y-0": is_animating,
+                      "opacity-100": is_animating,
                       "opacity-0 translate-y-4": !is_animating,
                     }
                   )}
@@ -193,7 +193,7 @@ const ChatSanction = ({
                 >
                   <span className="font-medium">{duration}</span>
                   {selected_duration === duration && (
-                    <CheckIcon className="w-5 h-5 text-red-600" />
+                    <CheckIcon className="w-4 h-4 text-red-600" />
                   )}
                 </div>
               ))}
