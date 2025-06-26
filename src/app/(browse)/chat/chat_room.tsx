@@ -177,8 +177,8 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
 
   return (
     <div className="flex h-full justify-end border border-orange-500">
-      <div className="w-5/6 h-4/5 grid grid-rows-10 border ">
-        <div className=" row-span-9 relative ">
+      <div className="w-5/6 h-4/5 grid grid-rows-10 border relative ">
+        <div className=" row-span-9 relative">
           {/* --채팅메세지 */}
           <div className="pl-4 border border-red-400 ">
             {receive_message_info.map((message_info) => {
@@ -202,6 +202,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             })}
           </div>
           {/* --채팅메세지 */}
+
           {is_modal_open && (
             //모달창
 
@@ -215,7 +216,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
               selected_warning_reason={selected_warning_reason}
             />
           )}
+          {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
         </div>
+
         <div className="row-span-1">
           <ChatInput
             chatInput={chatInput}
