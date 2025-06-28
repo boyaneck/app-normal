@@ -44,7 +44,17 @@ const ChatSanction = ({
   const [selected_duration, set_selected_duration] = useState<string | null>(
     null
   );
-
+  const [show_option, set_show_option] = useState(false);
+  useEffect(() => {
+    if (option_example === null) {
+      // option_example이 null이 되면 (제재 이유 목록으로 돌아갈 때)
+      set_show_option(false); // 잠시 숨김 (애니메이션 시작을 위해 초기 상태로)
+      const timer = setTimeout(() => set_show_option(true), 50); // 짧은 딜레이 후 나타나도록 설정
+      return () => clearTimeout(timer);
+    } else {
+      set_show_option(false); // 제재 기간 선택 화면으로 넘어갈 때는 목록을 숨김
+    }
+  }, [option_example]);
   const selectReason = (
     option: (typeof option_data)[0],
     e: React.MouseEvent<HTMLDivElement>
@@ -60,6 +70,7 @@ const ChatSanction = ({
       if (prev === null) return null;
       return { ...prev, reason: option.reason, duration: null }; // duration 초기화
     });
+    set_show_option(false);
   };
 
   useEffect(() => {
@@ -200,18 +211,28 @@ const ChatSanction = ({
         // --- 아이템 선택 후 애니메이션 & 상세 설정 UI ---
         // --- 아이템 선택 전 원래 리스트 ---
         <div className="mt-4 space-y-2 border  flex flex-col items-center ">
-          {option_data.map((option) => (
+          {option_data.map((option, index) => (
             <div
               key={option.id}
               onClick={(e) => selectReason(option, e)}
-              className={`p-2 rounded-lg bg-white cursor-pointer
+              className={clsx(
+                `p-2 rounded-lg bg-white cursor-pointer
               w-[200px]
               shadow-sm 
               text-[12px] text-center
-              transition-all duration-200
+              transition-all duration-300
               hover:shadow-md hover:bg-gray-50 
               transform hover:scale-105 hover:z-10
-              `}
+              `,
+                {
+                  // ✨ 애니메이션 클래스 추가 ✨
+                  "opacity-100 translate-y-0": show_option, // 나타날 때 최종 상태
+                  "opacity-0 translate-y-4": !show_option, // 숨겨질 때 초기 상태 (아래로 살짝 내려가면서 투명해짐)
+                }
+              )}
+              style={{
+                transitionDelay: `${show_option ? index * 70 : 0}ms`,
+              }}
             >
               {option.reason}
             </div>
