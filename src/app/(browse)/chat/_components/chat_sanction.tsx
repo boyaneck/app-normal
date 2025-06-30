@@ -36,9 +36,12 @@ const ChatSanction = ({
   set_selected_warning_reason,
 }: chat_sanction_component_props) => {
   // 애니메이션 관련 상태
-  const [option_example, set_option_example] =
+  const [sanction_duration_list, set_sanction_duration_list] =
     useState<selected_item_state | null>(null);
-  const [is_animating, set_is_animating] = useState(false);
+  const [
+    selected_sanction_duration_state,
+    set_selected_sanction_duration_state,
+  ] = useState(false);
 
   // UI 변경: 기간 선택을 위한 새로운 상태
   const [selected_duration, set_selected_duration] = useState<string | null>(
@@ -46,15 +49,15 @@ const ChatSanction = ({
   );
   const [show_option, set_show_option] = useState(false);
   useEffect(() => {
-    if (option_example === null) {
-      // option_example이 null이 되면 (제재 이유 목록으로 돌아갈 때)
+    if (sanction_duration_list === null) {
+      // sanction_duration_list이 null이 되면 (제재 이유 목록으로 돌아갈 때)
       set_show_option(false); // 잠시 숨김 (애니메이션 시작을 위해 초기 상태로)
       const timer = setTimeout(() => set_show_option(true), 50); // 짧은 딜레이 후 나타나도록 설정
       return () => clearTimeout(timer);
     } else {
-      set_show_option(false); // 제재 기간 선택 화면으로 넘어갈 때는 목록을 숨김
+      set_show_option(false); // 제ㄹ재 기간 선택 화면으로 넘어갈 때는 목록을 숨김
     }
-  }, [option_example]);
+  }, [sanction_duration_list]);
   const selectReason = (
     option: (typeof option_data)[0],
     e: React.MouseEvent<HTMLDivElement>
@@ -62,7 +65,7 @@ const ChatSanction = ({
     if (selected_warning_reason === option.reason) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    set_option_example({ item: option, rect });
+    set_sanction_duration_list({ item: option, rect });
 
     // 부모 컴포넌트 상태 업데이트
     set_selected_warning_reason(option.reason);
@@ -74,13 +77,16 @@ const ChatSanction = ({
   };
 
   useEffect(() => {
-    if (option_example) {
-      const timer = setTimeout(() => set_is_animating(true), 10);
+    if (sanction_duration_list) {
+      const timer = setTimeout(
+        () => set_selected_sanction_duration_state(true),
+        10
+      );
       return () => clearTimeout(timer);
     } else {
-      set_is_animating(false);
+      set_selected_sanction_duration_state(false);
     }
-  }, [option_example]);
+  }, [sanction_duration_list]);
 
   // UI 변경: 기간 선택 핸들러
   const selectDuration = (duration: string) => {
@@ -114,7 +120,7 @@ const ChatSanction = ({
   };
 
   const resetSelection = () => {
-    set_option_example(null);
+    set_sanction_duration_list(null);
     set_selected_warning_reason(null);
     set_selected_duration(null);
   };
@@ -131,92 +137,13 @@ const ChatSanction = ({
         </button>
       </div>
       <div className="">{selected_message_for_modal?.message}</div>
-
-      {option_example ? (
-        <div
-          className={clsx(
-            "fixed  rounded-xl bg-gray-200 text-black shadow-2xl ",
-            "transition-all duration-300 ease-in-out", // 애니메이션 효과
-            {
-              // ✨ 애니메이션 최종 상태: 모달 상단 중앙으로 이동
-              "!top-32 left-4/5   p-4": is_animating,
-              "p-4": !is_animating,
-            }
-          )}
-        >
-          {/* --제재 사항 DIV-- */}
+      <div className="mt-4 space-y-2 border  flex flex-col items-center ">
+        {option_data.map((option, index) => (
           <div
+            key={option.id}
+            onClick={(e) => selectReason(option, e)}
             className={clsx(
-              "transition-opacity duration-100 w-full bg-white",
-              is_animating ? "opacity-100 delay-100" : "opacity-0"
-            )}
-          >
-            <div className="border border-black  p-3 rounded-lg">
-              <h2 className="text-center text-sm font-bold text-black">
-                {option_example.item.reason}item_reason
-              </h2>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <p className="font-semibold text-sm text-gray-600 mb-2">
-                제재 기간 선택:
-              </p>
-              {sanction_duration.map((duration, index) => (
-                <div
-                  key={index}
-                  onClick={() => selectDuration(duration)}
-                  className={clsx(
-                    "flex items-center text-[9px] justify-between p-2 rounded-lg cursor-pointer border ml-3 w-3/5",
-                    "transition-all duration-300", // 개별 아이템의 애니메이션 시간
-                    {
-                      " border-gray-300 text-red-700":
-                        selected_duration === duration,
-                      "bg-gray-50 border-red-200 hover:bg-red-100":
-                        selected_duration !== duration,
-                      // is_animating 상태에 따라 나타나고 사라짐
-                      "opacity-100 ": is_animating,
-                      "opacity-0 translate-y-4": !is_animating,
-                    }
-                  )}
-                  style={{
-                    transitionDelay: `${is_animating ? 300 + index * 70 : 0}ms`,
-                  }}
-                >
-                  <span className="font-medium">{duration}</span>
-                  {selected_duration === duration && (
-                    <CheckIcon className="w-4 h-4 text-red-600" />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 flex justify-center space-x-4">
-              <button
-                onClick={sendSanctionInfo}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold disabled:bg-gray-400"
-                disabled={!selected_duration}
-              >
-                전송
-              </button>
-              <button
-                onClick={resetSelection}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold"
-              >
-                다시 선택
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        // --- 아이템 선택 후 애니메이션 & 상세 설정 UI ---
-        // --- 아이템 선택 전 원래 리스트 ---
-        <div className="mt-4 space-y-2 border  flex flex-col items-center ">
-          {option_data.map((option, index) => (
-            <div
-              key={option.id}
-              onClick={(e) => selectReason(option, e)}
-              className={clsx(
-                `p-2 rounded-lg bg-white cursor-pointer
+              `p-2 rounded-lg bg-white cursor-pointer
               w-[200px]
               shadow-sm 
               text-[12px] text-center
@@ -224,21 +151,105 @@ const ChatSanction = ({
               hover:shadow-md hover:bg-gray-50 
               transform hover:scale-105 hover:z-10
               `,
-                {
-                  // ✨ 애니메이션 클래스 추가 ✨
-                  "opacity-100 translate-y-0": show_option, // 나타날 때 최종 상태
-                  "opacity-0 translate-y-4": !show_option, // 숨겨질 때 초기 상태 (아래로 살짝 내려가면서 투명해짐)
-                }
-              )}
-              style={{
-                transitionDelay: `${show_option ? index * 70 : 0}ms`,
-              }}
-            >
-              {option.reason}
-            </div>
+              {
+                "opacity-100 translate-y-0": show_option, // 나타날 때 최종 상태
+                "opacity-0 translate-y-4": !show_option, // 숨겨질 때 초기 상태 (아래로 살짝 내려가면서 투명해짐)
+              }
+            )}
+            style={{
+              transitionDelay: `${show_option ? index * 70 : 0}ms`,
+            }}
+          >
+            {option.reason}
+          </div>
+        ))}
+      </div>
+      {selected_sanction_duration_state ? (
+        <div
+          className={`rounded-xl shadow-2xl
+            text-black bg-pink-300
+            transition-all duration-300 ease-in-out
+            absolute inset-0`}
+        >
+          제재 기간 선택
+          {sanction_duration?.map((duration, idx) => (
+            <div>{duration}</div>
           ))}
         </div>
+      ) : (
+        <div></div>
       )}
+      {/* <div
+        className={`rounded-xl shadow-2xl 
+        text-black bg-red-300
+            transition-all duration-300 ease-in-out`}
+      >
+        <div
+          className={clsx(
+            "transition-opacity duration-100 w-full bg-white",
+            selected_sanction_duration_state
+              ? "opacity-100 delay-100"
+              : "opacity-0"
+          )}
+        >
+          <h2 className="text-center text-sm font-bold text-black">
+            {sanction_duration_list.item.reason}item_reason
+          </h2>
+
+          <div className="mt-4 space-y-2">
+            <p className="font-semibold text-sm text-gray-600 mb-2">
+              제재 기간 선택:
+            </p>
+            {sanction_duration.map((duration, index) => (
+              <div
+                key={index}
+                onClick={() => selectDuration(duration)}
+                className={clsx(
+                  " flex justify-between text-[9px]  p-2  cursor-pointer  ml-3 w-3/5 border-red-300",
+                  "transition-all duration-300", // 개별 아이템의 애니메이션 시간
+                  {
+                    " border-red-400  text-red-700":
+                      selected_duration === duration,
+                    " border-black": selected_duration !== duration,
+                    // selected_sanction_duration_state 상태에 따라 나타나고 사라짐
+                    "opacity-100 ": selected_sanction_duration_state,
+                    "opacity-0 translate-y-4":
+                      !selected_sanction_duration_state,
+                  }
+                )}
+                style={{
+                  transitionDelay: `${
+                    selected_sanction_duration_state ? 300 + index * 70 : 0
+                  }ms`,
+                }}
+              >
+                <span className="font-medium">{duration}</span>
+                {selected_duration === duration && (
+                  <CheckIcon className="w-4 h-4 text-red-600" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex justify-center space-x-4">
+            <button
+              onClick={sendSanctionInfo}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold disabled:bg-gray-400"
+              disabled={!selected_duration}
+            >
+              전송
+            </button>
+            <button
+              onClick={resetSelection}
+              className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold"
+            >
+              다시 선택
+            </button>
+          </div>
+        </div>
+      </div> */}
+
+      <></>
     </div>
   );
 };
