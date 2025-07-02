@@ -7,7 +7,7 @@ services:
   # 1. 'redis-server' 라는 이름의 서비스 (NPC 상점 주인)
   redis-server:
     image: "redis:latest" # Redis 공식 최신 버전 이미지를 사용
-    container_name: my-chat-redis # 컨테이너에 별명 붙여주기
+    : container_name:app_normal_redis # 컨테이너에 별명 붙여주기
     ports:
       - "6379:6379" # 내 PC의 6379 포트와 컨테이너의 6379 포트를 연결
     networks:
@@ -20,8 +20,8 @@ services:
       - "3000:3000"
     environment:
       - REDIS_URL=redis://redis-server:6379
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      # - SUPABASE_URL=${SUPABASE_URL}
+      # - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
     depends_on:
       - redis-server # 'app'은 'redis-server'가 먼저 실행된 후에 실행되어야 함
     networks:
