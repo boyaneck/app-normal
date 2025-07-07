@@ -176,65 +176,61 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   return (
-    <div className="flex h-full justify-end border border-orange-500">
-      <div className="w-5/6 h-4/5 grid grid-rows-10 border relative ">
-        <div className=" row-span-9 relative">
-          {/* --채팅메세지 */}
-          <div className="pl-4 border border-red-400 ">
-            {receive_message_info.map((message_info) => {
-              const isRemoving = message_remove === message_info;
-              return (
-                <AnimatedMessage
-                  message={`${message_info.user_nickname}: ${message_info.message}`}
-                  is_visible={isRemoving}
-                  avatar_url={message_info.avatar_url}
-                  user_nickname={message_info.user_nickname}
-                  user_id={message_info.id}
-                  user_email={message_info.email}
-                  selected_message_for_modal={selected_message_for_modal}
-                  set_selected_message_for_modal={
-                    set_selected_message_for_modal
-                  }
-                  is_modal_open={is_modal_open}
-                  set_is_modal_open={set_is_modal_open}
-                />
-              );
-            })}
-          </div>
-          {/* --채팅메세지 */}
-
-          {is_modal_open && (
-            //모달창
-
-            <ChatSanction
-              set_is_modal_open={set_is_modal_open}
-              is_modal_open={is_modal_open}
-              set_selected_message_for_modal={set_selected_message_for_modal}
-              selected_message_for_modal={selected_message_for_modal}
-              selectWarningOption={selectWarningOption}
-              set_selected_warning_reason={set_selected_warning_reason}
-              selected_warning_reason={selected_warning_reason}
-            />
-          )}
-          {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
+    <div className="w-5/6 h-4/5 grid grid-rows-10 border relative ">
+      <div className=" row-span-9 relative">
+        {/* --채팅메세지 */}
+        <div className="pl-4 border border-red-400 ">
+          {receive_message_info.map((message_info) => {
+            const isRemoving = message_remove === message_info;
+            return (
+              <AnimatedMessage
+                message={`${message_info.user_nickname}: ${message_info.message}`}
+                is_visible={isRemoving}
+                avatar_url={message_info.avatar_url}
+                user_nickname={message_info.user_nickname}
+                user_id={message_info.id}
+                user_email={message_info.email}
+                selected_message_for_modal={selected_message_for_modal}
+                set_selected_message_for_modal={set_selected_message_for_modal}
+                is_modal_open={is_modal_open}
+                set_is_modal_open={set_is_modal_open}
+              />
+            );
+          })}
         </div>
+        {/* --채팅메세지 */}
 
-        <div className="row-span-1">
-          <ChatInput
-            chatInput={chatInput}
-            sendMessage={sendMessage}
-            set_show_emoji_picker={set_show_emoji_picker}
-            show_emoji_picker={show_emoji_picker}
-            emojiClick={emojiClick}
-            heartClick={heartClick}
-            set_hearts={set_hearts}
-            hearts={hearts}
-            heartAnimationEnd={heartAnimationEnd}
-            current_host_nickname={current_host_nickname}
-            message={message}
-            set_message={set_message}
+        {is_modal_open && (
+          //모달창
+
+          <ChatSanction
+            set_is_modal_open={set_is_modal_open}
+            is_modal_open={is_modal_open}
+            set_selected_message_for_modal={set_selected_message_for_modal}
+            selected_message_for_modal={selected_message_for_modal}
+            selectWarningOption={selectWarningOption}
+            set_selected_warning_reason={set_selected_warning_reason}
+            selected_warning_reason={selected_warning_reason}
           />
-        </div>
+        )}
+        {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
+      </div>
+
+      <div className="row-span-1">
+        <ChatInput
+          chatInput={chatInput}
+          sendMessage={sendMessage}
+          set_show_emoji_picker={set_show_emoji_picker}
+          show_emoji_picker={show_emoji_picker}
+          emojiClick={emojiClick}
+          heartClick={heartClick}
+          set_hearts={set_hearts}
+          hearts={hearts}
+          heartAnimationEnd={heartAnimationEnd}
+          current_host_nickname={current_host_nickname}
+          message={message}
+          set_message={set_message}
+        />
       </div>
     </div>
   );
