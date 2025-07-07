@@ -77,14 +77,14 @@ const UserLivePage = () => {
     return <div>Cannot watch the stream</div>;
   }
   return (
-    <div className="grid grid-cols-12   bg-pink-300 relative">
+    <div className="grid grid-cols-12    relative">
       {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
       <div className="col-span-11 h-5/6 col-start-2 border border-red-500">
         <LiveKitRoom
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          className="border bg-sky-300 border-red-500 "
+          className="border border-red-500 "
         >
           <div className="relative max-width: 500px; max-height: 300px;">
             <Video
