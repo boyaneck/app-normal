@@ -79,7 +79,7 @@ const UserLivePage = () => {
   return (
     <div className="grid grid-cols-12    relative">
       {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
-      <div className="col-span-11 h-5/6 col-start-2 border border-red-500">
+      <div className="col-span-11 h-5/6 col-start-2 ">
         <LiveKitRoom
           audio={true}
           token={token}
