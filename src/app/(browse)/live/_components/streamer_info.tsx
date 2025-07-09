@@ -15,21 +15,20 @@ interface live_info {
   user_id: string;
   visitor: number;
 }
-interface SubInfoProps {
+interface streamer_info_props {
   live_information: live_info | undefined;
   current_host_id: string | undefined;
   current_host_email: string | undefined;
 }
 
-const SubInfo = ({
+const StreamerInfo = ({
   live_information,
   current_host_id,
   current_host_email,
-}: SubInfoProps) => {
+}: streamer_info_props) => {
   const { followMutation } = useFollow();
 
   const { user, setUser } = useUserStore();
-  console.log("현재 유저의", user, current_host_id);
   const current_user_email =
     user?.user_email !== undefined ? user.user_email : "";
   const host_email = current_host_email !== undefined ? current_host_email : "";
@@ -61,4 +60,4 @@ const SubInfo = ({
   );
 };
 
-export default SubInfo;
+export default StreamerInfo;

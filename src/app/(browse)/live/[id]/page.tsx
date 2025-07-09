@@ -14,10 +14,12 @@ import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import ChatRoom from "../../chat/chat_room";
-import SubInfo from "../sub/sub_info";
+import SubInfo from "../_components/streamer_info";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfoAboutLive } from "@/api";
 import { userInfo } from "os";
+import StreamerInfo from "../_components/streamer_info";
+import clsx from "clsx";
 
 interface live_info {
   category: string | null;
@@ -72,16 +74,33 @@ const UserLivePage = () => {
     }
   }, []);
 
+  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
+  const [show_streamer_info, set_show_streamer_info] = useState(false);
   console.log("자 호스트 닉네임일ㄸ래", host_nickname);
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
   return (
     <div className="grid grid-cols-12    relative">
-      {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
-      <div className="col-span-11 h-5/6 col-start-2 ">
+      {/* <div className='col-span-12  lg:col-span-2 bg-yellow-200'>Side bar</div> */}
+      <div
+        className={clsx("col-span-11 h-5/6 col-start-2 ", {
+          "animate-curtainUp": show_streamer_info,
+        })}
+        onMouseOver={() => {
+          set_show_streamer_info_bar(true);
+        }}
+        onMouseLeave={() => {
+          set_show_streamer_info_bar(false);
+        }}
+      >
         <LiveKitRoom
           audio={true}
+          Faspect-video
+          object-contain
+          group
+          relative
+          w-full
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
           className="border border-red-500 "
@@ -99,17 +118,27 @@ const UserLivePage = () => {
               <ChatPage current_host_nickname={current_host_nickname} />
             </div>
           </div>
-        </LiveKitRoom>
-        {/* SubInfo 래퍼 */}
-        {/* <div className="absolute bottom-0 left-0 w-full h-24 flex justify-around items-center transform translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-            <div className="w-24 h-24 rounded-full overflow-hidden">
-              <SubInfo
-                live_information={live_information}
-                current_host_id={current_host_id}
-                current_host_email={current_host_nickname}
-              />
+          {show_streamer_info_bar && (
+            <div
+              className="flex justify-center hover:cursor-pointer"
+              onClick={() => {
+                set_show_streamer_info(true);
+              }}
+            >
+              <div className="border border-gray bg-gray-200 w-1/6 h-2  rounded-xl mb-2"></div>
             </div>
-          </div> */}
+          )}
+        </LiveKitRoom>
+
+        {/* SubInfo 래퍼 */}
+
+        <div className={clsx("border border-green-600")}>
+          <StreamerInfo
+            live_information={live_information}
+            current_host_id={current_host_id}
+            current_host_email={current_host_nickname}
+          />
+        </div>
       </div>
     </div>
   );

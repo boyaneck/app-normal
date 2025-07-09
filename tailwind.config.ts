@@ -19,6 +19,11 @@ module.exports = {
           "50%": { transform: "rotate(3deg)" }, // 중간: 약간 오른쪽으로 기울임
         },
 
+        curtainUp: {
+          "0%": { transform: "translateY(0)" },
+          "20%": { transform: "translateY(5%)" },
+          "100%": { transform: "translateY(-20%}" },
+        },
         heartWave: {
           "0%": {
             transform: "translate(-50%, -50%) scale(1)",
@@ -33,8 +38,10 @@ module.exports = {
       animation: {
         fadeOutUp: "fadeOutUp 0.3s ease-out forwards",
         moneyFlap: "moneyFlap 0.2s ease-in-out infinite",
-        // heartWave: "heartWave 0.8s linear forwards",
+        // heartWave: 'heartWave 0.8s linear forwards',
         heartWave: "heartWave 0.8s forwards",
+        // curtainUp: "curatainUp 0.7s ease-in-out forwards",
+        curtainUp: "curtainUp 0.7s ease-in-out forwards",
       },
     },
   },
