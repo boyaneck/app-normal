@@ -25,6 +25,11 @@ import Loading_Video from "./loading_video";
 import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
+import clsx from "clsx";
+import RippleBar from "./alarm";
+import SlidingLiquid from "./sliding_liquid_bar";
+import Alarm from "./alarm";
+import SlidingLiquidBar from "./sliding_liquid_bar";
 
 interface VideoProps {
   host_name: string | undefined;
@@ -104,11 +109,51 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       </div>
     );
   }
-
+  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
+  const [show_streamer_info, set_show_streamer_info] = useState(false);
   return (
-    <div className="aspect-video object-contain group relative w-full">
+    <div
+      className={clsx(
+        "aspect-video object-contain group relative w-full  bg-yellow-300 transition-all duration-300 ease-apple",
+        {
+          "animate-curtainUp": show_streamer_info,
+          "animate-curtainDown": !show_streamer_info,
+        }
+      )}
+      onMouseOver={() => {
+        set_show_streamer_info_bar(true);
+      }}
+      onMouseLeave={() => {
+        set_show_streamer_info_bar(false);
+      }}
+    >
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
+      {show_streamer_info_bar && (
+        <div
+          className={clsx("flex justify-center hover:cursor-pointer", {
+            "animate-raiseUpBar": show_streamer_info_bar,
+          })}
+          onClick={() => {
+            set_show_streamer_info(true);
+          }}
+        >
+          <div
+            className="border border-gray bg-gray-200 w-1/6 h-8  rounded-xl mb-2"
+            style={{
+              background: "linear-gradient(to bottom right, #2d3748, #1a202c)",
+            }}
+          >
+            <Alarm>
+              <span className="text-red text-xl">👤</span>
+            </Alarm>
+
+            <main className="flex  items-center justify-center p-5">
+              <SlidingLiquidBar />
+            </main>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
