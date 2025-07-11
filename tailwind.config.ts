@@ -8,7 +8,9 @@ module.exports = {
       colors: {
         main_color: "#69E2FF", // 커스텀 색상을 main_color로 지정
       },
-
+      smoothTransitionForBar: {
+        transitionBar: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
+      },
       keyframes: {
         fadeOutUp: {
           from: { opacity: 1, transform: "translateY(0)" },
@@ -19,11 +21,26 @@ module.exports = {
           "50%": { transform: "rotate(3deg)" }, // 중간: 약간 오른쪽으로 기울임
         },
 
-        curtainUp: {
-          "0%": { transform: "translateY(0)" },
-          "20%": { transform: "translateY(5%)" },
-          "100%": { transform: "translateY(-20%}" },
+        raiseUpBar: {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "70%": { transform: "translateY(-5%)", opacity: "1" }, // 살짝 더 올라갔다가
+          "100%": { transform: "translateY(0)", opacity: "1" }, // 제자리로
         },
+        curtainUp: {
+          "0%": { clipPath: "inset(0 0 0 0)" },
+          "20%": { clipPath: "inset(0 0 -10% 0)" },
+          "100%": { clipPath: "inset(0 0 5% 0)" },
+        },
+        curtainDown: {
+          "0%": { clipPath: "inset(0 0 -10% 0)" },
+          "20%": { clipPath: "inset(0 0 -13% 0" },
+          "100%": { clipPath: "isnet(0 0 0 0" },
+        },
+        ripple: {
+          "0%": { transform: "scale(0.8)", opacity: "1" },
+          "100%": { transform: "scale(2.4)", opacity: "0" },
+        },
+
         heartWave: {
           "0%": {
             transform: "translate(-50%, -50%) scale(1)",
@@ -36,6 +53,9 @@ module.exports = {
         },
       },
       animation: {
+        ripple: "ripple 1s cubic-bezier(0, 0, 0.2, 1) infinite",
+        raiseUpBar:
+          "raiseUpBar 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0) forwards",
         fadeOutUp: "fadeOutUp 0.3s ease-out forwards",
         moneyFlap: "moneyFlap 0.2s ease-in-out infinite",
         // heartWave: 'heartWave 0.8s linear forwards',
