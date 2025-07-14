@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserInfoAboutLive } from "@/api";
 import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
+import clsx from "clsx";
 
 interface live_info {
   category: string | null;
@@ -50,9 +51,16 @@ const UserLivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
-
+  const stream_nav_bar = [
+    { id: "chat", icon: "💬" },
+    { id: "streamer", icon: "👤" },
+    { id: "settings", icon: "⚙️" },
+    { id: "info", icon: "🎬" },
+  ];
+  const [stream_nav_item, set_stream_nav_item] = useState(null);
   const live_information = get_user_info_about_live?.live_information[0];
 
+  const [show_chat, set_show_chat] = useState(false);
   //로그인유저만 아닌 비로그인 유저도 추가해야함
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
@@ -77,6 +85,7 @@ const UserLivePage = () => {
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
+
   return (
     <div className="grid grid-cols-12    relative">
       {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
@@ -109,7 +118,21 @@ const UserLivePage = () => {
 
         {/* SubInfo 래퍼 */}
 
-        <div className="border border-green-600">
+        <div
+          className="border border-black w-4 h-4 cursor-pointer"
+          onClick={() => {
+            set_show_chat((prev) => !prev);
+          }}
+        ></div>
+        <div
+          className={clsx(
+            `border border-green-600
+            opacity-0 translate-y-full`,
+            {
+              "animate-revealDown": show_chat,
+            }
+          )}
+        >
           <StreamerInfo
             live_information={live_information}
             current_host_id={current_host_id}

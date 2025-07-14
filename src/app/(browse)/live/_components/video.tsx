@@ -26,10 +26,6 @@ import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
 import clsx from "clsx";
-import RippleBar from "./alarm";
-import SlidingLiquid from "./sliding_liquid_bar";
-import Alarm from "./alarm";
-import SlidingLiquidBar from "./sliding_liquid_bar";
 
 interface VideoProps {
   host_name: string | undefined;
@@ -113,6 +109,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const nav_items = ["🎬", "💬", "👤", "⚙️"];
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const [show_streamer_info, set_show_streamer_info] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+
   return (
     <div
       className={clsx(
@@ -146,7 +144,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
             }
           )}
           onClick={() => {
-            set_show_streamer_info(true);
+            set_show_streamer_info((prev) => !prev);
           }}
         >
           <div

@@ -40,7 +40,12 @@ module.exports = {
           "0%": { transform: "scale(0.8)", opacity: "1" },
           "100%": { transform: "scale(2.4)", opacity: "0" },
         },
-
+        revealDown: {
+          // 시작: Y축 -100% 위치 (위쪽 화면 밖)에서 시작
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          // 끝: Y축 0 (제자리)으로 내려오면서 나타남
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
         heartWave: {
           "0%": {
             transform: "translate(-50%, -50%) scale(1)",
@@ -62,6 +67,7 @@ module.exports = {
         heartWave: "heartWave 0.8s forwards",
         // curtainUp: "curatainUp 0.7s ease-in-out forwards",
         curtainUp: "curtainUp 0.7s ease-in-out forwards",
+        revealDown: "revealDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },
     },
   },
