@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import {
   ConnectionState,
   Track,
@@ -26,18 +26,27 @@ import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
 import clsx from "clsx";
-import RippleBar from "./alarm";
-import SlidingLiquid from "./sliding_liquid_bar";
-import Alarm from "./alarm";
-import SlidingLiquidBar from "./sliding_liquid_bar";
 
 interface VideoProps {
   host_name: string | undefined;
   host_identity: string;
   token: string;
   className?: string;
+  show_streamer_info_bar: boolean;
+  set_show_streamer_info_bar: React.Dispatch<SetStateAction<boolean>>;
+  show_streamer_info: boolean;
+  set_show_streamer_info: React.Dispatch<SetStateAction<boolean>>;
 }
-const Video = ({ host_name, host_identity, token }: VideoProps) => {
+const Video = ({
+  host_name,
+  host_identity,
+  token,
+  className,
+  show_streamer_info_bar,
+  set_show_streamer_info_bar,
+  show_streamer_info,
+  set_show_streamer_info,
+}: VideoProps) => {
   const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
@@ -109,12 +118,16 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       </div>
     );
   }
-  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
-  const [show_streamer_info, set_show_streamer_info] = useState(false);
+
+  const nav_items = ["🎬", "💬", "👤", "⚙️"];
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+
   return (
     <div
       className={clsx(
-        "aspect-video object-contain group relative w-full  bg-yellow-300 transition-all duration-300 ease-apple",
+        `aspect-video object-contain group 
+        relative w-full 
+         transition-all duration-300 `,
         {
           "animate-curtainUp": show_streamer_info,
           "animate-curtainDown": !show_streamer_info,
@@ -131,26 +144,38 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       <div>현재 모든 시청자 수 {total_viewer}</div>
       {show_streamer_info_bar && (
         <div
-          className={clsx("flex justify-center hover:cursor-pointer", {
-            "animate-raiseUpBar": show_streamer_info_bar,
-          })}
+          className={clsx(
+            `flex flex-col  items-center justify-end 
+            hover:cursor-pointer
+            absolute inset-0
+          `,
+            {
+              "animate-raiseUpBar": show_streamer_info_bar,
+            }
+          )}
           onClick={() => {
-            set_show_streamer_info(true);
+            set_show_streamer_info((prev) => !prev);
           }}
         >
           <div
-            className="border border-gray bg-gray-200 w-1/6 h-8  rounded-xl mb-2"
-            style={{
-              background: "linear-gradient(to bottom right, #2d3748, #1a202c)",
-            }}
+            className={clsx(`w-1/6 h-8  rounded-xl mb-2
+            bg-white/10
+            backdrop-blur-lg
+            border border-white/20
+            shadow-lg
+            flex items-center justify-center gap-4`)}
           >
-            <Alarm>
-              <span className="text-red text-xl">👤</span>
-            </Alarm>
-
-            <main className="flex  items-center justify-center p-5">
-              <SlidingLiquidBar />
-            </main>
+            {nav_items.map((icon, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className={clsx(`hover:cursor-pointer hover:scale-110`)}
+              >
+                {icon}
+              </button>
+            ))}
           </div>
         </div>
       )}
