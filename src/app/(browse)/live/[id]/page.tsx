@@ -51,6 +51,8 @@ const UserLivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
+  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
+  const [show_streamer_info, set_show_streamer_info] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
     { id: "streamer", icon: "👤" },

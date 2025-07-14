@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import {
   ConnectionState,
   Track,
@@ -32,8 +32,21 @@ interface VideoProps {
   host_identity: string;
   token: string;
   className?: string;
+  show_streamer_info_bar: boolean;
+  set_show_streamer_info_bar: React.Dispatch<SetStateAction<boolean>>;
+  show_streamer_info: boolean;
+  set_show_streamer_info: React.Dispatch<SetStateAction<boolean>>;
 }
-const Video = ({ host_name, host_identity, token }: VideoProps) => {
+const Video = ({
+  host_name,
+  host_identity,
+  token,
+  className,
+  show_streamer_info_bar,
+  set_show_streamer_info_bar,
+  show_streamer_info,
+  set_show_streamer_info,
+}: VideoProps) => {
   const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
@@ -107,8 +120,6 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   }
 
   const nav_items = ["🎬", "💬", "👤", "⚙️"];
-  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
-  const [show_streamer_info, set_show_streamer_info] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
@@ -116,7 +127,6 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       className={clsx(
         `aspect-video object-contain group 
         relative w-full 
-         bg-yellow-300 
          transition-all duration-300 `,
         {
           "animate-curtainUp": show_streamer_info,
