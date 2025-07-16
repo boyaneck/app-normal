@@ -37,7 +37,7 @@ interface live_info {
 interface sub_props {
   live_information: live_info | undefined;
 }
-const UserLivePage = () => {
+const LivePage = () => {
   const search_params = useSearchParams();
   const id = search_params.get("host_id");
   const host_nickname = search_params.get("host_nickname");
@@ -59,11 +59,8 @@ const UserLivePage = () => {
     { id: "settings", icon: "⚙️" },
     { id: "info", icon: "🎬" },
   ];
-  const [stream_nav_item, set_stream_nav_item] = useState(null);
   const live_information = get_user_info_about_live?.live_information[0];
-
   const [show_chat, set_show_chat] = useState(false);
-  //로그인유저만 아닌 비로그인 유저도 추가해야함
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewrToken(
@@ -90,11 +87,10 @@ const UserLivePage = () => {
 
   return (
     <div className="grid grid-cols-12    relative">
-      {/* <div className="col-span-12  lg:col-span-2 bg-yellow-200">Side bar</div> */}
-      <div className="col-span-11 h-5/6 col-start-2 ">
+      <div className="col-span-11 h-5/6 col-start-2 bg-green-300">
         <LiveKitRoom
           audio={true}
-          Faspect-video
+          aspect-video
           object-contain
           group
           relative
@@ -103,22 +99,51 @@ const UserLivePage = () => {
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
           className="border border-red-500 "
         >
-          <div className="relative max-width: 500px; max-height: 300px;">
+          <div
+            className="relative"
+            onMouseOver={() => set_show_streamer_info_bar(true)}
+            onMouseLeave={() => set_show_streamer_info_bar(false)}
+          >
             <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-              className="object-contain 
-                  "
+              className="object-contain"
+              // show_streamer_info_bar={show_streamer_info_bar}
+              // set_show_streamer_info_bar={set_show_streamer_info_bar}
+              // show_streamer_info={show_streamer_info}
+              // set_show_streamer_info={set_show_streamer_info}
             />
-
-            <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
+            <div>
               <ChatPage current_host_nickname={current_host_nickname} />
+            </div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-black">
+              <div
+                className={clsx(
+                  ` h-8  rounded-xl mb-2
+                bg-white/10
+                backdrop-blur-lg
+                border border-white/20
+                shadow-lg
+                flex items-center justify-center gap-4`,
+                  { "animate-curtainUp": show_streamer_info_bar }
+                )}
+              >
+                {stream_nav_bar.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={clsx(`hover:cursor-pointer hover:scale-110`)}
+                  >
+                    {item.icon}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </LiveKitRoom>
-
-        {/* SubInfo 래퍼 */}
 
         <div
           className="border border-black w-4 h-4 cursor-pointer"
@@ -126,15 +151,8 @@ const UserLivePage = () => {
             set_show_chat((prev) => !prev);
           }}
         ></div>
-        <div
-          className={clsx(
-            `border border-green-600
-            opacity-0 translate-y-full`,
-            {
-              "animate-revealDown": show_chat,
-            }
-          )}
-        >
+
+        <div className={clsx({ "animate-revealDown": show_streamer_info })}>
           <StreamerInfo
             live_information={live_information}
             current_host_id={current_host_id}
@@ -146,4 +164,4 @@ const UserLivePage = () => {
   );
 };
 
-export default UserLivePage;
+export default LivePage;

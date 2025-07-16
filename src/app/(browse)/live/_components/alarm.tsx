@@ -1,6 +1,3 @@
-// 파일 경로: /src/components/RippleButton.jsx (예시)
-
-// 재사용성을 위해 아이콘을 children으로 받습니다.
 const Alarm = ({ children }: any) => {
   return (
     <div className="relative group flex items-center justify-center">
