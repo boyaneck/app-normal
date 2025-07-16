@@ -1,6 +1,6 @@
 "use client";
 
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ConnectionState,
   Track,
@@ -32,21 +32,8 @@ interface VideoProps {
   host_identity: string;
   token: string;
   className?: string;
-  show_streamer_info_bar: boolean;
-  set_show_streamer_info_bar: React.Dispatch<SetStateAction<boolean>>;
-  show_streamer_info: boolean;
-  set_show_streamer_info: React.Dispatch<SetStateAction<boolean>>;
 }
-const Video = ({
-  host_name,
-  host_identity,
-  token,
-  className,
-  show_streamer_info_bar,
-  set_show_streamer_info_bar,
-  show_streamer_info,
-  set_show_streamer_info,
-}: VideoProps) => {
+const Video = ({ host_name, host_identity, token }: VideoProps) => {
   const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
@@ -120,13 +107,17 @@ const Video = ({
   }
 
   const nav_items = ["🎬", "💬", "👤", "⚙️"];
+  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
+  const [show_streamer_info, set_show_streamer_info] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <div
       className={clsx(
-        `aspect-video object-contain group 
+        `object-contain
+        h-[300px]
         relative w-full 
+         bg-yellow-300 
          transition-all duration-300 `,
         {
           "animate-curtainUp": show_streamer_info,
@@ -142,7 +133,7 @@ const Video = ({
     >
       {content}
       <div>현재 모든 시청자 수 {total_viewer}</div>
-      {show_streamer_info_bar && (
+      {/* {show_streamer_info_bar && (
         <div
           className={clsx(
             `flex flex-col  items-center justify-end 
@@ -178,7 +169,7 @@ const Video = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
