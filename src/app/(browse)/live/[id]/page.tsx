@@ -125,8 +125,9 @@ const LivePage = () => {
                 backdrop-blur-lg
                 border border-white/20
                 shadow-lg
-                flex items-center justify-center gap-4`,
-                  { "animate-curtainUp": show_streamer_info_bar }
+                flex items-center justify-center gap-4
+                opacity-0`,
+                  { "animate-raiseUpBar": show_streamer_info_bar }
                 )}
               >
                 {stream_nav_bar.map((item, idx) => (
