@@ -20,6 +20,7 @@ import { getUserInfoAboutLive } from "@/api";
 import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
+import StreamerInfoBar from "../../chat/_components/streamer_info_bar";
 
 interface live_info {
   category: string | null;
@@ -86,8 +87,14 @@ const LivePage = () => {
   }
 
   return (
-    <div className="grid grid-cols-12    relative">
-      <div className="col-span-11 h-5/6 col-start-2 bg-green-300">
+    <div className="grid grid-cols-12  h-[75vh]  relative">
+      <div
+        className="col-span-11 h-full col-start-2 bg-green-300"
+        onMouseOver={() => {
+          set_show_streamer_info_bar(true);
+        }}
+        onMouseLeave={() => set_show_streamer_info_bar(false)}
+      >
         <LiveKitRoom
           audio={true}
           aspect-video
@@ -99,67 +106,35 @@ const LivePage = () => {
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
           className="border border-red-500 "
         >
-          <div
-            className="relative"
-            onMouseOver={() => set_show_streamer_info_bar(true)}
-            onMouseLeave={() => set_show_streamer_info_bar(false)}
-          >
-            <Video
-              host_name={current_host_nickname}
-              host_identity={current_host_id}
-              token={token}
-              className="object-contain"
-              // show_streamer_info_bar={show_streamer_info_bar}
-              // set_show_streamer_info_bar={set_show_streamer_info_bar}
-              // show_streamer_info={show_streamer_info}
-              // set_show_streamer_info={set_show_streamer_info}
-            />
-            <div>
-              <ChatPage current_host_nickname={current_host_nickname} />
-            </div>
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-black">
-              <div
-                className={clsx(
-                  ` h-8  rounded-xl mb-2
-                bg-white/10
-                backdrop-blur-lg
-                border border-white/20
-                shadow-lg
-                flex items-center justify-center gap-4`,
-                  { "animate-curtainUp": show_streamer_info_bar }
-                )}
-              >
-                {stream_nav_bar.map((item, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    className={clsx(`hover:cursor-pointer hover:scale-110`)}
-                  >
-                    {item.icon}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <Video
+            host_name={current_host_nickname}
+            host_identity={current_host_id}
+            token={token}
+            className="object-contain"
+            // show_streamer_info_bar={show_streamer_info_bar}
+            // set_show_streamer_info_bar={set_show_streamer_info_bar}
+            // show_streamer_info={show_streamer_info}
+            // set_show_streamer_info={set_show_streamer_info}
+          />
         </LiveKitRoom>
+        <ChatPage current_host_nickname={current_host_nickname} />
+        <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
+      </div>
 
-        <div
+      {/* <div
           className="border border-black w-4 h-4 cursor-pointer"
           onClick={() => {
             set_show_chat((prev) => !prev);
           }}
-        ></div>
+        ></div> */}
 
-        <div className={clsx({ "animate-revealDown": show_streamer_info })}>
+      {/* <div className={clsx({ "animate-revealDown": show_streamer_info })}>
           <StreamerInfo
             live_information={live_information}
             current_host_id={current_host_id}
             current_host_email={current_host_nickname}
           />
-        </div>
-      </div>
+        </div> */}
     </div>
   );
 };

@@ -115,8 +115,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     <div
       className={clsx(
         `object-contain
-        h-[300px]
-        relative w-full 
+        h-full w-full 
+        relative 
          bg-yellow-300 
          transition-all duration-300 `,
         {

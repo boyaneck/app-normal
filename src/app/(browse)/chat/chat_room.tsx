@@ -176,7 +176,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
   };
 
   return (
-    <div className="w-5/6 h-4/5 grid grid-rows-10 border relative bg-transparent">
+    <div className=" grid grid-rows-10 border absolute top-3 right-3 bg-purple-400 border-red-500">
       <div className=" row-span-9 relative">
         {/* --채팅메세지 */}
         <div className="">
