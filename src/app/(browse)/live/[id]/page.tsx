@@ -20,6 +20,7 @@ import { getUserInfoAboutLive } from "@/api";
 import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
+import StreamerInfoBar from "../../chat/_components/streamer_info_bar";
 
 interface live_info {
   category: string | null;
@@ -117,32 +118,7 @@ const LivePage = () => {
           />
         </LiveKitRoom>
         <ChatPage current_host_nickname={current_host_nickname} />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 border-black">
-          <div
-            className={clsx(
-              ` h-8  rounded-xl mb-2
-                bg-white/10
-                backdrop-blur-lg
-                border border-white/20
-                shadow-lg
-                flex items-center justify-center gap-4
-                opacity-1`,
-              { "animate-raiseUpBar": show_streamer_info_bar }
-            )}
-          >
-            {stream_nav_bar.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className={clsx(`hover:cursor-pointer hover:scale-110`)}
-              >
-                {item.icon}
-              </button>
-            ))}
-          </div>
-        </div>
+        <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
       </div>
 
       {/* <div
