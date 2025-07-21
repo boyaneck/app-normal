@@ -108,8 +108,7 @@ const UserLivePage = () => {
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-              className="object-contain 
-                  "
+              className="object-contain"
             />
 
             <div className="absolute top-[15vh] right-0 flex flex-col w-2/5 h-4/5 bg-transparent ">
