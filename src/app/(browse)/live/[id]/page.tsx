@@ -20,7 +20,7 @@ import { getUserInfoAboutLive } from "@/api";
 import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
-import StreamerInfoBar from "../../chat/_components/streamer_info_bar";
+import StreamerInfoBar from "../_components/streamer_info_bar";
 
 interface live_info {
   category: string | null;

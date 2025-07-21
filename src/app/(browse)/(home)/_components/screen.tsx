@@ -3,7 +3,7 @@ import { getLiveUser } from "@/api";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
 import { useViewrToken } from "@/hooks/useViewerToken";
-import { useSidebarStore } from "@/store/sidebar_store";
+import { useSidebarStore } from "@/store/bar_store";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";
