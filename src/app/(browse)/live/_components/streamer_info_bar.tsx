@@ -1,21 +1,22 @@
 import React from "react";
 import clsx from "clsx";
+import { useStreamingBarStore } from "@/store/bar_store";
 
-// 1. 컴포넌트가 받을 props의 타입을 명시적으로 정의합니다.
-//    - 아이콘 데이터의 타입
 interface NavItem {
-  icon: React.ReactNode; // 아이콘은 React 컴포넌트(JSX)이므로 React.ReactNode 타입을 사용합니다.
+  id: "chat" | "setting" | "streamer_info";
+  icon: React.ReactNode;
 }
 
-//    - StreamerInfoBar 컴포넌트 전체의 props 타입
 interface StreamerInfoBarProps {
   show: boolean;
   items: NavItem[];
 }
 
 const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
+  const { icon, toggle } = useStreamingBarStore();
+
+  console.log("아이콘 확인하기", icon);
   return (
-    // 부모를 기준으로 하단 중앙에 위치합니다.
     <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
       <div
         className={clsx(
@@ -37,8 +38,8 @@ const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
           <button
             key={idx}
             onClick={(e) => {
-              // 이벤트 버블링을 막아, 부모의 onMouseLeave 등이 실행되지 않게 합니다.
               e.stopPropagation();
+              toggle(item.id);
             }}
             className="hover:cursor-pointer hover:scale-110 transition-transform"
           >

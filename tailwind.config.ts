@@ -56,8 +56,19 @@ module.exports = {
             opacity: "0",
           },
         },
+        slideInFromRight: {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        // 오른쪽으로 나가는 애니메이션
+        slideOutToRight: {
+          "0%": { transform: "translateX(0)", opacity: "1" },
+          "100%": { transform: "translateX(100%)", opacity: "0" },
+        },
       },
       animation: {
+        slideIn: "slideInFromRight 0.3s ease-out forwards",
+        slideOut: "slideOutToRight 0.3s ease-in forwards",
         ripple: "ripple 1s cubic-bezier(0, 0, 0.2, 1) infinite",
         raiseUpBar:
           "raiseUpBar 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0) forwards",

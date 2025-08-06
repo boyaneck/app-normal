@@ -87,7 +87,11 @@ const LivePage = () => {
   }
 
   return (
-    <div className="grid grid-cols-12  h-[75vh]  relative">
+    <div
+      className={`grid grid-cols-12  
+    h-[75vh]  relative
+     overflow-hidden`}
+    >
       <div
         className="col-span-11 h-full col-start-2 bg-green-300"
         onMouseOver={() => {
