@@ -21,6 +21,7 @@ import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
 import StreamerInfoBar from "../_components/streamer_info_bar";
+import { useStreamingBarStore } from "@/store/bar_store";
 
 interface live_info {
   category: string | null;
@@ -70,6 +71,18 @@ const LivePage = () => {
     current_host_id
   );
 
+  const icon = useStreamingBarStore((state) => state.icon);
+  const [is_info_active, set_is_info_active] = useState(false);
+
+  useEffect(() => {
+    const info_active_check = icon.includes("streamer");
+    console.log("기본값이 false가 나와야 하는거 아니야 ?", info_active_check);
+    if (info_active_check) {
+      set_is_info_active(false);
+    } else {
+      set_is_info_active(true);
+    }
+  }, [icon]);
   useEffect(() => {
     if (current_host_id) {
       set_room_name(current_host_id);
@@ -85,15 +98,19 @@ const LivePage = () => {
   if (!token || !name || !identity) {
     return <div>Cannot watch the stream</div>;
   }
-
   return (
     <div
       className={`grid grid-cols-12  
     h-[75vh]  relative
      overflow-hidden`}
     >
+      {" "}
+      curtain
       <div
-        className="col-span-11 h-full col-start-2 bg-green-300"
+        className={clsx(
+          `col-span-11 h-full col-start-2 bg-green-300`,
+          is_info_active ? "animate-curtainUp" : "animate-curtainDown"
+        )}
         onMouseOver={() => {
           set_show_streamer_info_bar(true);
         }}
@@ -123,22 +140,15 @@ const LivePage = () => {
         </LiveKitRoom>
         <ChatPage current_host_nickname={current_host_nickname} />
         <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
-      </div>
-
-      {/* <div
-          className="border border-black w-4 h-4 cursor-pointer"
-          onClick={() => {
-            set_show_chat((prev) => !prev);
-          }}
-        ></div> */}
-
-      {/* <div className={clsx({ "animate-revealDown": show_streamer_info })}>
+        <div className={clsx({ "animate-revealDown": is_info_active })}>
           <StreamerInfo
             live_information={live_information}
             current_host_id={current_host_id}
             current_host_email={current_host_nickname}
           />
-        </div> */}
+        </div>
+        <div>ss</div>
+      </div>
     </div>
   );
 };
