@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useStreamingBarStore } from "@/store/bar_store";
 
 interface NavItem {
-  id: "chat" | "setting" | "streamer_info";
+  id: "chat" | "setting" | "streamer";
   icon: React.ReactNode;
 }
 

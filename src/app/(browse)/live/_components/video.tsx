@@ -26,6 +26,7 @@ import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
 import clsx from "clsx";
+import { useStreamingBarStore } from "@/store/bar_store";
 
 interface VideoProps {
   host_name: string | undefined;
@@ -34,6 +35,7 @@ interface VideoProps {
   className?: string;
 }
 const Video = ({ host_name, host_identity, token }: VideoProps) => {
+  const icon = useStreamingBarStore((state) => state.icon);
   const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
@@ -65,6 +67,18 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     set_total_viewer(participants.length - 1);
     socket?.emit("user_in_out", remote_participant_except_host);
   }, [total_viewer]);
+
+  const [is_info_active, set_is_info_active] = useState(false);
+
+  useEffect(() => {
+    const info_active_check = icon.includes("streamer");
+    console.log("아이콘 확인하기zzzzzzzzzzz", info_active_check);
+    if (info_active_check) {
+      set_is_info_active(false);
+    } else {
+      set_is_info_active(true);
+    }
+  }, [icon]);
   let user_info = {};
   console.log("호스트 제외한 유저 ? ", remote_participant_except_host);
   let content;
@@ -117,11 +131,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         `object-contain
         h-full w-full 
         relative 
-         bg-yellow-300 
-         transition-all duration-300 `,
+         bg-sky-300
+         transition-all duration-300`,
         {
-          "animate-curtainUp": show_streamer_info,
-          "animate-curtainDown": !show_streamer_info,
+          "bg-pink-500 animate-curtainUp": is_info_active,
+          "animate-curtainDown": !is_info_active,
         }
       )}
       onMouseOver={() => {

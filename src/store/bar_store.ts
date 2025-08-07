@@ -22,7 +22,7 @@ export const streamerInfoBarStore = create<streamerInfoBarProps>((set) => ({
   set_streamer_info_items: (item) => set({ streamer_info_items: item }),
 }));
 // export type bar_state = "chat" | "setting" | "streamer_info";
-export type bar_state = "chat" | "setting" | "streamer_info";
+export type bar_state = "chat" | "setting" | "streamer";
 interface streamingBarProps {
   icon: bar_state[];
 
