@@ -64,6 +64,7 @@ export const useStreamDuration = ({
       }
     };
     const sss = "";
+    const ddd = "";
     //처음 접속시 스트리머 찾아서 시간 설정
     const streamer = room.getParticipantByIdentity(streamer_id);
     parseMetadata(streamer);
