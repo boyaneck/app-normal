@@ -29,7 +29,7 @@ export const AnimatedMessage = ({
       }}
     >
       <div
-        className="group cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
+        className=" cursor-pointer hover:font-bold hover:shadow-xl hover:scale-[1.02]
         transition-all duration-200 ease-in-out rounded-sm 
         "
       >
