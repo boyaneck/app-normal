@@ -191,9 +191,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     <>
       <div
         className={clsx(
-          `grid grid-rows-10 border 
+          `grid grid-rows-10
+           border border-gray-400
           absolute top-3 right-3 
-           border-gray-400
           rounded-xl`,
           {
             "animate-slideIn": !is_chat_active,
@@ -201,7 +201,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
           }
         )}
       >
-        <div className=" row-span-9 relative">
+        <div className=" row-span-9 relative flex flex-col-reverse overflow-hidden h-[250px]">
           {/* --채팅메세지 */}
           <div className="">
             {receive_message_info.map((message_info) => {
@@ -225,7 +225,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             })}
           </div>
           {/* --채팅메세지 */}
-
           {is_modal_open && (
             //모달창
 

@@ -22,6 +22,7 @@ import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
+import { useStreamDuration } from "@/hooks/useStreamDuration";
 
 interface live_info {
   category: string | null;
@@ -104,11 +105,9 @@ const LivePage = () => {
     h-[75vh]  relative
      overflow-hidden`}
     >
-      {" "}
-      curtain
       <div
         className={clsx(
-          `col-span-11 h-full col-start-2 bg-green-300`,
+          `col-span-11 h-full col-start-2 bg-red-300`,
           is_info_active ? "animate-curtainUp" : "animate-curtainDown"
         )}
         onMouseOver={() => {
@@ -125,7 +124,7 @@ const LivePage = () => {
           w-full
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          className="border border-red-500 "
+          className=""
         >
           <Video
             host_name={current_host_nickname}

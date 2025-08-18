@@ -131,10 +131,9 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         `object-contain
         h-full w-full 
         relative 
-         bg-sky-300
          transition-all duration-300`,
         {
-          "bg-pink-500 animate-curtainUp": is_info_active,
+          " animate-curtainUp": is_info_active,
           "animate-curtainDown": !is_info_active,
         }
       )}
