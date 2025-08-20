@@ -18,6 +18,11 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "src")));
 app.post("/payment/im_port", handleWebhook);
 app.post("/sanction_chat", sanctionChat);
+app.post(
+  "/live/live_duration",
+  express.raw({ type: "application/webhook+json" }),
+  livekitWebhook
+);
 initialize_socket(server);
 
 //Routes setup
