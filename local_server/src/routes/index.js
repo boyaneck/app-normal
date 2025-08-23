@@ -1,6 +1,5 @@
-const express = require("express");
-const paymentRoutes = require("./payment_route");
-
+import express from "express";
+import paymentRoutes from "../payment/payment_route";
 const router = express.router();
 
 router.get("/", (req, res) => {
@@ -10,4 +9,4 @@ router.get("/", (req, res) => {
 
 router.use("/payment", paymentRoutes);
 
-module.exports = routes;
+export default router;

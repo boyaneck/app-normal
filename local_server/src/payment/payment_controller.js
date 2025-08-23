@@ -1,7 +1,6 @@
 const paymentService = require("../services/payment.service");
-const { logger } = require("../utils/logger");
-
-exports.handleWebhook = async (req, res, next) => {
+import logger from "../utils/logger";
+export const handleWebhook = async (req, res, next) => {
   try {
     await paymentService.processPaymentWebhook(req.body);
     res.status(200).send("Webhook received successfully");

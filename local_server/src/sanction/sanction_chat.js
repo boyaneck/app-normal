@@ -1,5 +1,4 @@
-const { redisClient } = require("../config/redis");
-
+import { redis_client } from "../config/redis.js";
 // const sanction_duration = {
 //   "30m": 30,
 //   "1h": 60,
@@ -7,12 +6,12 @@ const { redisClient } = require("../config/redis");
 //   permanent: -1,
 // };
 
-const sanctionChat = async (req, res) => {
+export const sanctionChat = async (req, res) => {
   console.log("제재 관련 정보를 보냄", req.body.sanction_info);
   console.log("제재 관련 req body", req.body);
 
   const { user_id, streamer_id, duration, reason } = req.body;
-  const subscriber = redisClient.duplicate();
+  const subscriber = redis_client.duplicate();
   subscriber.subscribe();
   subscriber.subscribe(
     CHAT_CHANNEL,
@@ -113,5 +112,3 @@ const sanctionChat = async (req, res) => {
   //   })
   // } catch (error) {}
 };
-
-module.exports = sanctionChat;

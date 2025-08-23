@@ -1,8 +1,5 @@
-const { SupabaseClient } = require("@supabase/supabase-js");
-
-const { redis_client } = require();
-
-const sanctionService = async (
+import SupabaseClient from "@supabase/supabase-js";
+export const sanctionService = async (
   io,
   redis_client,
   channel_id,
@@ -55,4 +52,3 @@ const sanctionService = async (
 
   return "유저가 성공적으로 제재되었습니다✔️";
 };
-module.exports = sanctionService;
