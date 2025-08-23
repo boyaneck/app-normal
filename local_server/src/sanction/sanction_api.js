@@ -1,5 +1,5 @@
-const { SupabaseClient } = require("@supabase/supabase-js");
-const { redis_client } = require("../config/redis");
+import SupabaseClient from "@supabase/supabase-js";
+import { redis_client } from "../config/redis";
 
 const sanctionRecord = async (user_id, user_nickname, duration, reason) => {
   const { data, error } = await SupabaseClient.from("sanction_logs").insert({

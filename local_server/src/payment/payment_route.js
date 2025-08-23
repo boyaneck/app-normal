@@ -1,8 +1,5 @@
-const express = require("express");
-const paymentController = require("../controllers/payment.controller");
+import express from "express";
 
-const router = express.Router();
+export const router = express.Router();
 
 router.post("/im_port", paymentController.handleWebhook);
-
-module.exports = router;

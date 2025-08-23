@@ -1,8 +1,9 @@
 // webhook.js
-const crypto = require("crypto");
-const axios = require("axios");
 
-const handleWebhook = async (req, res) => {
+import crypto from "crypto";
+import axios from "axios";
+
+export const handleWebhook = async (req, res) => {
   try {
     console.log("✅ 웹훅 요청 받음!");
     const { imp_uid, merchant_uid } = req.body;
@@ -97,5 +98,3 @@ const handleWebhook = async (req, res) => {
     res.status(400).json(e); // 수정: JSON 형식으로 오류 응답
   }
 };
-
-module.exports = { handleWebhook };
