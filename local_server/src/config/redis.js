@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+
 const channel = {
   chat_channel: process.env.CHAT_CHANNEL,
 };
@@ -15,7 +16,9 @@ subscriber.on("error", (err) => console.error("Redis Subscriber Error", err));
 // };
 
 const connectRedis = async () => {
+  console.log("연결확인하기기");
   if (!redis_client.isOpen) {
+    console.log("연결이 되었나요 ?");
     // 이미 연결되어 있다면 다시 시도하지 않음
     await redis_client.connect();
     console.log("🚀 Redis에 성공적으로 연결되었습니다.");
