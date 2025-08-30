@@ -29,12 +29,6 @@ app.post("/sanction_chat", sanctionChat);
 app.use("/live", live_route);
 
 initialize_socket(server);
-//Routes setup
-// app.use("/", routes);
-
-//Error handling
-// app.use(errorHandler);
-// server.listen(port, () => console.log(`server is running! ${port}`));
 
 const startServer = async () => {
   try {
