@@ -23,6 +23,7 @@ import clsx from "clsx";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
 import { useStreamDuration } from "@/hooks/useStreamDuration";
+import { useSocketStore } from "@/store/socket_store";
 
 interface live_info {
   category: string | null;
@@ -41,6 +42,7 @@ interface sub_props {
   live_information: live_info | undefined;
 }
 const LivePage = () => {
+  const { socket, connect_socket, disconnect_socket } = useSocketStore();
   const search_params = useSearchParams();
   const id = search_params.get("host_id");
   const host_nickname = search_params.get("host_nickname");
