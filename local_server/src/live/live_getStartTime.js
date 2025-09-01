@@ -1,16 +1,17 @@
-import { redis_client } from "../config/redis";
+import { redis_client } from "../config/redis.js";
 
 export const getStartTime = async (req, res) => {
-  const { streamer_id } = req.body;
-  if (streamer_id) {
+  const { id } = req.body;
+  if (!id) {
     return res.status(400).json({ message: "start_time is required" });
   }
   try {
-    const startTime = await redis_client.get(`streamer:${streamer_id}`);
+    const start_time = await redis_client.get(`streamer:${id}`);
     const data = {
       message: "Redis에서 해당 스트리머의 방송시간을 성공적으로 가져옵니다.",
-      time: startTime,
+      time: start_time,
     };
     res.status(200).json(data);
+    console.log("제대로 요청이 이루어짐");
   } catch (error) {}
 };
