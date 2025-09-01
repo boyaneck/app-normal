@@ -2,46 +2,21 @@
 import { useViewrToken } from "@/hooks/useViewerToken";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import {
-  LiveKitRoom,
-  useLiveKitRoom,
-  useRoomInfo,
-  useRoomContext,
-  RoomName,
-  useParticipants,
-} from "@livekit/components-react";
+import { LiveKitRoom } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
-import ChatRoom from "../../chat/chat_room";
-import SubInfo from "../_components/streamer_info";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfoAboutLive } from "@/api";
-import { userInfo } from "os";
 import StreamerInfo from "../_components/streamer_info";
 import clsx from "clsx";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
-import { useStreamDuration } from "@/hooks/useStreamDuration";
 import { useSocketStore } from "@/store/socket_store";
+import axios from "axios";
 
-interface live_info {
-  category: string | null;
-  id: string;
-  ingress_id: string;
-  is_live: boolean;
-  server_url: string;
-  stream_key: string;
-  title: string;
-  user_email: string;
-  user_id: string;
-  visitor: number;
-}
-
-interface sub_props {
-  live_information: live_info | undefined;
-}
 const LivePage = () => {
+  console.log("LIVE 페이지 랜더링");
   const { socket, connect_socket, disconnect_socket } = useSocketStore();
   const search_params = useSearchParams();
   const id = search_params.get("host_id");
@@ -76,7 +51,24 @@ const LivePage = () => {
 
   const icon = useStreamingBarStore((state) => state.icon);
   const [is_info_active, set_is_info_active] = useState(false);
+  console.log("useffect 바로 위의 랜더링");
+  useEffect(() => {
+    console.log("POST 요청 전1");
+    const URL = process.env.LOCAL_POST_API!; // 프로토콜 추가
+    console.log("POST 요청 전2");
+    const getStreamingStartAt = async () => {
+      try {
+        console.log("POST 요청 전3");
+        const res = await axios.post(URL, "ALICE");
+        console.log("응답 데이터:", res.data);
+      } catch (error) {
+        console.error("API 호출 중 오류 발생:", error);
+      }
+    };
 
+    getStreamingStartAt();
+    console.log("HTTP 요청이 이루어짐");
+  }, []);
   useEffect(() => {
     const info_active_check = icon.includes("streamer");
     console.log("기본값이 false가 나와야 하는거 아니야 ?", info_active_check);
@@ -99,7 +91,7 @@ const LivePage = () => {
 
   console.log("자 호스트 닉네임일ㄸ래", host_nickname);
   if (!token || !name || !identity) {
-    return <div>Cannot watch the stream</div>;
+    // return <div>Cannot watch the stream</div>;
   }
   return (
     <div
