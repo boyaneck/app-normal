@@ -16,8 +16,6 @@ import { useSocketStore } from "@/store/socket_store";
 import axios from "axios";
 
 const LivePage = () => {
-  console.log("LIVE 페이지 랜더링");
-  const { socket, connect_socket, disconnect_socket } = useSocketStore();
   const search_params = useSearchParams();
   const id = search_params.get("host_id");
   const host_nickname = search_params.get("host_nickname");
@@ -31,8 +29,8 @@ const LivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
+
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
-  const [show_streamer_info, set_show_streamer_info] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
     { id: "streamer", icon: "👤" },
@@ -40,7 +38,6 @@ const LivePage = () => {
     { id: "info", icon: "🎬" },
   ];
   const live_information = get_user_info_about_live?.live_information[0];
-  const [show_chat, set_show_chat] = useState(false);
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewrToken(
@@ -50,16 +47,17 @@ const LivePage = () => {
   );
 
   const icon = useStreamingBarStore((state) => state.icon);
+  const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
   console.log("useffect 바로 위의 랜더링");
   useEffect(() => {
-    console.log("POST 요청 전1");
-    const URL = process.env.LOCAL_POST_API!; // 프로토콜 추가
-    console.log("POST 요청 전2");
+    console.log("useffect 안의 콘솔");
+    const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
     const getStreamingStartAt = async () => {
       try {
-        console.log("POST 요청 전3");
-        const res = await axios.post(URL, "ALICE");
+        const res = await axios.post(URL, { id: "Alicia Doe" });
+        const timer = res.data;
+        set_streaming_timer(timer);
         console.log("응답 데이터:", res.data);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
@@ -71,7 +69,6 @@ const LivePage = () => {
   }, []);
   useEffect(() => {
     const info_active_check = icon.includes("streamer");
-    console.log("기본값이 false가 나와야 하는거 아니야 ?", info_active_check);
     if (info_active_check) {
       set_is_info_active(false);
     } else {
@@ -81,18 +78,14 @@ const LivePage = () => {
   useEffect(() => {
     if (current_host_id) {
       set_room_name(current_host_id);
-
-      console.log(
-        " 현재 페이지 이동시 해당 호스트의 아이디디",
-        current_host_id
-      );
     }
   }, []);
 
-  console.log("자 호스트 닉네임일ㄸ래", host_nickname);
   if (!token || !name || !identity) {
+    console.log("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
     // return <div>Cannot watch the stream</div>;
   }
+  console.log("ㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂ");
   return (
     <div
       className={`grid grid-cols-12  
@@ -101,7 +94,7 @@ const LivePage = () => {
     >
       <div
         className={clsx(
-          `col-span-11 h-full col-start-2 bg-red-300`,
+          `col-span-11 h-full col-start-2 `,
           is_info_active ? "animate-curtainUp" : "animate-curtainDown"
         )}
         onMouseOver={() => {
@@ -109,16 +102,11 @@ const LivePage = () => {
         }}
         onMouseLeave={() => set_show_streamer_info_bar(false)}
       >
-        <LiveKitRoom
+        {/* <LiveKitRoom
           audio={true}
-          aspect-video
-          object-contain
-          group
-          relative
-          w-full
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          className=""
+          className="aspect-video object-contain group relative w-full"
         >
           <Video
             host_name={current_host_nickname}
@@ -130,7 +118,8 @@ const LivePage = () => {
             // show_streamer_info={show_streamer_info}
             // set_show_streamer_info={set_show_streamer_info}
           />
-        </LiveKitRoom>
+        </LiveKitRoom> */}
+        <div>adasd</div>
         <ChatPage current_host_nickname={current_host_nickname} />
         <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
         <div className={clsx({ "animate-revealDown": is_info_active })}>
@@ -140,8 +129,9 @@ const LivePage = () => {
             current_host_email={current_host_nickname}
           />
         </div>
-        <div>ss</div>
+        <div>린이ㅏㅓㄹ나ㅣㅓㄹㅇ나ㅣㅓㄹㅇ나ㅣㅏㅣㅓㅏㅣㅇ널</div>
       </div>
+      <div>으허어허엏어</div>
     </div>
   );
 };

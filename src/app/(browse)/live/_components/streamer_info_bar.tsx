@@ -15,7 +15,6 @@ interface StreamerInfoBarProps {
 const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
   const { icon, toggle } = useStreamingBarStore();
 
-  console.log("아이콘 확인하기", icon);
   return (
     <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
       <div

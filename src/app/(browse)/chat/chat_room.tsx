@@ -139,7 +139,6 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     // set_hearts(([prev_hearts]) => [...[prev_hearts], { id: Date.now() }]);
   };
 
-  console.log("하트 확인하기", hearts);
   const heartAnimationEnd = ({ id }: heart) => {
     //여기서 하트 카운트를 세고 ,
     set_hearts(([prev_hearts]) =>

@@ -15,10 +15,11 @@ export const livekitWebhook = async (req, res) => {
     const room_name = event.room.name;
     const redis_key = `${room_name}의 방송`;
     if (event.event === "track_published") {
+      console.log("redis client 데이터 넣기 시작");
       const room_exist = await redis_client_for_livekit.hSetNX(
         redis_key,
         event.participant?.identity,
-        `start_time:${Date.now()}`
+        `${Date.now()}`
       );
       console.log(
         `🚀 Redis 저장  '${room_name}'의 방송 정보가 새롭게 저장되었습니다.`
