@@ -1,7 +1,7 @@
 "use client";
 import { useViewrToken } from "@/hooks/useViewerToken";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
@@ -49,7 +49,62 @@ const LivePage = () => {
   const icon = useStreamingBarStore((state) => state.icon);
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
-  console.log("useffect 바로 위의 랜더링");
+  const timerRef = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const numericTimer = Number(streaming_timer);
+
+    // 1. 초기값 설정: 유효한 값이 아닐 때만 "00:00"을 표시
+    if (isNaN(numericTimer)) {
+      if (timerRef.current) {
+        timerRef.current.innerText = "시간 오류";
+      }
+      return;
+    }
+
+    // 2. 초기 1초 타이머 설정
+    let timer_chk = setInterval(() => {
+      const now = Date.now();
+      const gap = now - numericTimer;
+      const total_seconds = Math.floor(gap / 1000);
+      const minutes = Math.floor(total_seconds / 60);
+      const seconds = total_seconds % 60;
+
+      // 1분 미만일 때는 초 단위로 표시
+      const display_time = `${String(minutes).padStart(2, "0")}:${String(
+        seconds
+      ).padStart(2, "0")}`;
+
+      if (timerRef.current) {
+        timerRef.current.innerText = display_time;
+      }
+
+      // 3. ✅ 1분 이상 경과 시 타이머 재설정
+      if (minutes >= 1) {
+        clearInterval(timer_chk); // 기존 1초 타이머 중단
+
+        // 1분마다 실행되는 새 타이머 설정
+        const minuteTimer = setInterval(() => {
+          const newNow = Date.now();
+          const newGap = newNow - numericTimer;
+          const newMinutes = Math.floor(newGap / (1000 * 60));
+
+          if (timerRef.current) {
+            timerRef.current.innerText = `${String(newMinutes).padStart(
+              2,
+              "0"
+            )}:00`;
+          }
+        }, 60000); // 1분 = 60000ms
+
+        // 새 타이머의 클린업 함수 반환
+        return () => clearInterval(minuteTimer);
+      }
+    }, 1000); // 1초마다 실행
+
+    // 초기 타이머의 클린업 함수
+    return () => clearInterval(timer_chk);
+  }, [streaming_timer]);
+  console.log("타이머", timerRef, "데이트", typeof Date.now());
   useEffect(() => {
     console.log("useffect 안의 콘솔");
     const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
@@ -128,6 +183,9 @@ const LivePage = () => {
             current_host_id={current_host_id}
             current_host_email={current_host_nickname}
           />
+        </div>
+        <div>
+          방송 경과 시간: <span ref={timerRef}>00:00</span>
         </div>
         <div>린이ㅏㅓㄹ나ㅣㅓㄹㅇ나ㅣㅓㄹㅇ나ㅣㅏㅣㅓㅏㅣㅇ널</div>
       </div>
