@@ -50,70 +50,85 @@ const LivePage = () => {
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
   const timerRef = useRef<HTMLSpanElement | null>(null);
+  const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // useEffect 안이 아닌 여기에 선언
   useEffect(() => {
-    const numericTimer = Number(streaming_timer);
+    console.log("--- useEffect 실행 ---");
+    console.log("streaming_timer:", streaming_timer, typeof streaming_timer);
 
-    // 1. 초기값 설정: 유효한 값이 아닐 때만 "00:00"을 표시
-    if (isNaN(numericTimer)) {
+    // 유효성 검사
+    if (
+      !streaming_timer ||
+      new Date(streaming_timer).toString() === "Invalid Date"
+    ) {
+      console.log(
+        "Invalid streaming_timer. Setting to 00:00 and clearing timer."
+      );
       if (timerRef.current) {
-        timerRef.current.innerText = "시간 오류";
+        timerRef.current.innerText = "00:00";
+      }
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+        timerIdRef.current = null;
       }
       return;
     }
 
-    // 2. 초기 1초 타이머 설정
-    let timer_chk = setInterval(() => {
+    const startTime = new Date(streaming_timer).getTime();
+    console.log("Parsed startTime:", new Date(startTime));
+
+    const updateTimer = () => {
       const now = Date.now();
-      const gap = now - numericTimer;
+      const gap = now - startTime;
       const total_seconds = Math.floor(gap / 1000);
       const minutes = Math.floor(total_seconds / 60);
       const seconds = total_seconds % 60;
 
-      // 1분 미만일 때는 초 단위로 표시
       const display_time = `${String(minutes).padStart(2, "0")}:${String(
         seconds
       ).padStart(2, "0")}`;
+
+      // console.log(`Current Time: ${display_time}, Total Seconds: ${total_seconds}`); // 너무 자주 출력되면 주석 처리
 
       if (timerRef.current) {
         timerRef.current.innerText = display_time;
       }
 
-      // 3. ✅ 1분 이상 경과 시 타이머 재설정
-      if (minutes >= 1) {
-        clearInterval(timer_chk); // 기존 1초 타이머 중단
-
-        // 1분마다 실행되는 새 타이머 설정
-        const minuteTimer = setInterval(() => {
-          const newNow = Date.now();
-          const newGap = newNow - numericTimer;
-          const newMinutes = Math.floor(newGap / (1000 * 60));
-
-          if (timerRef.current) {
-            timerRef.current.innerText = `${String(newMinutes).padStart(
-              2,
-              "0"
-            )}:00`;
-          }
-        }, 60000); // 1분 = 60000ms
-
-        // 새 타이머의 클린업 함수 반환
-        return () => clearInterval(minuteTimer);
+      if (minutes >= 1 && timerIdRef.current) {
+        if (total_seconds % 60 === 0 && total_seconds >= 60) {
+          console.log("Changing interval to 60 seconds.");
+          clearInterval(timerIdRef.current);
+          timerIdRef.current = setInterval(updateTimer, 60000);
+        }
       }
-    }, 1000); // 1초마다 실행
+    };
 
-    // 초기 타이머의 클린업 함수
-    return () => clearInterval(timer_chk);
+    if (timerIdRef.current) {
+      console.log("Clearing existing timer before setting new one.");
+      clearInterval(timerIdRef.current);
+    }
+
+    console.log("Setting initial interval to 1000ms.");
+    timerIdRef.current = setInterval(updateTimer, 1000);
+    updateTimer(); // Initial call
+
+    return () => {
+      console.log("--- useEffect Cleanup ---");
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+        timerIdRef.current = null;
+        console.log("Timer cleared during cleanup.");
+      }
+    };
   }, [streaming_timer]);
-  console.log("타이머", timerRef, "데이트", typeof Date.now());
+  console.log("시간경과 확인해보기", streaming_timer, timerRef, timerIdRef);
   useEffect(() => {
-    console.log("useffect 안의 콘솔");
     const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
     const getStreamingStartAt = async () => {
       try {
         const res = await axios.post(URL, { id: "Alicia Doe" });
         const timer = res.data;
         set_streaming_timer(timer);
-        console.log("응답 데이터:", res.data);
+        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", timer);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       }
