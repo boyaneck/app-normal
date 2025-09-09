@@ -14,6 +14,7 @@ import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
 import { useSocketStore } from "@/store/socket_store";
 import axios from "axios";
+import { useLiveTimer } from "@/hooks/useLiveTimer";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -50,88 +51,8 @@ const LivePage = () => {
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
   const timerRef = useRef<HTMLSpanElement | null>(null);
-  const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // useEffect 안이 아닌 여기에 선언
-  useEffect(() => {
-    // 유효성 검사
-    const num = Number(streaming_timer);
-    if (!streaming_timer) {
-      console.log("Redis 에서 방송 시작 시간을 받아오지 못하였습니다.");
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-      }
-      return;
-    }
-    if (isNaN(num)) {
-      console.log("제대로 된 숫자형 시간이 아닙니다.");
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-      }
-    }
 
-    const start_time = new Date(num).getTime();
-    console.log("시간파싱이 잘되나요 ??", start_time);
-    // ----------데이터 잘 가져왔다면
-
-    const updateTimer = () => {
-      const now = Date.now();
-      const gap = now - start_time;
-      const total_seconds = Math.floor(gap / 1000);
-      const minutes = Math.floor(total_seconds / 60);
-      const seconds = total_seconds % 60;
-      let display_time;
-      //초당데이터
-      if (minutes < 1) {
-        console.log("초당데이터 실행중");
-        display_time = `${String(seconds).padStart(2, "0")}초`;
-        if (total_seconds >= 60 && timerIdRef.current) {
-          clearInterval(timerIdRef.current);
-          timerIdRef.current = setInterval(updateTimer, 60000);
-        }
-      } else if (minutes < 60) {
-        display_time = `${minutes}분`;
-      } else {
-        const hours = Math.floor(minutes / 60);
-        const remaining_minutes = minutes % 60;
-        display_time = `${hours}시간`;
-        if (
-          remaining_minutes === 0 &&
-          total_seconds >= 3600 &&
-          timerIdRef.current
-        ) {
-          console.log("시간 타이머로 전환합니다.");
-          clearInterval(timerIdRef.current);
-          timerIdRef.current = setInterval(updateTimer, 3600000);
-        }
-
-        if (timerRef.current) {
-          timerRef.current.innerText = display_time;
-        }
-      }
-
-      //분당 데이터터
-    };
-
-    timerIdRef.current = setInterval(updateTimer, 1000);
-    updateTimer(); // Initial call
-
-    return () => {
-      console.log("--- useEffect Cleanup ---");
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-        console.log("Timer cleared during cleanup.");
-      }
-    };
-  }, [streaming_timer]);
-
-  console.log(
-    "시간경과 확인해보기",
-    typeof streaming_timer,
-    timerRef,
-    timerIdRef
-  );
+  const { live_time } = useLiveTimer({ streaming_timer });
   useEffect(() => {
     const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
     const getStreamingStartAt = async () => {
@@ -210,7 +131,7 @@ const LivePage = () => {
           />
         </div>
         <div>
-          방송 경과 시간: <span ref={timerRef}>00:00</span>
+          방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         </div>
         <div>린이ㅏㅓㄹ나ㅣㅓㄹㅇ나ㅣㅓㄹㅇ나ㅣㅏㅣㅓㅏㅣㅇ널</div>
       </div>
