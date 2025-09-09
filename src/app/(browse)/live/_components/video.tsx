@@ -120,10 +120,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     );
   }
 
-  const nav_items = ["🎬", "💬", "👤", "⚙️"];
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
-  const [show_streamer_info, set_show_streamer_info] = useState(false);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <div

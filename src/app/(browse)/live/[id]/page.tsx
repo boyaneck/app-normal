@@ -87,6 +87,24 @@ const LivePage = () => {
     console.log("token,name,identity");
     // return <div>Cannot watch the stream</div>;
   }
+  const videoRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const handleFullScreen = () => {
+    if (!isFullScreen) {
+      // 전체 화면 진입
+      if (videoRef?.current?.requestFullscreen) {
+        videoRef?.current.requestFullscreen();
+      }
+    } else {
+      // 전체 화면 종료
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    setIsFullScreen(!isFullScreen);
+  };
+
   return (
     <div
       className={`grid grid-cols-12  
@@ -102,8 +120,12 @@ const LivePage = () => {
           set_show_streamer_info_bar(true);
         }}
         onMouseLeave={() => set_show_streamer_info_bar(false)}
+      ></div>
+      {/* <div
+        ref={videoRef}
+        className="aspect-video object-contain group relative w-full"
       >
-        {/* <LiveKitRoom
+        <LiveKitRoom
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
@@ -119,8 +141,27 @@ const LivePage = () => {
             // show_streamer_info={show_streamer_info}
             // set_show_streamer_info={set_show_streamer_info}
           />
-        </LiveKitRoom> */}
-        <div>adasd</div>
+        </LiveKitRoom>
+      </div> */}
+      <div
+        ref={videoRef}
+        className="aspect-video object-contain group relative w-full"
+      >
+        <LiveKitRoom
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+          className="w-full h-full"
+        >
+          <Video
+            host_name={current_host_nickname}
+            host_identity={current_host_id}
+            token={token}
+            className="object-contain"
+          />
+        </LiveKitRoom>
+      </div>
+      <div>
         <ChatPage current_host_nickname={current_host_nickname} />
         <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
         <div className={clsx({ "animate-revealDown": is_info_active })}>
@@ -133,9 +174,17 @@ const LivePage = () => {
         <div>
           방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         </div>
-        <div>린이ㅏㅓㄹ나ㅣㅓㄹㅇ나ㅣㅓㄹㅇ나ㅣㅏㅣㅓㅏㅣㅇ널</div>
       </div>
-      <div>으허어허엏어</div>
+      <div>
+        {" "}
+        <button
+          onClick={handleFullScreen}
+          className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+        >
+          전체화면 버튼
+          {isFullScreen ? "전체 화면 종료" : "전체 화면"}
+        </button>
+      </div>
     </div>
   );
 };
