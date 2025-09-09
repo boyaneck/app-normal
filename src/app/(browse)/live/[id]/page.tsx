@@ -52,62 +52,67 @@ const LivePage = () => {
   const timerRef = useRef<HTMLSpanElement | null>(null);
   const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // useEffect 안이 아닌 여기에 선언
   useEffect(() => {
-    console.log("--- useEffect 실행 ---");
-    console.log("streaming_timer:", streaming_timer, typeof streaming_timer);
-
     // 유효성 검사
-    if (
-      !streaming_timer ||
-      new Date(streaming_timer).toString() === "Invalid Date"
-    ) {
-      console.log(
-        "Invalid streaming_timer. Setting to 00:00 and clearing timer."
-      );
-      if (timerRef.current) {
-        timerRef.current.innerText = "00:00";
-      }
+    const num = Number(streaming_timer);
+    if (!streaming_timer) {
+      console.log("Redis 에서 방송 시작 시간을 받아오지 못하였습니다.");
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
         timerIdRef.current = null;
       }
       return;
     }
+    if (isNaN(num)) {
+      console.log("제대로 된 숫자형 시간이 아닙니다.");
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+        timerIdRef.current = null;
+      }
+    }
 
-    const startTime = new Date(streaming_timer).getTime();
-    console.log("Parsed startTime:", new Date(startTime));
+    const start_time = new Date(num).getTime();
+    console.log("시간파싱이 잘되나요 ??", start_time);
+    // ----------데이터 잘 가져왔다면
 
     const updateTimer = () => {
       const now = Date.now();
-      const gap = now - startTime;
+      const gap = now - start_time;
       const total_seconds = Math.floor(gap / 1000);
       const minutes = Math.floor(total_seconds / 60);
       const seconds = total_seconds % 60;
-
-      const display_time = `${String(minutes).padStart(2, "0")}:${String(
-        seconds
-      ).padStart(2, "0")}`;
-
-      // console.log(`Current Time: ${display_time}, Total Seconds: ${total_seconds}`); // 너무 자주 출력되면 주석 처리
-
-      if (timerRef.current) {
-        timerRef.current.innerText = display_time;
-      }
-
-      if (minutes >= 1 && timerIdRef.current) {
-        if (total_seconds % 60 === 0 && total_seconds >= 60) {
-          console.log("Changing interval to 60 seconds.");
+      let display_time;
+      //초당데이터
+      if (minutes < 1) {
+        console.log("초당데이터 실행중");
+        display_time = `${String(seconds).padStart(2, "0")}초`;
+        if (total_seconds >= 60 && timerIdRef.current) {
           clearInterval(timerIdRef.current);
           timerIdRef.current = setInterval(updateTimer, 60000);
         }
+      } else if (minutes < 60) {
+        display_time = `${minutes}분`;
+      } else {
+        const hours = Math.floor(minutes / 60);
+        const remaining_minutes = minutes % 60;
+        display_time = `${hours}시간`;
+        if (
+          remaining_minutes === 0 &&
+          total_seconds >= 3600 &&
+          timerIdRef.current
+        ) {
+          console.log("시간 타이머로 전환합니다.");
+          clearInterval(timerIdRef.current);
+          timerIdRef.current = setInterval(updateTimer, 3600000);
+        }
+
+        if (timerRef.current) {
+          timerRef.current.innerText = display_time;
+        }
       }
+
+      //분당 데이터터
     };
 
-    if (timerIdRef.current) {
-      console.log("Clearing existing timer before setting new one.");
-      clearInterval(timerIdRef.current);
-    }
-
-    console.log("Setting initial interval to 1000ms.");
     timerIdRef.current = setInterval(updateTimer, 1000);
     updateTimer(); // Initial call
 
@@ -120,15 +125,21 @@ const LivePage = () => {
       }
     };
   }, [streaming_timer]);
-  console.log("시간경과 확인해보기", streaming_timer, timerRef, timerIdRef);
+
+  console.log(
+    "시간경과 확인해보기",
+    typeof streaming_timer,
+    timerRef,
+    timerIdRef
+  );
   useEffect(() => {
     const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
     const getStreamingStartAt = async () => {
       try {
         const res = await axios.post(URL, { id: "Alicia Doe" });
-        const timer = res.data;
-        set_streaming_timer(timer);
-        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", timer);
+        const data = res.data;
+        set_streaming_timer(data.time);
+        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", data.time);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       }
@@ -152,10 +163,9 @@ const LivePage = () => {
   }, []);
 
   if (!token || !name || !identity) {
-    console.log("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+    console.log("token,name,identity");
     // return <div>Cannot watch the stream</div>;
   }
-  console.log("ㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂ");
   return (
     <div
       className={`grid grid-cols-12  

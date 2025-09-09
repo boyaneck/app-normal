@@ -16,6 +16,7 @@ interface FollowProps {
 
 const useFollow = () => {
   const queryClient = useQueryClient();
+  const [tt, settt] = useState();
   const followMutation = useMutation({
     mutationFn: ({
       current_user_email,
