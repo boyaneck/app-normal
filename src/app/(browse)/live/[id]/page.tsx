@@ -14,6 +14,7 @@ import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
 import { useSocketStore } from "@/store/socket_store";
 import axios from "axios";
+import { useLiveTimer } from "@/hooks/useLiveTimer";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -50,85 +51,16 @@ const LivePage = () => {
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
   const timerRef = useRef<HTMLSpanElement | null>(null);
-  const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // useEffect 안이 아닌 여기에 선언
-  useEffect(() => {
-    console.log("--- useEffect 실행 ---");
-    console.log("streaming_timer:", streaming_timer, typeof streaming_timer);
 
-    // 유효성 검사
-    if (
-      !streaming_timer ||
-      new Date(streaming_timer).toString() === "Invalid Date"
-    ) {
-      console.log(
-        "Invalid streaming_timer. Setting to 00:00 and clearing timer."
-      );
-      if (timerRef.current) {
-        timerRef.current.innerText = "00:00";
-      }
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-      }
-      return;
-    }
-
-    const startTime = new Date(streaming_timer).getTime();
-    console.log("Parsed startTime:", new Date(startTime));
-
-    const updateTimer = () => {
-      const now = Date.now();
-      const gap = now - startTime;
-      const total_seconds = Math.floor(gap / 1000);
-      const minutes = Math.floor(total_seconds / 60);
-      const seconds = total_seconds % 60;
-
-      const display_time = `${String(minutes).padStart(2, "0")}:${String(
-        seconds
-      ).padStart(2, "0")}`;
-
-      // console.log(`Current Time: ${display_time}, Total Seconds: ${total_seconds}`); // 너무 자주 출력되면 주석 처리
-
-      if (timerRef.current) {
-        timerRef.current.innerText = display_time;
-      }
-
-      if (minutes >= 1 && timerIdRef.current) {
-        if (total_seconds % 60 === 0 && total_seconds >= 60) {
-          console.log("Changing interval to 60 seconds.");
-          clearInterval(timerIdRef.current);
-          timerIdRef.current = setInterval(updateTimer, 60000);
-        }
-      }
-    };
-
-    if (timerIdRef.current) {
-      console.log("Clearing existing timer before setting new one.");
-      clearInterval(timerIdRef.current);
-    }
-
-    console.log("Setting initial interval to 1000ms.");
-    timerIdRef.current = setInterval(updateTimer, 1000);
-    updateTimer(); // Initial call
-
-    return () => {
-      console.log("--- useEffect Cleanup ---");
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-        console.log("Timer cleared during cleanup.");
-      }
-    };
-  }, [streaming_timer]);
-  console.log("시간경과 확인해보기", streaming_timer, timerRef, timerIdRef);
+  const { live_time } = useLiveTimer({ streaming_timer });
   useEffect(() => {
     const URL = process.env.NEXT_PUBLIC_LIVE_POST_API!; // 프로토콜 추가
     const getStreamingStartAt = async () => {
       try {
         const res = await axios.post(URL, { id: "Alicia Doe" });
-        const timer = res.data;
-        set_streaming_timer(timer);
-        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", timer);
+        const data = res.data;
+        set_streaming_timer(data.time);
+        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", data.time);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       }
@@ -152,10 +84,27 @@ const LivePage = () => {
   }, []);
 
   if (!token || !name || !identity) {
-    console.log("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ");
+    console.log("token,name,identity");
     // return <div>Cannot watch the stream</div>;
   }
-  console.log("ㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂㅂ");
+  const videoRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const handleFullScreen = () => {
+    if (!isFullScreen) {
+      // 전체 화면 진입
+      if (videoRef?.current?.requestFullscreen) {
+        videoRef?.current.requestFullscreen();
+      }
+    } else {
+      // 전체 화면 종료
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    setIsFullScreen(!isFullScreen);
+  };
+
   return (
     <div
       className={`grid grid-cols-12  
@@ -171,8 +120,12 @@ const LivePage = () => {
           set_show_streamer_info_bar(true);
         }}
         onMouseLeave={() => set_show_streamer_info_bar(false)}
+      ></div>
+      {/* <div
+        ref={videoRef}
+        className="aspect-video object-contain group relative w-full"
       >
-        {/* <LiveKitRoom
+        <LiveKitRoom
           audio={true}
           token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
@@ -188,8 +141,27 @@ const LivePage = () => {
             // show_streamer_info={show_streamer_info}
             // set_show_streamer_info={set_show_streamer_info}
           />
-        </LiveKitRoom> */}
-        <div>adasd</div>
+        </LiveKitRoom>
+      </div> */}
+      <div
+        ref={videoRef}
+        className="aspect-video object-contain group relative w-full"
+      >
+        <LiveKitRoom
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+          className="w-full h-full"
+        >
+          <Video
+            host_name={current_host_nickname}
+            host_identity={current_host_id}
+            token={token}
+            className="object-contain"
+          />
+        </LiveKitRoom>
+      </div>
+      <div>
         <ChatPage current_host_nickname={current_host_nickname} />
         <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
         <div className={clsx({ "animate-revealDown": is_info_active })}>
@@ -200,11 +172,19 @@ const LivePage = () => {
           />
         </div>
         <div>
-          방송 경과 시간: <span ref={timerRef}>00:00</span>
+          방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         </div>
-        <div>린이ㅏㅓㄹ나ㅣㅓㄹㅇ나ㅣㅓㄹㅇ나ㅣㅏㅣㅓㅏㅣㅇ널</div>
       </div>
-      <div>으허어허엏어</div>
+      <div>
+        {" "}
+        <button
+          onClick={handleFullScreen}
+          className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+        >
+          전체화면 버튼
+          {isFullScreen ? "전체 화면 종료" : "전체 화면"}
+        </button>
+      </div>
     </div>
   );
 };

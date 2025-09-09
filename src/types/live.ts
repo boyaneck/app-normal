@@ -11,6 +11,9 @@ export interface live_info {
   visitor: number;
 }
 
+export interface live_timer_props {
+  streaming_timer: string | null;
+}
 export interface sub_props {
   live_information: live_info | undefined;
 }
