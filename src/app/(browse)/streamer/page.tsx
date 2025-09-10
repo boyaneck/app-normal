@@ -10,7 +10,7 @@ interface CreatorPageProps {
   };
 }
 
-const CreatorPage = async ({ params }: CreatorPageProps) => {
+const StreamerPage = async ({ params }: CreatorPageProps) => {
   const external_user = "";
   const { user } = useUserStore((state) => state);
   const { following_user } = useFollowingUserStore((state) => state);
@@ -34,4 +34,4 @@ const CreatorPage = async ({ params }: CreatorPageProps) => {
   );
 };
 
-export default CreatorPage;
+export default StreamerPage;
