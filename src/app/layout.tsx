@@ -18,10 +18,7 @@ export default function RootLayout({
   return (
     <Provider>
       <html lang="en">
-        <body className={inter.className}>
-          {children}
-          여기는 레이아웃!!
-        </body>
+        <body className={inter.className}>{children}</body>
       </html>
     </Provider>
   );

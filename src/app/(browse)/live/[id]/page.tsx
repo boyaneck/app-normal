@@ -1,5 +1,5 @@
 "use client";
-import { useViewrToken } from "@/hooks/useViewerToken";
+import { useViewerToken } from "@/hooks/useViewerToken";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
@@ -43,7 +43,7 @@ const LivePage = () => {
   const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
-  const { token, name, identity } = useViewrToken(
+  const { token, name, identity } = useViewerToken(
     user?.user_id,
     user?.user_nickname,
     current_host_id
@@ -108,114 +108,59 @@ const LivePage = () => {
   };
 
   return (
-    <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
-      {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
-      <div
-        ref={videoRef}
-        className="col-span-9 h-full relative"
-        onMouseOver={() => {
-          set_show_streamer_info_bar(true);
-        }}
-        onMouseLeave={() => set_show_streamer_info_bar(false)}
-      >
-        <LiveKitRoom
-          audio={true}
-          token={token}
-          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          // ✅ 중복 클래스 제거 및 부모에 맞게 채우도록 변경
-          className="w-full h-full"
+    <div>
+      <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
+        {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
+        <div
+          ref={videoRef}
+          className="col-start-2 col-span-9 h-full relative"
+          onMouseOver={() => {
+            set_show_streamer_info_bar(true);
+          }}
+          onMouseLeave={() => set_show_streamer_info_bar(false)}
         >
-          <Video
-            host_name={current_host_nickname}
-            host_identity={current_host_id}
+          <LiveKitRoom
+            audio={true}
             token={token}
-            className="w-full h-full object-contain"
+            serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+            // ✅ 중복 클래스 제거 및 부모에 맞게 채우도록 변경
+            className="w-full h-full"
+          >
+            <Video
+              host_name={current_host_nickname}
+              host_identity={current_host_id}
+              token={token}
+              className="w-full h-full object-contain "
+            />
+          </LiveKitRoom>
+          <ChatPage current_host_nickname={current_host_nickname} />
+
+          {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
+          {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
+          <StreamerInfoBar
+            items={stream_nav_bar}
+            show={show_streamer_info_bar}
           />
-        </LiveKitRoom>
 
-        {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
-        {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
-        <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
-
-        <button
-          onClick={handleFullScreen}
-          className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-        >
-          {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
-        </button>
+          <button
+            onClick={handleFullScreen}
+            className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+          >
+            {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
+          </button>
+        </div>
       </div>
 
-      {/* ✅ 3. 채팅 영역: 별도의 컬럼을 할당합니다. */}
-      <div className="col-span-3 h-full border border-red-400">
-        <ChatPage current_host_nickname={current_host_nickname} />
-        <div className={clsx({ "animate-revealDown": is_info_active })}>
-          <StreamerInfo
-            live_information={live_information}
-            current_host_id={current_host_id}
-            current_host_email={current_host_nickname}
-          />
-        </div>
+      <div>
         방송 경과 시간: <span ref={timerRef}>{live_time}</span>
+        <StreamerInfo
+          live_information={live_information}
+          current_host_id={current_host_id}
+          current_host_email={current_host_nickname}
+        />
+        새로운 공간
       </div>
     </div>
-    // <div
-    //   className={`grid grid-cols-12
-    // h-[75vh]  relative
-    //  overflow-hidden`}
-    // >
-    //   <div
-    //     className={clsx(
-    //       `col-span-11 h-full col-start-2 `,
-    //       is_info_active ? "animate-curtainUp" : "animate-curtainDown"
-    //     )}
-    //     onMouseOver={() => {
-    //       set_show_streamer_info_bar(true);
-    //     }}
-    //     onMouseLeave={() => set_show_streamer_info_bar(false)}
-    //   ></div>
-    //   <div
-    //     ref={videoRef}
-    //     className="aspect-video object-contain group relative w-full"
-    //   >
-    //     <LiveKitRoom
-    //       audio={true}
-    //       token={token}
-    //       serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-    //       className="aspect-video object-contain group relative w-full"
-    //     >
-    //       <Video
-    //         host_name={current_host_nickname}
-    //         host_identity={current_host_id}
-    //         token={token}
-    //         className="object-contain"
-    //         // show_streamer_info_bar={show_streamer_info_bar}
-    //         // set_show_streamer_info_bar={set_show_streamer_info_bar}
-    //         // show_streamer_info={show_streamer_info}
-    //         // set_show_streamer_info={set_show_streamer_info}
-    //       />
-    //     </LiveKitRoom>
-    //   </div>
-
-    //   <div>
-    //     <ChatPage current_host_nickname={current_host_nickname} />
-    //     <StreamerInfoBar show={show_streamer_info_bar} items={stream_nav_bar} />
-    //     <div className={clsx({ "animate-revealDown": is_info_active })}>
-    //       <StreamerInfo
-    //         live_information={live_information}
-    //         current_host_id={current_host_id}
-    //         current_host_email={current_host_nickname}
-    //       />
-    //     </div>
-    //     방송 경과 시간: <span ref={timerRef}>{live_time}</span>
-    //   </div>
-    //   <button
-    //     onClick={handleFullScreen}
-    //     className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-    //   >
-    //     전체화면 버튼
-    //     {isFullScreen ? "전체 화면 종료" : "전체 화면"}
-    //   </button>
-    // </div>
   );
 };
 

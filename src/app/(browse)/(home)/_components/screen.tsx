@@ -2,7 +2,7 @@
 import { getLiveUser } from "@/api";
 import { Button } from "@/components/ui/button";
 import useFollow from "@/hooks/useFollow";
-import { useViewrToken } from "@/hooks/useViewerToken";
+import { useViewerToken } from "@/hooks/useViewerToken";
 import { useSidebarStore } from "@/store/bar_store";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
@@ -36,7 +36,7 @@ const Screen = () => {
   );
 
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
-  const { token, identity, name } = useViewrToken(
+  const { token, identity, name } = useViewerToken(
     user?.user_id,
     user?.user_nickname,
     host_id
