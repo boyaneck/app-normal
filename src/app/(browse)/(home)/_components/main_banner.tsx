@@ -3,7 +3,7 @@ import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import React, { useState } from "react";
 import Video from "../../live/_components/video";
-import { useViewrToken } from "@/hooks/useViewerToken";
+import { useViewerToken } from "@/hooks/useViewerToken";
 import { useQuery } from "@tanstack/react-query";
 
 const Main_banner = () => {
@@ -18,7 +18,7 @@ const Main_banner = () => {
     queryFn: getLiveUser,
   });
 
-  const { token } = useViewrToken("Guest", "Guest", "");
+  const { token } = useViewerToken("Guest", "Guest", "G");
 
   return (
     <div

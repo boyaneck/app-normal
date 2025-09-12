@@ -128,7 +128,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         `object-contain
         h-full w-full 
         relative 
-         transition-all duration-300`,
+         transition-all duration-300
+         border border-black rounded-xl`,
         {
           " animate-curtainUp": is_info_active,
           "animate-curtainDown": !is_info_active,

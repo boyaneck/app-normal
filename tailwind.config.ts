@@ -27,14 +27,14 @@ module.exports = {
           "100%": { transform: "translateY(0)", opacity: "1" }, // 제자리로
         },
         curtainUp: {
-          "0%": { clipPath: "inset(0 0 0 0)" },
+          "0%": { clipPath: "inset(100% 0 0 0)" },
           "20%": { clipPath: "inset(0 0 -10% 0)" },
           "100%": { clipPath: "inset(0 0 5% 0)" },
         },
         curtainDown: {
           "0%": { clipPath: "inset(0 0 -10% 0)" },
           "20%": { clipPath: "inset(0 0 -13% 0" },
-          "100%": { clipPath: "isnet(0 0 0 0" },
+          "100%": { clipPath: "isnet(100% 0 0 0" },
         },
         ripple: {
           "0%": { transform: "scale(0.8)", opacity: "1" },
@@ -65,6 +65,14 @@ module.exports = {
           "0%": { transform: "translateX(0)", opacity: "1" },
           "100%": { transform: "translateX(100%)", opacity: "0" },
         },
+        revealFromBottom: {
+          "0%": { height: "0" },
+          "100%": { height: "100%" },
+        },
+        hideToBottom: {
+          "0%": { height: "100%" },
+          "100%": { height: "0" },
+        },
       },
       animation: {
         slideIn: "slideInFromRight 0.3s ease-out forwards",
@@ -79,6 +87,8 @@ module.exports = {
         // curtainUp: "curatainUp 0.7s ease-in-out forwards",
         curtainUp: "curtainUp 0.7s ease-in-out forwards",
         revealDown: "revealDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        revealFromBottom: "revealFromBottom 0.3s ease-in-out forwards",
+        hideToBottom: "hideToBottom 0.3s ease-in-out forwards",
       },
     },
   },

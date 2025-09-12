@@ -1,3 +1,5 @@
+import { useViewerToken } from "@/hooks/useViewerToken";
+import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import { Video } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -5,33 +7,19 @@ import React, { useEffect, useRef, useState } from "react";
 const LiveSetting = () => {
   const [viewerToken, setViewerToken] = useState<string | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
+  const { user } = useUserStore((state) => state);
+  const { token, name, identity } = useViewerToken(
+    user?.user_id,
+    user?.user_nickname,
+    user?.user_id
+  );
 
   useEffect(() => {
     // 1. WebRTC로 내 카메라 영상을 직접 가져옵니다.
-    const testVideo = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error("Error accessing camera:", error);
-      }
-    };
-
-    // 2. 시청자용 토큰을 가져옵니다.
-    const getToken = async () => {
-      // setViewerToken(awasetViewerTokenken());
-    };
-
-    testVideo();
-    getToken();
+    const testVideo = async () => {};
   }, []);
 
-  if (!viewerToken) {
+  if (!token) {
     return <div>로딩 중...</div>;
   }
 
@@ -52,7 +40,7 @@ const LiveSetting = () => {
       <div className="col-span-1">
         <h3 className="text-center">실제 시청자 화면 (지연 발생)</h3>
         <LiveKitRoom
-          token={viewerToken}
+          token={token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
           connect={true}
           audio={false}

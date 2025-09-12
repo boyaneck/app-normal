@@ -51,7 +51,6 @@ const StreamerInfo = ({
     <div>
       {/* 카테고리 {live_info?.category} */}
       <span>타이틀:{live_info?.title}</span>
-      현재 시청중인 시청자 수 , 해당 방송 경과시간,후원하기 버튼 {}
       <span onClick={() => toggleFollow()} className="border border-red-800">
         팔로우 버튼
       </span>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useViewrToken } from "./useViewerToken";
+import { useViewerToken } from "./useViewerToken";
 
 interface useScreenProps {
   host_identity: string;
@@ -35,7 +35,7 @@ export const useScreen = ({
     handleMouseHover({ host_identity, host_nickname, current_user_id });
   }, [host_identity]);
 
-  const { token, name, identity } = useViewrToken(
+  const { token, name, identity } = useViewerToken(
     chk_host_id,
     chk_host_nickname,
     chk_current_user_id

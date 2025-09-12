@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
 
-export const useViewrToken = (
+export const useViewerToken = (
   user_identity: string | undefined,
   user_nickname: string | undefined,
   current_host_id: string | undefined
