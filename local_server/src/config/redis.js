@@ -10,11 +10,6 @@ const subscriber = redis_client.duplicate();
 redis_client.on("error", (err) => console.error("Redis subscriber Error", err));
 subscriber.on("error", (err) => console.error("Redis Subscriber Error", err));
 
-// const connectRedis = async () => {
-//   await Promise.all([redis_client.connect(), subscriber.connect()]);
-//   console.log("Redis subscriber and Subscriber connected.");
-// };
-
 const connectRedis = async () => {
   console.log("연결확인하기기");
   if (!redis_client.isOpen) {
