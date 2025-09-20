@@ -4,6 +4,7 @@ const redis_client_for_livekit = redis_client;
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
 const receiver = new WebhookReceiver(api_key, api_secret);
+let conn_keep_rate;
 export const liveParticipantWebhook = async (req, res) => {
   try {
     // req.body가 Buffer 타입이므로, WebhookReceiver에 그대로 전달합니다.
@@ -17,6 +18,7 @@ export const liveParticipantWebhook = async (req, res) => {
     const redis_parti_key = `${room_name}:live`;
     const redis_top_parti_key = `${room_name}:top_parti`;
     const redis_avg_viewer_key = `${room_name}:avg_viewer`;
+    const redis_duration_key = `${room_name}:${parti}:duration`;
     if (event.event === "participant_joined") {
       await redis_client_for_livekit.sAdd(redis_parti_key, parti);
       const current_parti = await redis_client_for_livekit.sCard(
@@ -53,7 +55,7 @@ export const liveParticipantWebhook = async (req, res) => {
       );
     } else if (event.event === "participant_left") {
       console.log("참여자 디버깅:", event);
-      await redis_client_for_livekit.sRem(redis_parti_key, parti);
+      //   await redis_client_for_livekit.sRem(redis_parti_key, parti);
 
       //평균 시청 지속률
       const end_at = Date.now();
@@ -64,21 +66,34 @@ export const liveParticipantWebhook = async (req, res) => {
 
       if (get_start_at) {
         const duration = Math.round((end_at - start_at) / 1000);
-        await redis_avg_viewer_key.r;
+        await redis_client_for_livekit.rPush(redis_duration_key, duration);
+
+        //시청 지속률
+        conn_keep_rate = await redis_client_for_livekit.scan(
+          redis_duration_key
+        );
+
+        // conn_keep_rate/현재 접속
 
         //마지막에 avg_viewer hash 키 모두삭제하기
-        await redis_client_for_livekit.del(redis_avg_viewer_key);
+        // await redis_client_for_livekit.del(redis_avg_viewer_key);
       }
     } else if (event.event === "room_finished") {
       console.log(`${room_name} 방 종료 `);
 
+      //지속 유저들/전체 입장한 유저들 = 평균 지속률률
       const all_parti = await redis_client_for_livekit.sMembers(
-        redis_avg_viewer_key
+        redis_parti_key
       );
+      const rate = conn_keep_rate / all_parti;
 
-      for (const parti of all_parti) {
-        const duration_key = `${room_name}:${parti}:duration`;
-      }
+      //   const all_parti = await redis_client_for_livekit.sMembers(
+      //     redis_avg_viewer_key
+      //   );
+
+      //   for (const parti of all_parti) {
+      //     const duration_key = `${room_name}:${parti}:duration`;
+      //   }
     }
     // ✅ 성공 응답을 보내야 합니다.
     res.status(200).send("Webhook processed successfully.");
