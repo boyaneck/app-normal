@@ -18,7 +18,7 @@ const Main_banner = () => {
     queryFn: getLiveUser,
   });
 
-  const { token } = useViewerToken("Guest", "Guest", "G");
+  const { token } = useViewerToken("Guest");
 
   return (
     <div

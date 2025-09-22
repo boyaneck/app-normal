@@ -43,10 +43,14 @@ const LivePage = () => {
   const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
-  const { token, name, identity } = useViewerToken(
-    user?.user_id,
-    user?.user_nickname,
-    current_host_id
+  const { token, name, identity } = useViewerToken(current_host_id);
+  console.log(
+    "스트리밍 페이지에서 새롭게 토큰",
+    typeof token,
+    "name:",
+    typeof name,
+    "identity",
+    typeof identity
   );
 
   const icon = useStreamingBarStore((state) => state.icon);
