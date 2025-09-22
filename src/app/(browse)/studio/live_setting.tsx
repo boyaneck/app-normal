@@ -8,11 +8,7 @@ const LiveSetting = () => {
   const [viewerToken, setViewerToken] = useState<string | null>(null);
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const { user } = useUserStore((state) => state);
-  const { token, name, identity } = useViewerToken(
-    user?.user_id,
-    user?.user_nickname,
-    user?.user_id
-  );
+  const { token, name, identity } = useViewerToken(user?.user_id);
 
   useEffect(() => {
     // 1. WebRTC로 내 카메라 영상을 직접 가져옵니다.

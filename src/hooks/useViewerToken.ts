@@ -2,26 +2,18 @@ import { useEffect, useState } from "react";
 import { JwtPayload, jwtDecode } from "jwt-decode";
 import { createViewerToken } from "@/api/token";
 
-export const useViewerToken = (
-  user_identity: string | undefined,
-  user_nickname: string | undefined,
-  current_host_id: string | undefined
-) => {
+export const useViewerToken = (host_id: string | undefined) => {
   const [token, setToken] = useState("");
   const [name, setName] = useState("");
   const [identity, setIdentity] = useState("");
 
   useEffect(() => {
-    if (!current_host_id) {
+    if (!host_id) {
       return;
     }
     const createToken = async () => {
       try {
-        const viewer_token = await createViewerToken(
-          user_identity,
-          user_nickname,
-          current_host_id
-        );
+        const viewer_token = await createViewerToken(host_id);
 
         setToken(viewer_token);
 
@@ -42,7 +34,7 @@ export const useViewerToken = (
       }
     };
     createToken();
-  }, [user_identity, current_host_id]);
+  }, [host_id]);
 
   return {
     token,

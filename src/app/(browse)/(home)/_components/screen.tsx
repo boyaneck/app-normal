@@ -36,11 +36,7 @@ const Screen = () => {
   );
 
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
-  const { token, identity, name } = useViewerToken(
-    user?.user_id,
-    user?.user_nickname,
-    host_id
-  );
+  const { token, identity, name } = useViewerToken(host_id);
 
   useEffect(() => {
     if (LiveUser) {
