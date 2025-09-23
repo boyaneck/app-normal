@@ -1,8 +1,10 @@
 "use client";
-import { supabaseForClient } from "@/supabase/supabase_client";
+// import { supabaseForClient } from "@/supabase/supabase_client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
 import React, { useState } from "react";
 const Signin = () => {
+  const supabaseForClient = createClientComponentClient();
   const getGoogleSocialLogin = async () => {
     try {
       await supabaseForClient.auth.signInWithOAuth({
