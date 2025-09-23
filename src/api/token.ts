@@ -5,6 +5,7 @@ import { v4 } from "uuid";
 import { getUserInfo, getUserInfoById } from "./user";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 
 // 수정된 createViewerToken 함수
 
@@ -13,20 +14,18 @@ export const createViewerToken = async (
 ) => {
   const cookie_store = await cookies();
 
+  const sess = cookie_store.getAll();
+  console.log("토큰 세션 정보 찾기 ", sess);
   let now_user_info;
   //현재 유저의 로그인 유무 확인
   try {
     const supabase = createServerComponentClient({ cookies });
-    console.log("쿠키를 확인해보자!!!!!!!", cookies);
-    console.log(
-      "슈퍼베이스의 쿠키를 통해 데이터 받기",
-      await supabase.auth.getUser()
-    );
+
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser();
-
+    console.log("토큰이 유효한 토큰인지 확인", user);
     if (user) {
       now_user_info = {
         id: user.id,
