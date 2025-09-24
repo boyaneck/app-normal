@@ -14,7 +14,7 @@ const Signin = () => {
             access_type: "offline",
             prompt: "consent",
           },
-          // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${url}`,
+          redirectTo: "http://localhost:3000/callback",
         },
       });
     } catch (error) {
@@ -27,7 +27,7 @@ const Signin = () => {
       await supabaseForClient.auth.signInWithOAuth({
         provider: "kakao",
         options: {
-          // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${url}`,
+          redirectTo: "http://localhost:3000/callback",
         },
       });
     } catch (error) {
