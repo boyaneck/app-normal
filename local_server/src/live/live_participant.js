@@ -59,7 +59,8 @@ export const liveParticipantWebhook = async (req, res) => {
       const rate = conn_keep_rate / all_parti;
     } else if (event.event === "ingress_ended") {
       //redis에 저장된 해당 관련 방송 데이터들을 다 supabase 저장하기
-      await redis_client;
+      await redis_client.rPush(`live_over${room_name}`, event);
+      res.status(200).send("Webhook을 성공적으로 받았습니다.");
       //저장된 supabase의 데이터들을 가져와서 스트리머의 화면에 보여주기기
     }
     // ✅ 성공 응답을 보내야 합니다.
