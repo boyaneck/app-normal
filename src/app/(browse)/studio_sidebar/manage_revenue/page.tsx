@@ -12,9 +12,9 @@ import {
 
 const ManageRevenuePage = () => {
   const productSales = [
-    { name: "Jan", product1: 4000, product2: 2400 },
-    { name: "Feb", product1: 3000, product2: 2210 },
-    { name: "Mar", product1: 2000, product2: 2290 },
+    { name: "월요일", product1: 4000, product2: 2400 },
+    { name: "화요일", product1: 3000, product2: 2210 },
+    { name: "수요일", product1: 2000, product2: 2290 },
     { name: "Apr", product1: 2780, product2: 2000 },
     { name: "May", product1: 1890, product2: 2181 },
     { name: "Jun", product1: 2390, product2: 2500 },
@@ -52,12 +52,12 @@ const ManageRevenuePage = () => {
           {/* 옅은 격자선 */}
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip content={<CustomTooltip />} />
+          {/* <Tooltip content={<CustomTooltip />} /> */}
           <Legend />
           <Line
-            type="monotone"
+            type="basis"
             dataKey="product1"
-            stroke="#29ABE2" // 토스 스타일 파란색
+            stroke="#c12323" // 토스 스타일 파란색
             strokeWidth={2}
             dot={false} // 데이터 포인트 제거
           />
