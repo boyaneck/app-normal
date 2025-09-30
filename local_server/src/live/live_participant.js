@@ -1,6 +1,5 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { insertAllParti, insertAvgParti, insertTopParti } from "../api/live.js";
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
@@ -13,8 +12,10 @@ export const liveParticipantWebhook = async (req, res) => {
 
     //최대 동시 시청자 수
     const event = receiver.receive(req.body, req.get("Authorization"));
-    const room_name = event.room.name;
-    const parti = event.participant.identity;
+    const room_name = event.room ? even.room.name : null;
+    console.log("이벤트확인하기", event);
+    const parti = event.participant ? event.participant.identity : null;
+    console.log("파티를 확인해 ", parti);
     if (event.event === "participant_joined") {
       await redis_client.sAdd(`${room_name}:live`, parti);
       const current_parti = await redis_client.sCard(`${room_name}:live`);
@@ -41,12 +42,12 @@ export const liveParticipantWebhook = async (req, res) => {
           current_parti
         );
         console.log("동시접속자 수 업데이트", current_parti);
-      }
-      //최대 동시 시청자수
+        //최대 동시 시청자수
 
-      //평균 시청 지속률
-      const start_at = Date.now();
-      await redis_client.hSet(`${room_name}:avg_viewer`, parti, start_at);
+        //평균 시청 지속률
+        const start_at = Date.now();
+        await redis_client.hSet(`${room_name}:avg_viewer`, parti, start_at);
+      }
     } else if (event.event === "participant_left") {
       await redis_client.decr(`${room_name}:count`);
       console.log("참여자 디버깅:", event);
@@ -60,12 +61,12 @@ export const liveParticipantWebhook = async (req, res) => {
 
       if (get_start_at) {
         const duration = Math.round((end_at - start_at) / 1000);
-        await redis_client.rPush(`${room_name}:${parti}:duration`, duration);
+        await redis_client.rPush(`${room_name}:duration`, duration);
 
         //시청 지속률
-        conn_keep_rate = await redis_client.scan(
-          `${room_name}:${parti}:duration`
-        );
+        // conn_keep_rate = await redis_client.scan(
+        //   `${room_name}:${parti}:duration`
+        // );
       }
     } else if (event.event === "room_finished") {
       console.log(`${room_name} 방 종료 `);
@@ -75,26 +76,21 @@ export const liveParticipantWebhook = async (req, res) => {
       const rate = conn_keep_rate / all_parti;
     } else if (event.event === "ingress_ended") {
       res.status(200).send("Webhook을 성공적으로 받았습니다.");
-
+      console.log("이벤트 안됨 ?", room_name);
       try {
         const get_all_parti = await redis_client.sMembers(`${room_name}:live`);
         const get_top_parti = await redis_client.hLen(`${room_name}:top_parti`);
         const get_avg_parti = await redis_client.lRange(
-          `${room_name}:${parti}:duration`,
+          `${room_name}:duration`,
           0,
           -1
         );
-      } catch (error) {}
-
-      try {
         await insertAllParti(get_all_parti, room_name);
         await insertTopParti(get_top_parti, room_name);
         await insertAvgParti(get_avg_parti, room_name);
-      } catch (error) {}
-      // const get_chat_parti_ratio=await redis_client
 
-      return;
-      //저장된 supabase의 데이터들을 가져와서 스트리머의 화면에 보여주기기
+        return;
+      } catch (error) {}
     }
     // ✅ 성공 응답을 보내야 합니다.
     res.status(200).send("Webhook processed successfully.");
