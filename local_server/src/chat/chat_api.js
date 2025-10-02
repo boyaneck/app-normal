@@ -177,12 +177,10 @@ export default async function handler(req, res) {
     }
 
     // --- 6. 성공 응답 ---
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Action '${data.action}' applied to ${data.targetIdentity}.`,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Action '${data.action}' applied to ${data.targetIdentity}.`,
+    });
   } catch (error) {
     console.error("Error processing moderation request:", error);
     // LiveKit 에러, DB 에러 등 상세 분기 필요

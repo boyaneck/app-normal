@@ -27,7 +27,6 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
     .from("users")
     .select(
       `
-       
       live_information (
         *    
       )
@@ -42,4 +41,16 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
   }
 
   return userInfoLive;
+};
+export const getPostLiveStats = async (room_name: string | undefined) => {
+  const { data: post_live_stats, error } = await supabaseForClient
+    .from("post_live_stats")
+    .select("*")
+    .eq("room_name", room_name);
+
+  if (error) {
+    console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생");
+  }
+
+  return post_live_stats;
 };

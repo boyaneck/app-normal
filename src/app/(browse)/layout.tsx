@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Navbar from "./_components/navbar";
 import Sidebar from "./_components/sidebar";
@@ -9,7 +10,7 @@ interface Props {
 const layout = ({ children }: Props) => {
   return (
     <div className="pt-10 border border-emerald-100  ">
-      {/* <Navbar /> */}
+      <Navbar />
       sssss
       <div className="grid border border-purple">
         {/* <Sidebar /> */}eeeee
