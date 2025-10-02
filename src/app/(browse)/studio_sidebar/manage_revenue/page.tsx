@@ -1,3 +1,7 @@
+"use client";
+import { getPostLiveStats } from "@/api";
+import useUserStore from "@/store/user";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import {
   ResponsiveContainer,
@@ -9,63 +13,53 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-
 const ManageRevenuePage = () => {
-  const productSales = [
-    { name: "월요일", product1: 4000, product2: 2400 },
-    { name: "화요일", product1: 3000, product2: 2210 },
-    { name: "수요일", product1: 2000, product2: 2290 },
-    { name: "Apr", product1: 2780, product2: 2000 },
-    { name: "May", product1: 1890, product2: 2181 },
-    { name: "Jun", product1: 2390, product2: 2500 },
-    { name: "Jun", product1: 2390, product2: 2500 },
-    { name: "Jun", product1: 2390, product2: 2500 },
-    { name: "Jun", product1: 2390, product2: 2500 },
+  const { user } = useUserStore((state) => state);
+  console.log("유저의 id가 방정보와 같나 ?", user);
+  const { data: post_live_stats } = useQuery({
+    queryKey: [`post_live_stats`],
+    queryFn: () => getPostLiveStats(user?.user_id),
+    enabled: !!user?.user_id,
+  });
+
+  console.log("유저의 정보", post_live_stats);
+
+  const bar_graph = [
+    { name: "월요일", 후원금액: 4000, 시청자: 2400 },
+    { name: "화요일", 후원금액: 3000, 시청자: 2210 },
+    { name: "수요일", 후원금액: 2000, 시청자: 2290 },
+    { name: "Apr", 후원금액: 2780, 시청자: 2000 },
+    { name: "May", 후원금액: 1890, 시청자: 2181 },
+    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
+    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
+    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
+    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
   ];
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "10px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-          }}
-        >
-          <p className="label">{`${label}`}</p>
-          <p className="intro">{`Product 1 : ${payload[0].value}`}</p>
-          <p className="desc">{`Product 2 : ${payload[1].value}`}</p>
-        </div>
-      );
-    }
-
-    return null;
-  };
 
   return (
     <div style={{ fontFamily: "sans-serif" }}>
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={productSales}>
+        <LineChart data={bar_graph}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}
           {/* 옅은 격자선 */}
           <XAxis dataKey="name" />
-          <YAxis />
-          {/* <Tooltip content={<CustomTooltip />} /> */}
+          <YAxis domain={[0, 10000]} />
+          <Tooltip />
           <Legend />
           <Line
-            type="basis"
-            dataKey="product1"
-            stroke="#c12323" // 토스 스타일 파란색
+            type="monotone"
+            dataKey="후원금액"
+            stroke="#F56565" // 토스 스타일 파란색
             strokeWidth={2}
+            activeDot={{ r: 6 }}
             dot={false} // 데이터 포인트 제거
           />
           <Line
             type="monotone"
-            dataKey="product2"
-            stroke="#82CAFA" // 토스 스타일 하늘색
+            dataKey="시청자"
+            stroke="#48BB78" // 토스 스타일 하늘색
             strokeWidth={2}
+            activeDot={{ r: 6 }}
             dot={false} // 데이터 포인트 제거
           />
         </LineChart>
