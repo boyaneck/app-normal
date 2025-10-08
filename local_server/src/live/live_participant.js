@@ -14,19 +14,10 @@ export const liveParticipantWebhook = async (req, res) => {
     const room_name = event.room ? event.room.name : null;
     const parti = event.participant ? event.participant.identity : null;
     if (event.event === "participant_joined") {
+      console.log("????????????");
       await redis_client.sAdd(`${room_name}:live`, parti);
       const current_parti = await redis_client.sCard(`${room_name}:live`);
-      const now = new Date();
-      const kst_off_set = 9 * 60 * 60 * 1000;
-      const kst_time = new Date(now.getTime() + kst_off_set);
-      const date = kst_time.toISOString().split("T")[0];
 
-      const day_of_week = kst_time.toLocaleDateString("ko-KR", {
-        weekday: "long",
-      });
-      const today = `${date}/${day_of_week}`;
-
-      await redis_client.hSetNX(`${room_name}:today`, "today", today);
       //최대 동시 시청자수
       await redis_client.hSet(
         `${room_name}:peak_viewer`,
@@ -101,8 +92,12 @@ export const liveParticipantWebhook = async (req, res) => {
           0,
           -1
         );
-
-        //supabase에 데이터 넣기
+        console.log(
+          "왜 숫자가 안나오는거지 ?",
+          typeof get_all_viewer,
+          typeof get_peak_viewer,
+          typeof get_viewer_duration
+        );
         await postLiveStats(
           get_all_viewer,
           get_peak_viewer,

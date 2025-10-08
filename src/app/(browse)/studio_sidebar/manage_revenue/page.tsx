@@ -17,7 +17,7 @@ const ManageRevenuePage = () => {
   //여기가 방송 관리 페이지로 변경경
 
   const { user } = useUserStore((state) => state);
-  const getDayNameFromDate = (date: Date) => {
+  const getDay = (date: Date) => {
     // dateString 대신 Date 객체를 직접 받도록 수정 (코드 일관성 유지)
     const days = [
       "일요일",
@@ -57,12 +57,13 @@ const ManageRevenuePage = () => {
 
         // 3. 차트 형식에 맞게 객체 생성
         result.push({
-          name: getDayNameFromDate(date),
-          후원금액: match_up?.donation_amount || 0,
+          name: getDay(date), // 💡 수정: 요일 이름 추가
+          후원금액: match_up?.donation_amount || 0, // 💡 후원금액 필드도 실제 데이터에서 가져오도록 가정
           시청자: match_up?.peak_viewer || 0,
         });
       }
 
+      // 🚨 수정: 루프가 끝난 후 배열을 반환합니다.
       return result;
     },
     initialData: [],
@@ -90,9 +91,8 @@ const ManageRevenuePage = () => {
   return (
     <div style={{ fontFamily: "sans-serif" }}>
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={stat_graph}>
+        <LineChart data={post_live_stats}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}
-          {/* 옅은 격자선 */}
           <XAxis dataKey="name" />
           <YAxis domain={[0, 10000]} />
           <Tooltip />
