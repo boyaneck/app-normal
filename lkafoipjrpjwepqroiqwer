@@ -1,0 +1,475 @@
+[33mcommit f542277954fa3136f88300045f67a7c53f0e8f3d[m[33m ([m[1;36mHEAD -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mfeature/home[m[33m)[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jul 14 23:40:56 2025 +0900
+
+    [CHORES] 브랜치 병합
+
+[33mcommit 3ff15415db63bc6279121316a099ebc41a1173d9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jul 14 20:32:50 2025 +0900
+
+    FE/[streaming] 스트리머 부가 정보 bar 애니메이션 추가
+
+[33mcommit b9726be0d917511d0f44bd26f1d4d406a58da7d2[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Jul 13 00:39:56 2025 +0900
+
+    FE/[streaming] 스트리밍 화면 info bar 완성
+
+[33mcommit 60a20270c629f6c0a18b5bc8ab8bb4741d42cedd[m[33m ([m[1;31morigin/feature/home[m[33m)[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Jul 11 23:02:29 2025 +0900
+
+    FE/feat_ 알람& liquid bar 초안 완성
+
+[33mcommit 853bdf537ab2051a296d811ab0117345135e99fa[m
+Merge: cf91951 8638d8c
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jul 9 23:46:45 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit cf919512cdf96442c7536f4c6c885ca986d0cc52[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jul 9 23:46:41 2025 +0900
+
+    FE/feat_ 스트리밍 화면 hover&click시 스트리머의 정보 애니메이션 추가중(tailwindconfig 충돌문제발생)
+
+[33mcommit 8638d8cc249b0e5a157af3dcb96e64c4e6595264[m
+Merge: 374aa09 a5b564d
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Jul 8 23:52:46 2025 +0900
+
+    FE/CHORES_ 채팅창 & 스트리밍화면
+    
+    FE/CHOPRES_ 채팅창의 border와 & 스트리밍 화면 border 제거
+
+[33mcommit a5b564d18058dd2163a9ef9d3fda017ed9db701d[m
+Merge: 0934041 374aa09
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jul 8 23:51:30 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 0934041c2eb5e8edd71cf7de503ae885a0a337e1[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jul 8 23:39:57 2025 +0900
+
+    FE/CHORES_채팅창의 border, 스트리밍 border 제거
+
+[33mcommit 374aa093e118c5b4aebed3f72a189531f877d900[m
+Merge: d0642fb a52d446
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jul 7 23:53:39 2025 +0900
+
+    FE/CHORES_ 채팅창 부모 div & 방송화면의 배경색 제거
+    
+    FE/CHORES_ 채팅창의 불필요한 부모 DIV 제거 & 방송화면의 배경색상제거
+
+[33mcommit a52d446b6e782c74984a530db924a58252c04b99[m
+Merge: 14d5bae d0642fb
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jul 7 23:52:18 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 14d5baedde03fb5e27dbc6363df54f73accc5941[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jul 7 23:52:13 2025 +0900
+
+    FE/CHORES_ 방송 화면의 배경색상제거
+
+[33mcommit 2bfb67fae8effcde1cb31d26e23271976127dcdc[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jul 7 23:42:42 2025 +0900
+
+    FE/CHORES_ 채팅창의 불필요한 부모 div제거
+
+[33mcommit d0642fb528f4f88fc73c5f85f5c6afc163af01e5[m
+Merge: 44b79a7 43207f6
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Jul 6 23:28:40 2025 +0900
+
+    BE/CHORES_ 제재 모달 state 통합, 애니메이션 지연 에러 수정
+    
+    BE/CHORES_ 제재 모달 state 통합, 애니메이션 지연 에러 수정
+
+[33mcommit 43207f6d0fd19d57cabce5b97bc91cb5a06dabae[m
+Merge: 7f4e3c2 44b79a7
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Jul 6 23:26:17 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 7f4e3c2cc3471529f7281fabbd6bcdd873761e5e[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Jul 6 23:26:12 2025 +0900
+
+    BE/CHORES_제대 모달 애니메이션 state 통합 및 애니메이션 지연 수정
+
+[33mcommit 44b79a79e00ed19e063a6a47920107cb4f8265f4[m
+Merge: 5b4825b 92e48d2
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Jul 2 23:47:11 2025 +0900
+
+    -[BE] BUILD (nginx,docker,redis)
+    
+    BE/BUILD(nginx,docker,redis) docker 컨테이이너 작동을 위한 환경설정-> docker파일 실행 오…
+
+[33mcommit 92e48d21ce7ab92a826211124da94525c9a15382[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jul 2 23:42:32 2025 +0900
+
+    BE/BUILD(nginx,docker,redis) docker 컨테이이너 작동을 위한 환경설정-> docker파일 실행 오류 발생
+
+[33mcommit 5b4825bd9f183a613244b944e87bbeebf0bf4aea[m
+Merge: 08f046b a9c69bf
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Tue Jul 1 23:57:32 2025 +0900
+
+    - BE(api) supabase 영구 기록을 위한 api 추가
+    
+    [CHORES] BE_feat(api) 제재된 유저를 영구 기록하기 위한 api 추가
+
+[33mcommit a9c69bfd10792df01ad983998154ed191bfb4fb5[m
+Merge: a5ef97c 08f046b
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jul 1 23:54:57 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit a5ef97cb276fc6a05cb96ffe0a7aeb955c05871d[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Tue Jul 1 23:54:51 2025 +0900
+
+    [CHORES] BE_feat(api) 제재된 유저를 영구 기록하기 위한 api 추가
+
+[33mcommit 08f046b35c6a2e71d8b79bb46d4522ce945be431[m
+Merge: ea289c3 1026eca
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jun 30 23:42:28 2025 +0900
+
+    Merge pull request #93 from boyaneck/feature/home
+    
+    [CHORES] 모달창 디자인 잘못된 코드  수정 및 디자인 수정중
+
+[33mcommit 1026eca404b6936bda6799a666dce5487a2a9844[m
+Merge: 9cbca59 ea289c3
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 30 23:40:55 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 9cbca5901b7fa91c131b3b5ccc410b554226a554[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 30 23:40:52 2025 +0900
+
+    [CHORES] 모달창 디자인 잘못된 코드 수정 및 디자인 수정중
+
+[33mcommit ea289c37781f390e29c725c2f1500613ac8c8b21[m
+Merge: d4be2e9 e37e995
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Jun 28 23:40:40 2025 +0900
+
+    Merge pull request #92 from boyaneck/feature/home
+    
+    [CHORES] 제재 사항 목록 위에서 아래로 뿌려주는 효과 추가
+
+[33mcommit e37e99560f139ced05ff2f01aa61c17b51ae5c6b[m
+Merge: f674a2a d4be2e9
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Jun 28 23:39:52 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit f674a2a8077b1929694e428ec7525acb74437dc0[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Jun 28 23:39:47 2025 +0900
+
+    [CHORES] 제재 사항 목록 위에서 아래로 뿌려주는 효과 추가
+
+[33mcommit d4be2e94b1aad6554a2f4e1df26bdb9ebe4c5138[m
+Merge: f697828 760b4e3
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Jun 27 23:45:51 2025 +0900
+
+    Merge pull request #91 from boyaneck/feature/home
+    
+    [CHORES] 제재 목록 width와 위치 조정 및 css
+
+[33mcommit 760b4e3cd51703967d1f65e6a287065011c78edb[m
+Merge: e12b055 f697828
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Jun 27 23:44:38 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit e12b0559dc7d8ab8713d8df9a6f3937f50235bcf[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Jun 27 23:39:45 2025 +0900
+
+    [CHORES] 제재 목록 width와 위치 조정 및 css 수정
+
+[33mcommit f697828525cbf23ebf2d965d44555c320eebb024[m
+Merge: d26842b ed3ffb3
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Jun 26 23:37:18 2025 +0900
+
+    Merge pull request #90 from boyaneck/feature/home
+    
+    [CHORES] 단순 css 수정
+
+[33mcommit ed3ffb39d8030f5a18abf34ecaf252346108fe0e[m
+Merge: 6cad4f2 d26842b
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jun 26 23:36:14 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 6cad4f2e1df1ef095ec14702277e5f0b8dcca7e2[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jun 26 23:36:09 2025 +0900
+
+    [CHORES] 단순 css 수정
+
+[33mcommit d26842b4451c47d045e17147ef610fa8329d6b65[m
+Merge: 51eee06 5eaebd7
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Jun 25 23:53:33 2025 +0900
+
+    Merge pull request #89 from boyaneck/feature/home
+    
+    [CHORES] 실행시 한번만 생성되는 Redis client와 subscriber 생성 중
+
+[33mcommit 5eaebd73f70a2a49130d31ba6bcae72a5f340394[m
+Merge: 9fffd8e 51eee06
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 25 23:49:25 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 9fffd8e8a5049591f0439629ef9572f40c67d163[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 25 23:49:22 2025 +0900
+
+    [CHORES] 실행시 한번만 생성되는 Redis client와 subscriber 생성 중
+
+[33mcommit 51eee060df9689646d97efa28693e718451c1482[m
+Merge: 47e7775 b69f827
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jun 23 23:27:30 2025 +0900
+
+    Merge pull request #88 from boyaneck/feature/home
+    
+    [CHROES] Redis pub/sub를 위한 기초 설계
+
+[33mcommit b69f827dd5ed4ef47f43da1b3480116bc1acff1e[m
+Merge: 00524eb 47e7775
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 23 23:26:55 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 00524eb9afc7d2ce715594fe485993f163764af7[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 23 23:26:51 2025 +0900
+
+    [CHROES] Redis pub/sub를 위한 기초 설계
+
+[33mcommit 47e77750b2730e2704be94ee7fe4dd376d478d23[m
+Merge: d75abe5 3c46b2d
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sat Jun 21 23:42:16 2025 +0900
+
+    Merge pull request #87 from boyaneck/feature/home
+    
+    [CHORES] 시간단위에 따라 제재 기능 로직 수정중
+
+[33mcommit 3c46b2d952ae86d99b3a1e1eb8f0881f74773f88[m
+Merge: 2d363c6 d75abe5
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Jun 21 23:40:59 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 2d363c6c6c08bdd533ba7c19acbe2bdbcc76b624[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sat Jun 21 23:40:51 2025 +0900
+
+    [CHORES] 시간단위에 따라 제재 기능 로직 수정중
+
+[33mcommit d75abe5316b756087c61ae863b2aa3d4cfd7b56d[m
+Merge: 30eb3bf c8fbaae
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Thu Jun 19 23:48:41 2025 +0900
+
+    Merge pull request #86 from boyaneck/feature/home
+    
+    [CONF] 로드 밸런싱과 리버스 프록시를 위 한 nginx 기본 설정
+
+[33mcommit c8fbaae48cfef330ca6cfdbd473e1ded3a122218[m
+Merge: 7fe34b8 30eb3bf
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jun 19 23:47:34 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 7fe34b83a0239bb746688f2573b16e11bc1a9e5a[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Thu Jun 19 23:46:19 2025 +0900
+
+    [CONF] 로드 밸런싱과 리버스 프록시를 위한 nginx 기본 설정
+
+[33mcommit 30eb3bf17a17513567638f8bf434cbecc6bb7378[m
+Merge: 624eb4e 8a3c1b7
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Jun 18 23:38:42 2025 +0900
+
+    Merge pull request #85 from boyaneck/feature/home
+    
+    [BUILD] docker와 redis 연결을 위한 환경 설정 중
+
+[33mcommit 8a3c1b7d3fb7d843e4ccd8aff9cd065fc0f93f54[m
+Merge: 435ab9b 624eb4e
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 18 23:37:34 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 435ab9bb15feece06271be6ab8d42952a92323b4[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 18 23:37:28 2025 +0900
+
+    [BUILD] docker와 redis 연결을 위한 환경설정 중
+
+[33mcommit 624eb4e9934b6d5e38a407b9b546a3881034c494[m
+Merge: 2babe6a 2f674bd
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jun 16 23:45:20 2025 +0900
+
+    Merge pull request #84 from boyaneck/feature/home
+    
+    [CHORES] redis및 socket을 이용한 기본적인 코드 작성중
+
+[33mcommit 2f674bd7c0dd5faa2134ebe33062fd9700069e49[m
+Merge: c3520fd 2babe6a
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 16 23:44:33 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit c3520fd1ebb538b7c397f26fde737627d94d0554[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 16 23:44:29 2025 +0900
+
+    [CHORES] redis및 socket을 이용한 기본적인 코드 작성중
+
+[33mcommit 2babe6a4a1c7d33c14b1b6be91657b5fdcf02eae[m
+Merge: 78a0683 4a9f32e
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Sun Jun 15 23:48:31 2025 +0900
+
+    Merge pull request #83 from boyaneck/feature/home
+    
+    [CHORES] redis 이용한 채팅 재제 코딩중
+
+[33mcommit 4a9f32e58e1f2e82d314ef6f1055cc69311d1230[m
+Merge: efc0c1c 78a0683
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Jun 15 23:46:59 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit efc0c1c621fac1dfdf2b119da9176ce477064204[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Sun Jun 15 23:46:54 2025 +0900
+
+    [CHORES] redis 이용한 채팅 재제 코딩중
+
+[33mcommit 78a06834bab0524c06f7ae433c5f36834562f50b[m
+Merge: 6d35257 e2ef1d3
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Fri Jun 13 23:42:30 2025 +0900
+
+    Merge pull request #82 from boyaneck/feature/home
+    
+    [CHORES] 로컬 서버에서 제재기능 관련 처 리 기초공사
+
+[33mcommit e2ef1d3e0cc2d7703457380fc987dd29fee819ee[m
+Merge: 126a656 6d35257
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Jun 13 23:41:25 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 126a6565edb19d8fb10c36e34fa3a0b64e24c8bb[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Fri Jun 13 23:41:20 2025 +0900
+
+    [CHORES] 로컬 서버에서 제재기능 관련 처리 기초공사
+
+[33mcommit 6d35257c1d621573d8172b2b98001aedf7037ac8[m
+Merge: 7f5309d 830d8db
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jun 9 23:35:10 2025 +0900
+
+    Merge pull request #81 from boyaneck/feature/home
+    
+    [CHORES] 채팅 제제 UI 애니메이션 TOP/DOWN 방식으로 수정
+
+[33mcommit 830d8dbf7465c8795aef168bb039179e126eb30c[m
+Merge: 9ef611a 7f5309d
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 9 23:33:57 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 9ef611a46300f9365f99c172e919e96ce260fac9[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 9 23:33:51 2025 +0900
+
+    [CHORES] 채팅 제제 UI 애니메이션 TOP/DOWN 방식으로 수정
+
+[33mcommit a46dc4d585f5cfe93f4e0993dfc2d72413879f80[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 9 19:00:08 2025 +0900
+
+    [CHORES] 채팅 컴포넌트의 UI들 각각 컴포넌트화 하여 분리
+
+[33mcommit 7f5309d1f10582cd6f88988f0e28ad2e8f24135c[m
+Merge: ac49e77 e2c685a
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Wed Jun 4 23:38:38 2025 +0900
+
+    Merge pull request #80 from boyaneck/feature/home
+    
+    [CHROES] 채팅신고 모달창 UI 수정중
+
+[33mcommit e2c685aab265f7b32f6538448dcc8cb82c5bae3d[m
+Merge: 66cc436 ac49e77
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 4 23:36:59 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
+
+[33mcommit 66cc43674f6fc3ddb5e78006525aa9a3d67a983a[m
+Author: boyaneck <jinxx93@naver.com>
+Date:   Wed Jun 4 23:36:55 2025 +0900
+
+    [CHROES] 채팅신고 모달창 UI 수정중
+
+[33mcommit ac49e77870909473c9f30c3a1f1af2ac27895b01[m
+Merge: b24ef63 1fefc78
+Author: boyaneck <104501394+boyaneck@users.noreply.github.com>
+Date:   Mon Jun 2 23:07:16 2025 +0900
+
+    Merge pull request #79 from boyaneck/feature/home
+    
+    [CHORES] state를 통하여 채팅 제제 정보 post로 요청
+
+[33mcommit 1fefc78ba95bf75dc37ac92e7a032662d0c442e3[m
+Merge: 80af5c7 b24ef63
+Author: boyaneck <jinxx93@naver.com>
+Date:   Mon Jun 2 23:06:23 2025 +0900
+
+    Merge branch 'main' of https://github.com/boyaneck/app-normal into feature/home
