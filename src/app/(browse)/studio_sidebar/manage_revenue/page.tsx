@@ -34,11 +34,8 @@ const ManageRevenuePage = () => {
     queryKey: [`post_live_stats`],
     queryFn: () => getPostLiveStats(user?.user_id),
     select: (stats) => {
-      const today = new Date();
-      const result = [];
-
-      // 7일치 배열 뼈대 생성 루프
-      for (let i = 6; i >= 0; i--) {}
+      //rpc 이용
+      return stats || [];
     },
     initialData: [],
     enabled: !!user?.user_id,
