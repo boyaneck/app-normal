@@ -1,5 +1,5 @@
 import { supabase } from "../config/supabase.js";
-export const insertAfterLiveInfo = async (
+export const postLiveStats = async (
   get_all_viewer,
   get_peak_viewer,
   room_name
@@ -9,22 +9,20 @@ export const insertAfterLiveInfo = async (
     const all_viewers_string = JSON.stringify(get_all_viewer);
     const room_name_string = room_name.join(",");
     // supabase insert
-    const { data, error } = await supabase
-      .from("after_live_information")
-      .insert([
-        {
-          room_name: room_name_string,
-          all_viewer: all_viewers_string,
-          peak_viewer: get_peak_viewer, // 혹시 문자열이면 숫자로
-        },
-      ]);
+    const { data, error } = await supabase.from("post_live_stats").insert([
+      {
+        room_name: room_name_string,
+        all_viewer: all_viewers_string,
+        peak_viewer: get_peak_viewer, // 혹시 문자열이면 숫자로
+      },
+    ]);
     if (error) {
       console.error("❌ supabase insert 에러:", error);
     } else {
-      console.log("✅ after_live_information 저장 완료:", data);
+      console.log("✅ postLiveStats 저장 완료:", data);
     }
   } catch (err) {
-    console.error("❌ insertAfterLiveInfo 함수 에러:", err);
+    console.error("❌ postLiveStats 함수 에러:", err);
   }
 };
 
