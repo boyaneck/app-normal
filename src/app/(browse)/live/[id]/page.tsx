@@ -134,11 +134,7 @@ const LivePage = () => {
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-<<<<<<< HEAD
               className="w-full h-full object-contain "
-=======
-              className="object-contain"
->>>>>>> f7d6a3a144dd99c98ae75511a136e6fa0f8a82f9
             />
           </LiveKitRoom>
           <ChatPage current_host_nickname={current_host_nickname} />

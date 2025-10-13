@@ -42,7 +42,7 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
 
   return userInfoLive;
 };
-export const getPostLiveStats = async (room_name: string | undefined) => {
+export const getPostLiveStats = async (room_name: string|undefined) => {
   const { data: post_live_stats, error } = await supabaseForClient
     .from("post_live_stats")
     .select("*")
