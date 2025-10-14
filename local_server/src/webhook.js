@@ -13,58 +13,43 @@ export const handleWebhook = async (req, res) => {
     console.log("ㅇㅇㅇㅇ", tx_id);
     // 환경 변수 검증
     const toss_secret_key = process.env.TOSS_SECRET;
-    const port_one_secret_key = process.env.PORT_ONE_SECRET_KEY;
-    const port_one_api_key = process.env.PORT_ONE_API_KEY;
+    const port_oneV2_store_id = process.env.PORT_ONE_STORE_KEY;
+    const port_oneV2_secret_key = process.env.PORT_ONE_SECRET_KEY;
 
-    if (!port_one_secret_key || !port_one_api_key) {
+    if (!port_oneV2_secret_key || !port_oneV2_store_id) {
       console.error("Webhook, 포트원 REST API 키가 누락되었습니다.");
       // 웹훅 재전송을 막기 위해 200 OK 응답을 보냅니다.
       return res.status(200).json({ message: "내부 서버 오류: 키 누락" });
     }
-    // if (!toss_secret_key) {
-    //   console.error("Webhook, TOSS_SECRET 키가 없습니다.");
-    //   return res.status(500).json({ message: "내부서버 오류: 시크릿 키 누락" });
-    // }
-
-    // const parse_secret = Buffer.from(`${port_one_secret_key}:`).toString(
-    //   `base64`
-    // );
-    // console.log("파싱하기", parse_secret);
-    // // 2. 토스 API 호출 (URL에 tx_id 사용)
-    // const getTossPayment = await axios({
-    //   // url: `https://api.tosspayments.com/v1/payments/${toss_payment_key}`,
-    //   url: `https://api.iamport.kr/payments/${imp_uid}`,
-    //   method: "get",
-    //   headers: {
-    //     Authorization: `Basic ${parse_secret}`, // Basic 뒤 공백 정상
-    //     "Content-Type": "application/json",
-    //   },
-    // });
-
-    const getToken = await axios({
-      url: "https://api.iamport.kr/users/getToken",
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      data: { imp_key: port_one_api_key, imp_secret: port_one_secret_key },
-    });
-
-    const { access_token } = getToken.data.response;
-
-    console.log("----------------------------------", access_token);
 
     //정보조회
 
+    // 환경
+
+    // 정보조회 요청 수정
     const getPayment = await axios({
-      url: `https://api.iamport.kr/payments/merchant_uid/${orderId}`,
-      // url: `https://api.iamport.kr/payments/merchant_uid/${orderId}`,
+      // V2 API 주소 및 엔드포인트는 그대로 유지 (404가 아닌 401이 떴으므로 URL 자체는 존재한다고 가정)
+      url: `https://api.portone.io/payments?merchantUid=${orderId}`,
       method: "get",
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json",
+        // 🚨 V2 공식 규격에 맞춰 Authorization 헤더 수정
+        Authorization: `PortOne ${port_oneV2_secret_key}`,
+        // "Portone-Store-Id"와 "Portone-Secret" 헤더는 삭제
       },
     });
+    console.log("뀨우우우우우우우ㅜ우우우", getPayment);
+    const payment_data = getPayment.data.payments
+      ? getPayment.data.payments[0]
+      : getPayment.data;
+    const actual_amount = payment_data.amount;
+    const payment_status = payment_data.status;
+    console.log("==========================================");
+    console.log(`[검증 결과] Merchant UID: ${orderId}`);
+    console.log(`[검증 결과] 결제 금액: ${actual_amount} 원`);
+    console.log(`[검증 결과] 결제 상태: ${payment_status}`);
+    console.log("==========================================");
 
-    const payment_data = getPayment.data.response;
-    console.log("최종으로 받아올 결제정보", payment_data);
     return res.status(200).json({
       status: "success",
       message: "결제 정보 조회 및 검증 완료",
