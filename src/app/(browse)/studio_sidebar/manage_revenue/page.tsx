@@ -13,6 +13,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import StatCard from "../../studio/_components/stat_card";
 const ManageRevenuePage = () => {
   //여기가 방송 관리 페이지로 변경경
 
@@ -64,6 +65,7 @@ const ManageRevenuePage = () => {
 
   return (
     <div style={{ fontFamily: "sans-serif" }}>
+      <StatCard />
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={stat_graph}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}

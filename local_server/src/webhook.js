@@ -49,6 +49,7 @@ export const handleWebhook = async (req, res) => {
     console.log(`[검증 결과] 결제 금액: ${actual_amount} 원`);
     console.log(`[검증 결과] 결제 상태: ${payment_status}`);
     console.log("==========================================");
+    console.log("payment데이터 확인", payment_data.items[0].amount.paid);
 
     return res.status(200).json({
       status: "success",
