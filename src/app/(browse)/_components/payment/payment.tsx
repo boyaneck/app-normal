@@ -60,7 +60,7 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           merchant_uid: `payment-${crypto.randomUUID()}`,
           name: current_host_nickname + "에게 후원",
           // amount: pay_ref?.current?.value,
-          amount: 10,
+          amount: 10009,
           buyer_email: "jinxx93@naver.com",
           buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
