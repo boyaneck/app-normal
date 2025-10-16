@@ -117,6 +117,7 @@ export interface chat_input_components_props {
   hearts: heart[];
   heartAnimationEnd: (id: heart) => void;
   current_host_nickname: string;
+  current_host_id: string;
   message: string;
   set_message: React.Dispatch<React.SetStateAction<string>>;
 }

@@ -7,8 +7,9 @@ import useUserStore from "@/store/user";
 
 interface Props {
   current_host_nickname: string | null;
+  current_host_id: string | null;
 }
-const PaymentPage = ({ current_host_nickname }: Props) => {
+const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
   const { user } = useUserStore();
   const pay_ref = useRef<HTMLInputElement>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
@@ -59,8 +60,12 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           pay_method: "card",
           merchant_uid: `payment-${crypto.randomUUID()}`,
           name: current_host_nickname + "에게 후원",
+
+          custom_data: JSON.stringify({
+            host_id: "!!!!호스트의 아이디가 들어갈수잇도록 할것",
+          }),
           // amount: pay_ref?.current?.value,
-          amount: 10009,
+          amount: 103,
           buyer_email: "jinxx93@naver.com",
           buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
@@ -75,6 +80,7 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           }
         }
       );
+      console.log("결제 데이터가 잘 가는ㄴ지 확인하기", IMP.request_pay);
       closeModal(); // 결제창 닫기
     } else {
       console.error("IMP 객체를 가져오는데 실패했습니다.");
