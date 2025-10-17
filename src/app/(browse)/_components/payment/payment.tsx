@@ -63,6 +63,7 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
 
           custom_data: JSON.stringify({
             host_id: "!!!!호스트의 아이디가 들어갈수잇도록 할것",
+            user: user?.user_nickname,
           }),
           // amount: pay_ref?.current?.value,
           amount: 103,
