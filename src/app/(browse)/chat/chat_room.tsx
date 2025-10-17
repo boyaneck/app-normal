@@ -23,8 +23,10 @@ import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
 interface Props {
   current_host_nickname: string;
+  current_host_id: string;
 }
-const ChatRoom = ({ current_host_nickname }: Props) => {
+const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
+  console.log("현재 스트리머의 아이디 인데 ???", current_host_id);
   const icon = useStreamingBarStore((state) => state.icon);
   const [receive_message_info, set_receive_message_info] = useState<
     chat_props[]
@@ -87,7 +89,9 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
     const email = user_info?.user_email;
     const date = dayjs().toISOString();
     const current_chat_room_number = "5";
+    console.log("현재 호스트의 아이디", current_host_id);
     const message_info = {
+      current_host_id,
       user_nickname,
       avatar_url,
       message,
@@ -253,6 +257,7 @@ const ChatRoom = ({ current_host_nickname }: Props) => {
             hearts={hearts}
             heartAnimationEnd={heartAnimationEnd}
             current_host_nickname={current_host_nickname}
+            current_host_id={current_host_id}
             message={message}
             set_message={set_message}
           />
