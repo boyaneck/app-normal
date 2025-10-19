@@ -32,7 +32,8 @@ const LivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
-
+  console.log("url 파라미터로 호스트 아이디", id);
+  console.log("스트리머의 방송 페이지", current_host_id);
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
@@ -44,14 +45,6 @@ const LivePage = () => {
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewerToken(current_host_id);
-  console.log(
-    "스트리밍 페이지에서 새롭게 토큰",
-    typeof token,
-    "name:",
-    typeof name,
-    "identity",
-    typeof identity
-  );
 
   const icon = useStreamingBarStore((state) => state.icon);
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
@@ -66,14 +59,12 @@ const LivePage = () => {
         const res = await axios.post(URL, { id: "Alicia Doe" });
         const data = res.data;
         set_streaming_timer(data.time);
-        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", data.time);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       }
     };
 
     getStreamingStartAt();
-    console.log("HTTP 요청이 이루어짐");
   }, []);
   useEffect(() => {
     const info_active_check = icon.includes("streamer");
@@ -90,7 +81,6 @@ const LivePage = () => {
   }, []);
 
   if (!token || !name || !identity) {
-    console.log("token,name,identity");
     // return <div>Cannot watch the stream</div>;
   }
   const videoRef = useRef<HTMLDivElement>(null);
@@ -137,7 +127,10 @@ const LivePage = () => {
               className="w-full h-full object-contain "
             />
           </LiveKitRoom>
-          <ChatPage current_host_nickname={current_host_nickname} />
+          <ChatPage
+            current_host_nickname={current_host_nickname}
+            current_host_id={current_host_id}
+          />
 
           {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
           {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
