@@ -57,6 +57,8 @@ export const handleWebhook = async (req, res) => {
       user: donation_user,
       amount: donation_sum,
     };
+
+    console.log("결제중", donation_sum);
     await redis_client.incrBy(`${room_name}:donation_sum`, donation_sum);
     await redis_client.lPush(
       `${room_name}:donation_list`,
