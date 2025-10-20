@@ -10,9 +10,17 @@ export const liveParticipantWebhook = async (req, res) => {
     // get('Authorization') 대신 headers.authorization을 사용합니다.
 
     //최대 동시 시청자 수
-    const event = receiver.receive(req.body, req.get("Authorization"));
+    // const event = receiver.receive(req.body, req.get("Authorization"));
+    const event = receiver.receive(req.body, req.headers.authorization);
+    console.log("아니 왜 ;;;;;", event.room.name);
     const room_name = event.room ? event.room.name : null;
+    if (!room_name) {
+      console.error("오류: room_name이 null입니다. 이벤트 유형을 확인하세요.");
+      return res.status(200).send("No room name, ignored."); // null 처리 후 조기 종료
+    }
     const parti = event.participant ? event.participant.identity : null;
+    console.log("event 값 확인하기", event);
+    console.log("event.room 의 값 확인하기", event.room);
     if (event.event === "participant_joined") {
       await redis_client.sAdd(`${room_name}:live`, parti);
       const current_parti = await redis_client.sCard(`${room_name}:live`);
@@ -38,12 +46,6 @@ export const liveParticipantWebhook = async (req, res) => {
         "peak_viewer"
       );
 
-      console.log(
-        "먼데 이건",
-        current_parti,
-        "currenttopparti",
-        current_top_parti
-      );
       if (
         current_top_parti === "1" ||
         current_parti > parseInt(current_top_parti, 10)
@@ -70,11 +72,12 @@ export const liveParticipantWebhook = async (req, res) => {
       //나중에 같은 유저가 여러번 같은방송에 들어왔을때, 해당 값을 어떻게 처리할지에 대해 생각하기
       //어떤때는 그냥 들어와서 보기만하는데 ,어떤때는 들어왔는데, 더 짧은시간이지만,채팅,후원을 할 수 있기에에
       if (get_start_at) {
+        const minimum_duration = 60;
+
         const duration = Math.round((end_at - get_start_at) / 1000);
-        await redis_client.rPush(
-          `${room_name}:duration`,
-          `${parti}:${duration}`
-        );
+        if (duration >= minimum_duration) {
+          await redis_client.sAdd(`${room_name}:duration_over_minute`, parti);
+        }
         //시청 지속률
         // conn_keep_rate = await redis_client.scan(
         //   `${room_name}:${parti}:duration`
@@ -90,28 +93,49 @@ export const liveParticipantWebhook = async (req, res) => {
         const get_all_viewer = await redis_client.sMembers(
           `${ingress_info_room_name}:live`
         );
-        console.log("이벤트 안됨 ?", ingress_info_room_name);
-        const get_peak_viewer = await redis_client.hGet(
-          `${ingress_info_room_name}:peak_viewer`,
-          "peak_viewer"
-        );
-        console.log("이벤트 안되냐?222", ingress_info_room_name);
+        // const get_peak_viewer = await redis_client.hGet(
+        //   `${ingress_info_room_name}:peak_viewer`,
+        //   "peak_viewer"
+        // );
         const get_viewer_duration = await redis_client.lRange(
           `${ingress_info_room_name}:duration`,
           0,
           -1
         );
 
-        //supabase에 데이터 넣기
-        await postLiveStats(
-          get_all_viewer,
-          get_peak_viewer,
-          get_viewer_duration,
-          ingress_info_room_name
+        console.log("방이 끝났어요11111111111", room_name);
+        const get_peak_viewer = await redis_client.sCard(
+          `${room_name}:peak_viewer`
+        );
+        const get_fund = await redis_client.get(`${room_name}:donation_sum`);
+        const get_turn_into_chat_rate = await redis_client.get(
+          `${room_name}:chat_involved_rate`
         );
 
+        console.log("방이 끝났어요222222222");
+        console.log(
+          "모든 데이터가 잘 가져와졌는지 확인하기 .. ",
+          "get_peak_viewer",
+          get_peak_viewer,
+          "get_fund:",
+          get_fund,
+          "get_turn_into_chat_rate:",
+          get_turn_into_chat_rate
+        );
+        await postLiveStats(
+          get_peak_viewer,
+          get_fund,
+          get_turn_into_chat_rate,
+          room_name
+        );
+
+        console.log("방이 끝났어요333333333333");
         return;
       } catch (error) {}
+    } else if (event.event === "room_ended") {
+      //supabase에 데이터 넣기
+      //후원금액,최대시청자,평균시청자,채팅전환율
+      // const get_avg_viewer=redis_client.
     }
     // ✅ 성공 응답을 보내야 합니다.
     res.status(200).send("Webhook processed successfully.");

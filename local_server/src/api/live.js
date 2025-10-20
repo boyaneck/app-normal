@@ -1,19 +1,32 @@
 import { supabase } from "../config/supabase.js";
 export const postLiveStats = async (
-  get_all_viewer,
   get_peak_viewer,
+  get_fund,
+  get_turn_into_chat_rate,
   room_name
 ) => {
   try {
     // 🔄 all_viewer가 객체 또는 배열이면 문자열로 변환
-    const all_viewers_string = JSON.stringify(get_all_viewer);
-    const room_name_string = room_name.join(",");
+    // const all_viewers_string = JSON.stringify(get_all_viewer);
+    // const room_name_string = room_name.join(",");
+    console.log(
+      "방송이 끝나면 반드시 여이가 떠야합니다.✅",
+      "get_peak_viewer,",
+      get_peak_viewer,
+      "get_fund,",
+      get_fund,
+      "get_turn_into_chat_rate,",
+      get_turn_into_chat_rate,
+      "room_name",
+      room_name
+    );
     // supabase insert
     const { data, error } = await supabase.from("post_live_stats").insert([
       {
-        room_name: room_name_string,
-        all_viewer: all_viewers_string,
+        broad_num: room_name,
         peak_viewer: get_peak_viewer, // 혹시 문자열이면 숫자로
+        fund: get_fund,
+        into_chat_rate: get_turn_into_chat_rate,
       },
     ]);
     if (error) {
