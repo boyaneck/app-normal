@@ -1,4 +1,5 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
+import { post_live_stats_props } from "@/types/live";
 
 //Ingress API
 export const insertIngress = async (
@@ -42,15 +43,20 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
 
   return userInfoLive;
 };
-export const getPostLiveStats = async (room_name: string|undefined) => {
+export const getPostLiveStats = async (room_name: string | undefined) => {
+  console.log("방송통계 api 실행", room_name);
   const { data: post_live_stats, error } = await supabaseForClient
     .from("post_live_stats")
     .select("*")
-    .eq("room_name", room_name);
+    .eq("broad_num", room_name)
+    .order("live_started_date", { ascending: false })
+    .limit(1);
 
   if (error) {
     console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생");
+    throw new Error(error.message);
   }
 
-  return post_live_stats;
+  console.log("방송이 끝난 후 통계를 가져오는 통계 API", post_live_stats);
+  return post_live_stats ? (post_live_stats[0] as post_live_stats_props) : null;
 };

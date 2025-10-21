@@ -1,5 +1,6 @@
 "use client";
 import { getPostLiveStats } from "@/api";
+
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
@@ -14,6 +15,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import StatCard from "../../studio/_components/stat_card";
+import { post_live_stats_props } from "@/types/live";
 const ManageRevenuePage = () => {
   //여기가 방송 관리 페이지로 변경경
 
@@ -31,26 +33,16 @@ const ManageRevenuePage = () => {
     return days[date.getDay()];
   };
 
-  const { data: post_live_stats } = useQuery({
-    queryKey: [`post_live_stats`],
+  const { data: post_live_stats } = useQuery<post_live_stats_props | null>({
+    queryKey: [`post_live_stats`, user?.user_id],
     queryFn: () => getPostLiveStats(user?.user_id),
-    select: (stats) => {
-      const today = new Date();
-      const result = [];
-
-      // 7일치 배열 뼈대 생성 루프
-      for (let i = 6; i >= 0; i--) {}
-    },
-    initialData: [],
     enabled: !!user?.user_id,
+    // staleTime: 1000 * 60 * 60,
   });
+  const live_stats = post_live_stats ? post_live_stats : null;
 
-  console.log(
-    "유저의 정보",
-    post_live_stats?.map((stat) => {
-      console.log("맵이잖아", stat.peak_viewer);
-    })
-  );
+  console.log("유저의 아이디", user?.user_id);
+  console.log("방송통계 데이터가져오기", post_live_stats);
   const stat_graph = [
     { name: "월요일", 후원금액: 4000, 시청자: 2400 },
     { name: "화요일", 후원금액: 3000, 시청자: 2210 },
@@ -65,7 +57,7 @@ const ManageRevenuePage = () => {
 
   return (
     <div style={{ fontFamily: "sans-serif" }}>
-      <StatCard />
+      <StatCard post_live_stats={post_live_stats} />
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={stat_graph}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}

@@ -62,7 +62,8 @@ export const ChatInput = ({
         ❤️
       </button>
       <span className="flex justify-center items-center ">
-        <PaymentPage current_host_nickname={current_host_nickname} />
+        <PaymentPage current_host_nickname={current_host_nickname} 
+                      curren_hoist_id={current_host}/>
       </span>
     </span>
   );
