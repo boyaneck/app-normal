@@ -32,8 +32,6 @@ const LivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
-  console.log("url 파라미터로 호스트 아이디", id);
-  console.log("스트리머의 방송 페이지", current_host_id);
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
@@ -45,7 +43,6 @@ const LivePage = () => {
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewerToken(current_host_id);
-
   const icon = useStreamingBarStore((state) => state.icon);
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);

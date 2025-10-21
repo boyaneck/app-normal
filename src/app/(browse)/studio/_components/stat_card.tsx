@@ -1,7 +1,8 @@
 "use-cient";
+import { post_live_stats_object, post_live_stats_props } from "@/types/live";
 import { DollarSign, MessageSquare, Repeat } from "lucide-react";
 
-const StatCard = () => {
+const StatCard = (post_live_stats: post_live_stats_object) => {
   // 이 데이터만 변경하여 다른 통계 카드를 만드세요.
   const stat = {
     title: "총 후원 금액",
