@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import StatCard from "../../studio/_components/stat_card";
 import { post_live_stats_props } from "@/types/live";
+import { DollarSign } from "lucide-react";
 const ManageRevenuePage = () => {
   //여기가 방송 관리 페이지로 변경경
 
@@ -39,10 +40,65 @@ const ManageRevenuePage = () => {
     enabled: !!user?.user_id,
     // staleTime: 1000 * 60 * 60,
   });
-  const live_stats = post_live_stats ? post_live_stats : null;
 
-  console.log("유저의 아이디", user?.user_id);
-  console.log("방송통계 데이터가져오기", post_live_stats);
+  const liveStats = (stat_prop: post_live_stats_props | null | undefined) => {
+    if (!stat_prop) return null;
+
+    return [
+      {
+        title: "평균 시청자 수 ",
+        value: stat_prop?.avg_viewer,
+        positive_color: "",
+      },
+      {
+        title: "최대 시청자 수 ",
+        value: stat_prop?.peak_viewer,
+      },
+      {
+        title: "채팅 전환률 ",
+        value: stat_prop?.into_chat_rate,
+      },
+      {
+        title: "총 후원 금액",
+        value: stat_prop?.fund,
+        icon: DollarSign,
+      },
+    ];
+  };
+
+  // trend: "80%",
+  // trendColor: "text-amber-500", // 데이터가 긍정적일 때의 강조 색상
+  // // icon: DollarSign,
+  // goalText: "이번 달 목표 달성",
+  // goalValue: 1556250,
+  // currentValue: 1245000,
+  // const progess_percent = Math.min(
+  //   (stat.currentValue / stat.goalValue) * 100,
+  //   100
+  // );
+  const detailStats = [
+    {
+      title: "채팅 전환율",
+      value: "22.5%",
+      trend: "▲ 3.1%",
+      trendColor: "text-blue-600",
+      barColor: "bg-blue-600", // Progress bar 색상
+      // icon: MessageSquare,
+      goalText: "총 시청자 대비",
+      progressValue: 22.5, // 실제 참여율 값 (22.5%)
+    },
+    {
+      title: "구독 전환율",
+      value: "1.8%",
+      trend: "▲ 0.2%",
+      trendColor: "text-pink-600",
+      barColor: "bg-pink-600", // Progress bar 색상
+      // icon: Repeat,
+      goalText: "일반 시청자 대비",
+      progressValue: 1.8, // 실제 전환율 값 (1.8%)
+    },
+  ];
+
   const stat_graph = [
     { name: "월요일", 후원금액: 4000, 시청자: 2400 },
     { name: "화요일", 후원금액: 3000, 시청자: 2210 },
@@ -55,9 +111,13 @@ const ManageRevenuePage = () => {
     { name: "Jun", 후원금액: 2390, 시청자: 2500 },
   ];
 
+  const resultStats = liveStats(post_live_stats);
   return (
     <div style={{ fontFamily: "sans-serif" }}>
-      <StatCard post_live_stats={post_live_stats} />
+      {resultStats?.map((stat) => (
+        <StatCard key={stat.title} live_stats_card={stat} />
+      ))}
+
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={stat_graph}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}

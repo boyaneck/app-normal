@@ -1,3 +1,6 @@
+import { LucideIcon, LucideProps } from "lucide-react";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
+
 export interface live_info {
   category: string | null;
   id: string;
@@ -28,4 +31,11 @@ export interface post_live_stats_props {
 }
 export interface post_live_stats_object {
   post_live_stats: post_live_stats_props | null | undefined;
+}
+
+export interface live_stats_card_props {
+  title: string;
+  value: string | null | undefined;
+  icon?: React.ElementType | undefined;
+  positive_color?: string | undefined;
 }

@@ -49,11 +49,11 @@ export const getPostLiveStats = async (room_name: string | undefined) => {
     .from("post_live_stats")
     .select("*")
     .eq("broad_num", room_name)
-    .order("live_started_date", { ascending: false })
+    .order("live_started_at", { ascending: false })
     .limit(1);
 
   if (error) {
-    console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생");
+    console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생", error.message);
     throw new Error(error.message);
   }
 
