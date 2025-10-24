@@ -1,8 +1,8 @@
 // StudioMainBanner.js (예시)
 import React from "react";
-import ManageRevenuePage from "../studio_sidebar/manage_revenue/page";
 import ManageViewerPage from "../studio_sidebar/manage_viewer/page";
 import AnalyzePage from "../studio_sidebar/analyze/page";
+import LiveStat from "./live_stat/live_stat";
 
 interface Props {
   selected_menu: string;
@@ -18,11 +18,11 @@ const StudioMainBanner = ({ selected_menu }: Props) => {
         </div>
       );
       break;
-    case "manage_revenue":
+    case "live_stat":
       content = (
         <div>
-          수익관리
-          <ManageRevenuePage></ManageRevenuePage>
+          라이브 통계
+          <LiveStat />
         </div>
       );
       break;

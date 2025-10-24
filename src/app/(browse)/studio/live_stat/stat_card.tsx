@@ -8,17 +8,8 @@ interface props {
 
 const StatCard = ({ live_stats_card }: props) => {
   console.log("라이브 통계 카드의 정보", live_stats_card);
+  const { icon: IconComponent } = live_stats_card;
   // 이 데이터만 변경하여 다른 통계 카드를 만드세요.
-  const stat = {
-    title: "총 후원 금액",
-    value: "400",
-    trend: "80%",
-    trendColor: "text-amber-500", // 데이터가 긍정적일 때의 강조 색상
-    icon: DollarSign,
-    goalText: "이번 달 목표 달성",
-    goalValue: 1556250,
-    currentValue: 1245000,
-  };
 
   // const progess_percent = Math.min(
   //   (stat.currentValue / stat.goalValue) * 100,
@@ -34,7 +25,7 @@ const StatCard = ({ live_stats_card }: props) => {
           </h3>
           <div className="p-2 rounded-full bg-amber-500/10 text-amber-500">
             {/* <stat.icon className="h-5 w-5" /> */}
-            {live_stats_card?.icon}
+            {/* <IconComponent /> */}
           </div>
         </div>
 
@@ -44,27 +35,26 @@ const StatCard = ({ live_stats_card }: props) => {
           </div>
 
           <div className="mt-2 flex items-center justify-between">
-            <span className={`text-sm ${stat.trendColor} font-bold`}>
-              {/* {stat.trend} */}
-            </span>
-            <span className="text-xs text-gray-500">{stat.goalText}</span>
+            {/* <span className={`text-sm ${stat.trendColor} font-bold`}> */}
+            {/* {stat.trend} */}
+            {/* </span> */}
+            {/* <span className="text-xs text-gray-500">{stat.goalText}</span> */}
           </div>
         </div>
-
-        <div className="pt-4">
+      </div>
+      {/* <div className="pt-4">
           <div className="h-1.5 w-full rounded-full bg-gray-200">
             <div
               className="h-1.5 rounded-full bg-amber-500 transition-all duration-700 ease-out"
               // style={{ width: `${progess_percent}%` }}
             ></div>
           </div>
-        </div>
-      </div>
-      <div className="lg:col-span-1 rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+        </div> */}
+      {/* <div className="lg:col-span-1 rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
         <h3 className="text-lg font-bold mb-5 text-gray-800 border-b pb-3">
           주요 참여 및 전환 지표
         </h3>
-      </div>
+      </div> */}
     </>
   );
 };
