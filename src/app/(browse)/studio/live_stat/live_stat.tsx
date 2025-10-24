@@ -14,10 +14,13 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import StatCard from "../../studio/live_stat/stat_card";
+import StatCard from "./stat_card";
 import { post_live_stats_props } from "@/types/live";
 import { DollarSign } from "lucide-react";
-const ManageRevenuePage = () => {
+import WeeklyTrendChart from "./weekly_trend_chart";
+import RecentNews from "./recent_new";
+import BriefRevenue from "./brief_revenue";
+const LiveStat = () => {
   //여기가 방송 관리 페이지로 변경경
 
   const { user } = useUserStore((state) => state);
@@ -113,15 +116,28 @@ const ManageRevenuePage = () => {
 
   const resultStats = liveStats(post_live_stats);
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
-      {resultStats?.map((stat) => (
-        <StatCard key={stat.title} live_stats_card={stat} />
-      ))}
-
-      <ResponsiveContainer width="100%" height={400}>
+    // <div style={{ fontFamily: "sans-serif" }}>
+    <div>
+      <div className="flex flex-row gap-4 pb-2">
+        {resultStats?.map((stat) => (
+          <StatCard key={stat.title} live_stats_card={stat} />
+        ))}
+      </div>
+      <div
+        className={`
+          bg-gray-400
+      grid grid-cols-1 md:grid-cols-2 justify-between 
+      p-2 border border-yellow-300 gap-2`}
+      >
+        <WeeklyTrendChart />
+        <RecentNews />
+        <BriefRevenue />
+        <div>새 컴포넌트</div>
+      </div>
+      <div className="h-full w-full border border-red-400">as</div>
+      {/* <ResponsiveContainer width="100%" height={400}>
         <LineChart data={stat_graph}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}
-          {/* 옅은 격자선 */}
           <XAxis dataKey="name" />
           <YAxis domain={[0, 10000]} />
           <Tooltip />
@@ -143,9 +159,9 @@ const ManageRevenuePage = () => {
             dot={false} // 데이터 포인트 제거
           />
         </LineChart>
-      </ResponsiveContainer>
+      </ResponsiveContainer> */}
     </div>
   );
 };
 
-export default ManageRevenuePage;
+export default LiveStat;

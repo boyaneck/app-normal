@@ -36,6 +36,7 @@ export interface post_live_stats_object {
 export interface live_stats_card_props {
   title: string;
   value: string | null | undefined;
+  // icon?: React.ElementType | undefined;
   icon?: React.ElementType | undefined;
   positive_color?: string | undefined;
 }
