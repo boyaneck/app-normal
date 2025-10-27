@@ -60,3 +60,25 @@ export const getPostLiveStats = async (room_name: string | undefined) => {
   console.log("방송이 끝난 후 통계를 가져오는 통계 API", post_live_stats);
   return post_live_stats ? (post_live_stats[0] as post_live_stats_props) : null;
 };
+
+export const getWeekleyPost = async (room_name: string) => {
+  const today = new Date();
+  const end_date = today.toISOString();
+  const a_week_ago = new Date(today);
+  a_week_ago.setDate(today.getDate() - 6);
+  a_week_ago.setHours(0, 0, 0, 0);
+  const start_date = a_week_ago.toISOString();
+  const { data: weekly_data, error } = await supabaseForClient
+    .from("post_live_stats")
+    .select("*")
+    .eq("broad_num", room_name)
+    .gte("live_started_at", start_date)
+    .lte("live_started_at", end_date)
+    .order("live_started_at", { ascending: false });
+
+  if (error) {
+    console.log("7일치 데이터 로드시 오류 ", error);
+    return [];
+  }
+  return weekly_data;
+};
