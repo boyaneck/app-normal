@@ -37,6 +37,98 @@ const LiveStat = () => {
     return days[date.getDay()];
   };
 
+  //숫자 카운팅 애니메이션
+  // const animate_count_num = (
+  //   ref,
+  //   start,
+  //   end,
+  //   duration,
+  //   prefix,
+  //   suffix,
+  //   decimal
+  // ) => {
+  //   if (!ref.current) return;
+
+  //   if (start === end || isNaN(start) || isNaN(end)) {
+  //     const final_value =
+  //       decimal > 0
+  //         ? end.toFixed(decimal)
+  //         : Math.round(end).toLocaleString("ko-KR");
+  //     ref.current.textContent = prefix + final_value + suffix;
+  //     return;
+  //   }
+  //   let start_timestamp: number | null = null;
+  //   const step = (timestamp: number) => {
+  //     if (!start_timestamp) {
+  //     }
+  //     const progress_raw = Math.min(
+  //       (timestamp - start_timestamp) / durration,
+  //       1
+  //     );
+  //     const progress=1 -Math.pow(1-progress_raw,3)
+  //     const current_val=start+(progress*(end-start))
+  //     let formatted_val:string
+
+  //     if(decmimal>0)
+  //   };
+  // };
+  // --- 숫자 카운팅 애니메이션 ---
+  const animateValue = (
+    ref: React.RefObject<HTMLSpanElement>,
+    start: number,
+    end: number,
+    duration: number = 300,
+    prefix: string = "",
+    suffix: string = "",
+    decimals: number = 0
+  ) => {
+    if (!ref.current) return;
+
+    if (start === end || isNaN(start) || isNaN(end)) {
+      const finalValue =
+        decimals > 0
+          ? end.toFixed(decimals)
+          : Math.round(end).toLocaleString("ko-KR");
+      ref.current.textContent = prefix + finalValue + suffix;
+      return;
+    }
+
+    let startTimestamp: number | null = null;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progressRaw = Math.min((timestamp - startTimestamp) / duration, 1);
+      const progress = 1 - Math.pow(1 - progressRaw, 3); // Cubic easeOut for smooth feel
+
+      const currentValue = start + progress * (end - start);
+
+      let formattedValue: string;
+      if (decimals > 0) {
+        formattedValue = currentValue.toFixed(decimals);
+      } else {
+        formattedValue = Math.round(currentValue).toLocaleString("ko-KR");
+      }
+
+      if (ref.current) {
+        ref.current.textContent = prefix + formattedValue + suffix;
+      }
+
+      if (progressRaw < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        const finalValue =
+          decimals > 0
+            ? end.toFixed(decimals)
+            : Math.round(end).toLocaleString("ko-KR");
+        if (ref.current) {
+          ref.current.textContent = prefix + finalValue + suffix;
+        }
+      }
+    };
+
+    window.requestAnimationFrame(step);
+  };
+
   const { data: post_live_stats } = useQuery<post_live_stats_props | null>({
     queryKey: [`post_live_stats`, user?.user_id],
     queryFn: () => getPostLiveStats(user?.user_id),
