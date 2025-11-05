@@ -40,3 +40,14 @@ export interface live_stats_card_props {
   icon?: React.ElementType | undefined;
   positive_color?: string | undefined;
 }
+
+export interface live_stat_count_props {
+  post_live_stats: post_live_stats_props | null;
+  ref: React.RefObject<HTMLSpanElement>;
+  start: number;
+  end: number;
+  prefix: string;
+  suffix: string;
+  duration: number;
+  decimal: number;
+}
