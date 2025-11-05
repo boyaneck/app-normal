@@ -4,16 +4,7 @@ import { getPostLiveStats } from "@/api";
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
-} from "recharts";
+
 import StatCard from "./stat_card";
 import { post_live_stats_props } from "@/types/live";
 import { DollarSign } from "lucide-react";
@@ -24,110 +15,6 @@ const LiveStat = () => {
   //여기가 방송 관리 페이지로 변경경
 
   const { user } = useUserStore((state) => state);
-  const getDayNameFromDate = (date: Date) => {
-    const days = [
-      "일요일",
-      "월요일",
-      "화요일",
-      "수요일",
-      "목요일",
-      "금요일",
-      "토요일",
-    ];
-    return days[date.getDay()];
-  };
-
-  //숫자 카운팅 애니메이션
-  // const animate_count_num = (
-  //   ref,
-  //   start,
-  //   end,
-  //   duration,
-  //   prefix,
-  //   suffix,
-  //   decimal
-  // ) => {
-  //   if (!ref.current) return;
-
-  //   if (start === end || isNaN(start) || isNaN(end)) {
-  //     const final_value =
-  //       decimal > 0
-  //         ? end.toFixed(decimal)
-  //         : Math.round(end).toLocaleString("ko-KR");
-  //     ref.current.textContent = prefix + final_value + suffix;
-  //     return;
-  //   }
-  //   let start_timestamp: number | null = null;
-  //   const step = (timestamp: number) => {
-  //     if (!start_timestamp) {
-  //     }
-  //     const progress_raw = Math.min(
-  //       (timestamp - start_timestamp) / durration,
-  //       1
-  //     );
-  //     const progress=1 -Math.pow(1-progress_raw,3)
-  //     const current_val=start+(progress*(end-start))
-  //     let formatted_val:string
-
-  //     if(decmimal>0)
-  //   };
-  // };
-  // --- 숫자 카운팅 애니메이션 ---
-  const animateValue = (
-    ref: React.RefObject<HTMLSpanElement>,
-    start: number,
-    end: number,
-    duration: number = 300,
-    prefix: string = "",
-    suffix: string = "",
-    decimals: number = 0
-  ) => {
-    if (!ref.current) return;
-
-    if (start === end || isNaN(start) || isNaN(end)) {
-      const finalValue =
-        decimals > 0
-          ? end.toFixed(decimals)
-          : Math.round(end).toLocaleString("ko-KR");
-      ref.current.textContent = prefix + finalValue + suffix;
-      return;
-    }
-
-    let startTimestamp: number | null = null;
-
-    const step = (timestamp: number) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progressRaw = Math.min((timestamp - startTimestamp) / duration, 1);
-      const progress = 1 - Math.pow(1 - progressRaw, 3); // Cubic easeOut for smooth feel
-
-      const currentValue = start + progress * (end - start);
-
-      let formattedValue: string;
-      if (decimals > 0) {
-        formattedValue = currentValue.toFixed(decimals);
-      } else {
-        formattedValue = Math.round(currentValue).toLocaleString("ko-KR");
-      }
-
-      if (ref.current) {
-        ref.current.textContent = prefix + formattedValue + suffix;
-      }
-
-      if (progressRaw < 1) {
-        window.requestAnimationFrame(step);
-      } else {
-        const finalValue =
-          decimals > 0
-            ? end.toFixed(decimals)
-            : Math.round(end).toLocaleString("ko-KR");
-        if (ref.current) {
-          ref.current.textContent = prefix + finalValue + suffix;
-        }
-      }
-    };
-
-    window.requestAnimationFrame(step);
-  };
 
   const { data: post_live_stats } = useQuery<post_live_stats_props | null>({
     queryKey: [`post_live_stats`, user?.user_id],
@@ -135,10 +22,48 @@ const LiveStat = () => {
     enabled: !!user?.user_id,
     // staleTime: 1000 * 60 * 60,
   });
-
+  console.log("현재 가져온 7일치 데이터", post_live_stats);
+  const is_live_post_arr = Array.isArray(post_live_stats)
+    ? post_live_stats
+    : [];
+  const live_num_of_week = is_live_post_arr.length;
   const liveStats = (stat_prop: post_live_stats_props | null | undefined) => {
+    const initial_data = {
+      avg_viewer: 0,
+      peak_viewer: 0,
+      into_chat_rate: 0,
+      fund: 0,
+    };
     if (!stat_prop) return null;
+    const cal_live_week = is_live_post_arr.reduce((acc, stat) => {
+      const avg_v = Number(stat.avg_viewer) || 0;
+      const peak_v = Number(stat.peak_viewer) || 0;
+      const chat_r = Number(stat.into_chat_rate) || 0;
+      const fd = Number(stat.fund) || 0;
 
+      acc.avg_viewer_sum += avg_v;
+      acc.peak_viewer_sum += peak_v;
+      acc.into_chat_rate_sum += chat_r;
+      acc.fund_sum += fd;
+
+      console.log("reduce의 결과값을 알려주세요", acc);
+      return acc;
+    }, initial_data);
+
+    const avg_of_week = {
+      avg_viewer: Math.round(
+        cal_live_week.avg_viewer_sum / live_num_of_week || 1
+      ),
+      peak_viewer: Math.round(
+        cal_live_week.peak_viewer_sum / live_num_of_week || 1
+      ),
+      into_chat_rate: Math.round(
+        cal_live_week.into_chat_rate / live_num_of_week || 1
+      ),
+      fund: Math.round(cal_live_week.fund_sum / live_num_of_week || 1),
+    };
+
+    console.log("이번주 방송 각각의 지표 나눈것", avg_of_week);
     return [
       {
         title: "평균 시청자 수 ",
@@ -161,16 +86,6 @@ const LiveStat = () => {
     ];
   };
 
-  // trend: "80%",
-  // trendColor: "text-amber-500", // 데이터가 긍정적일 때의 강조 색상
-  // // icon: DollarSign,
-  // goalText: "이번 달 목표 달성",
-  // goalValue: 1556250,
-  // currentValue: 1245000,
-  // const progess_percent = Math.min(
-  //   (stat.currentValue / stat.goalValue) * 100,
-  //   100
-  // );
   const detailStats = [
     {
       title: "채팅 전환율",
@@ -194,18 +109,6 @@ const LiveStat = () => {
     },
   ];
 
-  const stat_graph = [
-    { name: "월요일", 후원금액: 4000, 시청자: 2400 },
-    { name: "화요일", 후원금액: 3000, 시청자: 2210 },
-    { name: "수요일", 후원금액: 2000, 시청자: 2290 },
-    { name: "Apr", 후원금액: 2780, 시청자: 2000 },
-    { name: "May", 후원금액: 1890, 시청자: 2181 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-  ];
-
   const resultStats = liveStats(post_live_stats);
   return (
     // <div style={{ fontFamily: "sans-serif" }}>
@@ -227,31 +130,6 @@ const LiveStat = () => {
         <div>새 컴포넌트</div>
       </div>
       <div className="h-full w-full border border-red-400">as</div>
-      {/* <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={stat_graph}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}
-          <XAxis dataKey="name" />
-          <YAxis domain={[0, 10000]} />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="후원금액"
-            stroke="#F56565" // 토스 스타일 파란색
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            dot={false} // 데이터 포인트 제거
-          />
-          <Line
-            type="monotone"
-            dataKey="시청자"
-            stroke="#48BB78" // 토스 스타일 하늘색
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            dot={false} // 데이터 포인트 제거
-          />
-        </LineChart>
-      </ResponsiveContainer> */}
     </div>
   );
 };

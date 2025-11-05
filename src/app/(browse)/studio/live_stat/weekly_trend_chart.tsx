@@ -25,6 +25,10 @@ const MOCK_DATA = [
   { name: "월", 후원금액: 3490, 시청자: 4300 },
 ];
 
+const calculateWeekSum = (live_stat_arr) => {
+  if (!live_stat_arr || live_stat_arr.length === 0)
+    return { data: null, sum: [] };
+};
 // ----------------------------------------------------------------------
 // 2. 커스텀 Tooltip 컴포넌트
 // ----------------------------------------------------------------------
@@ -57,10 +61,18 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-// ----------------------------------------------------------------------
-// 3. 메인 차트 컴포넌트
-// ----------------------------------------------------------------------
-
+const chartMouseMove = (state: any) => {
+  if (state.activePayload && state.activePayload.length) {
+    chartMouseLeave(state.activePayload[0].payload);
+    console.log(
+      "마우스 호버시생기는 데이터 확인하기",
+      state.activePayload[0].payload
+    );
+  } else {
+    chartMouseLeave(null);
+  }
+};
+const chartMouseLeave = (val: null) => {};
 const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
   // MOCK_DATA를 기본값으로 설정
   return (
@@ -79,6 +91,8 @@ const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
         <LineChart
           data={data}
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+          onMouseMove={chartMouseMove}
+          onMouseLeave={() => chartMouseLeave(null)}
         >
           <CartesianGrid
             strokeDasharray="3 3"
