@@ -43,7 +43,6 @@ export interface live_stats_card_props {
 
 export interface live_stat_count_props {
   post_live_stats: post_live_stats_props | null;
-  ref: React.RefObject<HTMLSpanElement>;
   start: number;
   end: number;
   prefix: string;
