@@ -1,12 +1,14 @@
 "use-cient";
 import { live_stats_card_props } from "@/types/live";
 import { DollarSign, MessageSquare, Repeat } from "lucide-react";
+import { forwardRef } from "react";
 
 interface props {
   live_stats_card: live_stats_card_props;
+  stat_card_ref: React.RefObject<HTMLDivElement>;
 }
 
-const StatCard = ({ live_stats_card }: props) => {
+const StatCard = forwardRef(({ live_stats_card, stat_card_ref }: props) => {
   console.log("라이브 통계 카드의 정보", live_stats_card);
 
   return (
@@ -24,33 +26,21 @@ const StatCard = ({ live_stats_card }: props) => {
         </div>
 
         <div className="flex flex-col">
-          <div className="text-4xl font-extrabold text-gray-900">
+          <div
+            className="text-4xl font-extrabold text-gray-900"
+            ref={stat_card_ref}
+          >
             {live_stats_card?.value}
           </div>
 
           <div className="mt-2 flex items-center justify-between">
             {/* <span className={`text-sm ${stat.trendColor} font-bold`}> */}
-            {/* {stat.trend} */}
-            {/* </span> */}
-            {/* <span className="text-xs text-gray-500">{stat.goalText}</span> */}
           </div>
+          <span className="text-xs text-gray-500"></span>
         </div>
       </div>
-      {/* <div className="pt-4">
-          <div className="h-1.5 w-full rounded-full bg-gray-200">
-            <div
-              className="h-1.5 rounded-full bg-amber-500 transition-all duration-700 ease-out"
-              // style={{ width: `${progess_percent}%` }}
-            ></div>
-          </div>
-        </div> */}
-      {/* <div className="lg:col-span-1 rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
-        <h3 className="text-lg font-bold mb-5 text-gray-800 border-b pb-3">
-          주요 참여 및 전환 지표
-        </h3>
-      </div> */}
     </>
   );
-};
+});
 
 export default StatCard;

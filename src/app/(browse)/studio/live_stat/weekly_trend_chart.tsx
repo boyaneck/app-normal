@@ -9,7 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { LineChart as LineChartIcon, TrendingUp } from "lucide-react"; // LineChart 이름 충돌 방지
-import React from "react";
+import React, { forwardRef } from "react";
+import { usePostLive } from "@/hooks/usePostLive";
 
 // ----------------------------------------------------------------------
 // 1. 차트 데이터 (임시)
@@ -29,51 +30,52 @@ const calculateWeekSum = (live_stat_arr) => {
   if (!live_stat_arr || live_stat_arr.length === 0)
     return { data: null, sum: [] };
 };
-// ----------------------------------------------------------------------
-// 2. 커스텀 Tooltip 컴포넌트
-// ----------------------------------------------------------------------
 
-// Recharts Tooltip은 active, payload, label 세 가지 props를 받습니다.
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-gray-800/90 border border-indigo-400/70 p-3 rounded-lg shadow-xl text-white backdrop-blur-sm">
-        <p className="font-bold text-sm mb-1 text-indigo-300">
-          {label}요일 방송 통계
-        </p>
-        <div className="space-y-1">
-          {payload.map((item, index) => (
-            <p key={index} className="text-xs flex justify-between">
-              <span style={{ color: item.color }} className="font-medium mr-3">
-                {item.name}:
-              </span>
-              <span className="font-semibold">
-                {item.name === "후원금액"
-                  ? `${item.value.toLocaleString()} 원`
-                  : `${item.value.toLocaleString()} 명`}
-              </span>
-            </p>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
-const chartMouseMove = (state: any) => {
-  if (state.activePayload && state.activePayload.length) {
-    chartMouseLeave(state.activePayload[0].payload);
-    console.log(
-      "마우스 호버시생기는 데이터 확인하기",
-      state.activePayload[0].payload
-    );
-  } else {
-    chartMouseLeave(null);
-  }
-};
-const chartMouseLeave = (val: null) => {};
 const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
+  const { animateCount } = usePostLive();
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-800/90 border border-indigo-400/70 p-3 rounded-lg shadow-xl text-white backdrop-blur-sm">
+          <p className="font-bold text-sm mb-1 text-indigo-300">
+            {label}요일 방송 통계
+          </p>
+          <div className="space-y-1">
+            {payload.map((item, index) => (
+              <p key={index} className="text-xs flex justify-between">
+                <span
+                  style={{ color: item.color }}
+                  className="font-medium mr-3"
+                >
+                  {item.name}:
+                </span>
+                <span className="font-semibold">
+                  {item.name === "후원금액"
+                    ? `${item.value.toLocaleString()} 원`
+                    : `${item.value.toLocaleString()} 명`}
+                </span>
+              </p>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const chartMouseMove = (state: any) => {
+    if (state.activePayload && state.activePayload.length) {
+      chartMouseLeave(state.activePayload[0].payload);
+      console.log(
+        "마우스 호버시생기는 데이터 확인하기",
+        state.activePayload[0].payload
+      );
+      animateCount(state.activePayload[0].payload);
+    } else {
+      chartMouseLeave(null);
+    }
+  };
+  const chartMouseLeave = (val: null) => {};
   // MOCK_DATA를 기본값으로 설정
   return (
     <div
