@@ -41,6 +41,15 @@ export interface live_stats_card_props {
   positive_color?: string | undefined;
 }
 
+export interface weekly_live_stats_props {
+  post_live_stats: post_live_stats_props | null;
+}
+export interface avg_for_week_props {
+  avg_viewer: number;
+  peak_viewer: number;
+  into_chat_rate: string; // toFixed(2) 때문에 string 타입일 가능성 높음
+  fund: number;
+}
 export interface live_stat_count_props {
   post_live_stats: post_live_stats_props | null;
   start: number;

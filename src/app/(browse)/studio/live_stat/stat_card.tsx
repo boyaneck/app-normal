@@ -1,10 +1,18 @@
 "use-cient";
-import { live_stats_card_props } from "@/types/live";
+import { live_stats_card_props, post_live_stats_props } from "@/types/live";
 import { DollarSign, MessageSquare, Repeat } from "lucide-react";
 import { forwardRef } from "react";
 
+interface object_props {
+  title: string;
+  value: number | undefined | string;
+  unit: string;
+}
+
+type weekley_avg_type = [string, object_props];
+
 interface props {
-  live_stats_card: live_stats_card_props;
+  live_stats_card: weekley_avg_type;
   stat_card_ref: React.RefObject<HTMLDivElement>;
 }
 
@@ -17,7 +25,7 @@ const StatCard = forwardRef(({ live_stats_card, stat_card_ref }: props) => {
         <div className="flex items-center justify-between pb-4">
           {/* 제목 */}
           <h3 className="text-base font-semibold  text-gray-700">
-            {live_stats_card?.title}
+            {/* {live_stats_card?.title} */}
           </h3>
           <div className="p-2 rounded-full bg-amber-500/10 text-amber-500">
             {/* <stat.icon className="h-5 w-5" /> */}
@@ -30,7 +38,7 @@ const StatCard = forwardRef(({ live_stats_card, stat_card_ref }: props) => {
             className="text-4xl font-extrabold text-gray-900"
             ref={stat_card_ref}
           >
-            {live_stats_card?.value}
+            {/* {live_stats_card?.values} */}
           </div>
 
           <div className="mt-2 flex items-center justify-between">
