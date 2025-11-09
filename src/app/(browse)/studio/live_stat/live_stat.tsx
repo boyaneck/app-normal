@@ -1,12 +1,16 @@
 "use client";
-import { getPostLiveStats } from "@/api";
+import { getPostLiveStatsWeek } from "@/api";
 
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
 import StatCard from "./stat_card";
-import { post_live_stats_props } from "@/types/live";
+import {
+  avg_for_week_props,
+  post_live_stats_props,
+  weekly_live_stats_props,
+} from "@/types/live";
 import { DollarSign } from "lucide-react";
 import WeeklyTrendChart from "./weekly_trend_chart";
 import RecentNews from "./recent_new";
@@ -17,13 +21,21 @@ const LiveStat = () => {
 
   const { user } = useUserStore((state) => state);
 
-  const { data: post_live_stats } = useQuery<post_live_stats_props | null>({
+  const { data: post_live_stats_week } = useQuery<
+    post_live_stats_props[] | null,
+    Error,
+    avg_for_week_props
+  >({
     queryKey: [`post_live_stats`, user?.user_id],
-    queryFn: () => getPostLiveStats(user?.user_id),
+    queryFn: () => getPostLiveStatsWeek(user?.user_id),
     enabled: !!user?.user_id,
-    // staleTime: 1000 * 60 * 60,
+    select: (live_stats: post_live_stats_props[] | null) => {
+      const weekly = avgForWeek(live_stats);
+      //평균값이 가각 4개 항목으로 생김
+      return weekly;
+    },
   });
-
+  console.log("해당 유저의 방송 7일차 정보", post_live_stats_week);
   const detailStats = [
     {
       title: "채팅 전환율",
@@ -35,32 +47,36 @@ const LiveStat = () => {
       goalText: "총 시청자 대비",
       progressValue: 22.5, // 실제 참여율 값 (22.5%)
     },
-    {
-      title: "구독 전환율",
-      value: "1.8%",
-      trend: "▲ 0.2%",
-      trendColor: "text-pink-600",
-      barColor: "bg-pink-600", // Progress bar 색상
-      // icon: Repeat,
-      goalText: "일반 시청자 대비",
-      progressValue: 1.8, // 실제 전환율 값 (1.8%)
-    },
   ];
 
-  const resultStats = [
-    { title: "fund", value: "111" },
-    { title: "fund", value: "111" },
-    { title: "fund", value: "111" },
-    { title: "fund", value: "111" },
-  ];
-  // const resultStats = avgForWeek(post_live_stats);
+  const avg_week = {
+    avg_viewr: {
+      title: "평균 시청자 수 ",
+      value: post_live_stats_week?.avg_viewer,
+      unit: "명",
+    },
+    peak_viewer: {
+      title: "최고 시청자 수 ",
+      value: post_live_stats_week?.peak_viewer,
+      unit: "명",
+    },
+    into_chat_rate: {
+      title: "채팅 전환율",
+      value: post_live_stats_week?.into_chat_rate,
+      unit: "%",
+    },
+    fund: { title: "후원금액", value: post_live_stats_week?.fund, unit: "원" },
+  };
+
+  Object.entries(avg_week).map((stat) => {
+    console.log("스탯돌리기", stat[0]);
+  });
   return (
-    // <div style={{ fontFamily: "sans-serif" }}>
     <div>
       <div className="flex flex-row gap-4 pb-2">
-        {resultStats?.map((stat) => (
+        {Object.entries(avg_week).map((stat) => (
           <StatCard
-            key={stat.title}
+            key={stat[0]}
             live_stats_card={stat}
             stat_card_ref={statCardRef}
           />
