@@ -9,8 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { LineChart as LineChartIcon, TrendingUp } from "lucide-react"; // LineChart 이름 충돌 방지
-import React, { forwardRef } from "react";
+import React, { forwardRef, RefObject } from "react";
 import { usePostLive } from "@/hooks/usePostLive";
+import { post_live_stats_props } from "@/types/live";
 
 // ----------------------------------------------------------------------
 // 1. 차트 데이터 (임시)
@@ -26,12 +27,13 @@ const MOCK_DATA = [
   { name: "월", 후원금액: 3490, 시청자: 4300 },
 ];
 
-const calculateWeekSum = (live_stat_arr) => {
-  if (!live_stat_arr || live_stat_arr.length === 0)
-    return { data: null, sum: [] };
-};
-
-const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
+interface props {
+  post_live_stats: post_live_stats_props[] | null | undefined;
+  stat_card_ref: RefObject<HTMLDivElement>;
+}
+const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
+  console.log("포스트 라이브 스탯", post_live_stats);
+  console.log("ref 확인하기", stat_card_ref.current);
   const { animateCount } = usePostLive();
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -70,12 +72,18 @@ const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
         "마우스 호버시생기는 데이터 확인하기",
         state.activePayload[0].payload
       );
-      animateCount(state.activePayload[0].payload);
+      const ref = stat_card_ref.current?.textContent;
+      const payload: post_live_stats_props = state.activePayload[0];
+      const post_live_obj = { payload, ref };
+      console.log("typeof ref의 타입을 알려줘", typeof ref);
+      animateCount(post_live_obj);
+      console.log("확인하기", post_live_stats);
     } else {
       chartMouseLeave(null);
     }
   };
   const chartMouseLeave = (val: null) => {};
+
   // MOCK_DATA를 기본값으로 설정
   return (
     <div
@@ -91,7 +99,8 @@ const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
 
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
-          data={data}
+          // data={MOCK_DATA}
+          data={post_live_stats}
           margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
           onMouseMove={chartMouseMove}
           onMouseLeave={() => chartMouseLeave(null)}
@@ -102,30 +111,26 @@ const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
             strokeOpacity={0.5}
           />
 
-          {/* dataKey="name"이 MOCK_DATA의 '화', '수', ...와 일치 */}
           <XAxis
-            dataKey="name"
+            dataKey="avg_viewer"
             stroke="#fff"
             padding={{ left: 10, right: 10 }}
             className="text-xs"
           />
 
-          {/* Y축의 도메인을 동적으로 설정하면 데이터 범위에 맞게 조정됩니다. */}
           <YAxis
             stroke="#fff"
             tickFormatter={(value) => value.toLocaleString()} // 1000 단위 콤마
             className="text-xs"
           />
 
-          {/* CustomTooltip을 content prop으로 전달 */}
           <Tooltip content={<CustomTooltip />} />
 
           <Legend wrapperStyle={{ paddingTop: "10px" }} />
 
-          {/* dataKey="후원금액"이 MOCK_DATA의 '후원금액' 키와 일치 */}
           <Line
             type="monotone"
-            dataKey="후원금액"
+            dataKey="fund"
             stroke="#F56565" // 빨간색 (후원)
             strokeWidth={3}
             activeDot={{
@@ -137,10 +142,9 @@ const WeeklyTrendChart = ({ data = MOCK_DATA }) => {
             dot={false}
           />
 
-          {/* dataKey="시청자"이 MOCK_DATA의 '시청자' 키와 일치 */}
           <Line
             type="monotone"
-            dataKey="시청자"
+            dataKey="all_viewer"
             stroke="#48BB78" // 녹색 (시청자)
             strokeWidth={3}
             activeDot={{

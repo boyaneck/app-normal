@@ -3,7 +3,7 @@ import { getPostLiveStatsWeek } from "@/api";
 
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useRef } from "react";
 
 import StatCard from "./stat_card";
 import {
@@ -17,11 +17,16 @@ import RecentNews from "./recent_new";
 import BriefRevenue from "./brief_revenue";
 import { usePostLive } from "@/hooks/usePostLive";
 const LiveStat = () => {
-  const { statCardRef, avgForWeek } = usePostLive();
+  const { avgForWeek } = usePostLive();
 
+  const postLiveStatCardRef = useRef<HTMLDivElement>(null);
+  console.log(
+    "최상위 컴포넌트에서 ,useref 확인하기",
+    postLiveStatCardRef.current?.textContent
+  );
   const { user } = useUserStore((state) => state);
 
-  const { data: post_live_stats_week } = useQuery<
+  const { data: avg_for_week } = useQuery<
     post_live_stats_props[] | null,
     Error,
     avg_for_week_props
@@ -35,7 +40,11 @@ const LiveStat = () => {
       return weekly;
     },
   });
-  console.log("해당 유저의 방송 7일차 정보", post_live_stats_week);
+  const { data: post_live_stats } = useQuery<post_live_stats_props[] | null>({
+    queryKey: [`post_live_stats`, user?.user_id],
+    queryFn: () => getPostLiveStatsWeek(user?.user_id),
+    enabled: !!user?.user_id,
+  });
   const detailStats = [
     {
       title: "채팅 전환율",
@@ -52,34 +61,33 @@ const LiveStat = () => {
   const avg_week = {
     avg_viewr: {
       title: "평균 시청자 수 ",
-      value: post_live_stats_week?.avg_viewer,
+      value: avg_for_week?.avg_viewer,
       unit: "명",
     },
     peak_viewer: {
       title: "최고 시청자 수 ",
-      value: post_live_stats_week?.peak_viewer,
+      value: avg_for_week?.peak_viewer,
       unit: "명",
     },
     into_chat_rate: {
       title: "채팅 전환율",
-      value: post_live_stats_week?.into_chat_rate,
+      value: avg_for_week?.into_chat_rate,
       unit: "%",
     },
-    fund: { title: "후원금액", value: post_live_stats_week?.fund, unit: "원" },
+    fund: { title: "후원금액", value: avg_for_week?.fund, unit: "원" },
   };
-
-  Object.entries(avg_week).map((stat) => {
-    console.log("스탯돌리기", stat[0]);
-  });
   return (
     <div>
-      <div className="flex flex-row gap-4 pb-2">
+      <div className="flex border border-red-400 flex-row gap-4 pb-2">
         {Object.entries(avg_week).map((stat) => (
-          <StatCard
-            key={stat[0]}
-            live_stats_card={stat}
-            stat_card_ref={statCardRef}
-          />
+          <span ref={postLiveStatCardRef}>
+            <StatCard key={stat[0]} live_stats_card={stat} />
+            {/* <StatCard
+              key={stat[0]}
+              live_stats_card={stat}
+              stat_card_ref={postLiveStatCardRef}
+            /> */}
+          </span>
         ))}
       </div>
       <div
@@ -88,7 +96,10 @@ const LiveStat = () => {
       grid grid-cols-1 md:grid-cols-2 justify-between 
       p-2 border border-yellow-300 gap-2`}
       >
-        <WeeklyTrendChart />
+        <WeeklyTrendChart
+          post_live_stats={post_live_stats}
+          stat_card_ref={postLiveStatCardRef}
+        />
         <RecentNews />
         <BriefRevenue />
         <div>새 컴포넌트</div>
