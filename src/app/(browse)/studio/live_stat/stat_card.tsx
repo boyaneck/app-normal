@@ -11,21 +11,11 @@ interface object_props {
 
 type weekley_avg_type = [string, object_props];
 
-// interface props {
-//   live_stats_card: weekley_avg_type;
-//   stat_card_ref: React.RefObject<HTMLDivElement>;
-// }
 interface props {
   live_stats_card: weekley_avg_type;
 }
-
 const StatCard = forwardRef(
-  (
-    // { live_stats_card, stat_card_ref }: props,
-    // ref: ForwardedRef<HTMLDivElement>
-    { live_stats_card }: props,
-    ref: ForwardedRef<HTMLDivElement>
-  ) => {
+  ({ live_stats_card }: props, ref: ForwardedRef<HTMLDivElement>) => {
     return (
       <>
         <div className="w-80 rounded-2xl border border-gray-100 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-xl">
@@ -41,10 +31,7 @@ const StatCard = forwardRef(
           </div>
 
           <div className="flex flex-col">
-            <div
-              className="text-4xl font-extrabold text-gray-900"
-              // ref={stat_card_ref}
-            >
+            <div className="text-4xl font-extrabold text-gray-900" ref={ref}>
               {live_stats_card[1]?.value}
             </div>
 
