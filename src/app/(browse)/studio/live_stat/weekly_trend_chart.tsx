@@ -70,11 +70,12 @@ const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
     if (state.activePayload && state.activePayload.length) {
       chartMouseLeave(state.activePayload[0].payload);
 
-      const ref = stat_card_ref.current?.textContent;
+      const ref = stat_card_ref.current;
       const payload: post_live_stats_props = state.activePayload[0];
       const post_live_obj = { payload, ref };
-      console.log("typeof ref의 타입을 알려줘", typeof ref);
+      console.log("typeof ref의 타입을 알려줘", ref);
       console.log("onmouse시 ref 데이터", stat_card_ref);
+      console.log("최종 payload 와 ref 데이터 확인하기", post_live_obj);
       animateCount(post_live_obj);
     } else {
       chartMouseLeave(null);
