@@ -68,15 +68,6 @@ interface props {
   ref: ref_store | null | undefined;
 }
 export const usePostLive = () => {
-  // const animateCount = ({
-  //   post_live_stats,
-  //   start,
-  //   end,
-  //   prefix,
-  //   suffix,
-  //   duration,
-  //   decimal,
-
   //PAYLOAD는 현재 그래프의 CURSOR 가 가르키는 날짜의 VALUE
   //ref는 현재 각가의 카드의 div
   const animateCount = (post_live_obj: props) => {
