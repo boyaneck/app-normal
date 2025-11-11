@@ -71,11 +71,6 @@ export const usePostLive = () => {
   //PAYLOAD는 현재 그래프의 CURSOR 가 가르키는 날짜의 VALUE
   //ref는 현재 각가의 카드의 div
   const animateCount = (post_live_obj: props) => {
-    console.log("데이터 확인하기", post_live_obj?.payload);
-    console.log(
-      "ref데이터들 각각 다 끄집어 내기 ",
-      post_live_obj?.ref?.peak_viewer?.textContent
-    );
     if (!post_live_obj?.ref) return;
     //현재 card의 데이터들
     const before_avg_viewer = post_live_obj.ref?.avg_viewer?.textContent;
