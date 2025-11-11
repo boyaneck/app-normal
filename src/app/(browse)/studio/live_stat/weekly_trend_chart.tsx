@@ -27,9 +27,10 @@ const MOCK_DATA = [
   { name: "월", 후원금액: 3490, 시청자: 4300 },
 ];
 
+type store = Record<string, HTMLDivElement | null>;
 interface props {
   post_live_stats: post_live_stats_props[] | null | undefined;
-  stat_card_ref: RefObject<HTMLDivElement>;
+  stat_card_ref: React.RefObject<store>;
 }
 const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
   console.log("포스트 라이브 스탯", post_live_stats);
@@ -68,16 +69,14 @@ const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
   const chartMouseMove = (state: any) => {
     if (state.activePayload && state.activePayload.length) {
       chartMouseLeave(state.activePayload[0].payload);
-      console.log(
-        "마우스 호버시생기는 데이터 확인하기",
-        state.activePayload[0].payload
-      );
-      const ref = stat_card_ref.current?.textContent;
+
+      const ref = stat_card_ref.current;
       const payload: post_live_stats_props = state.activePayload[0];
       const post_live_obj = { payload, ref };
-      console.log("typeof ref의 타입을 알려줘", typeof ref);
+      console.log("typeof ref의 타입을 알려줘", ref);
+      console.log("onmouse시 ref 데이터", stat_card_ref);
+      console.log("최종 payload 와 ref 데이터 확인하기", post_live_obj);
       animateCount(post_live_obj);
-      console.log("확인하기", post_live_stats);
     } else {
       chartMouseLeave(null);
     }
