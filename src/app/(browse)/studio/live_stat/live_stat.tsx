@@ -54,7 +54,7 @@ const LiveStat = () => {
   ];
 
   const avg_week = {
-    avg_viewr: {
+    avg_viewer: {
       title: "평균 시청자 수 ",
       value: avg_for_week?.avg_viewer,
       unit: "명",
@@ -74,7 +74,6 @@ const LiveStat = () => {
   type ref_store = Record<string, HTMLDivElement | null>;
   // const postLiveStatCardRef = useRef<HTMLDivElement>(null);
   const postLiveStatCardRef = useRef<ref_store>({});
-  console.log("상위 컴포넌트에서 해당 useRef확인", postLiveStatCardRef);
   return (
     <div>
       <div className="flex border border-red-400 flex-row gap-4 pb-2">
