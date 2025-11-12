@@ -44,7 +44,6 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
   return userInfoLive;
 };
 export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
-  console.log("방송통계 api 실행", room_name);
   const { data: post_live_stats, error } = await supabaseForClient
     .from("post_live_stats")
     .select("*")
@@ -57,7 +56,6 @@ export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
     throw new Error(error.message);
   }
 
-  console.log("방송이 끝난 후 통계를 가져오는 통계 API", post_live_stats);
   return post_live_stats ? post_live_stats : null;
 };
 

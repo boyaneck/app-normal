@@ -15,6 +15,7 @@ export const ChatInput = ({
   heartAnimationEnd,
   current_host_nickname,
   message,
+  current_host_id,
   set_message,
 }: chat_input_components_props) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,8 +63,10 @@ export const ChatInput = ({
         ❤️
       </button>
       <span className="flex justify-center items-center ">
-        <PaymentPage current_host_nickname={current_host_nickname} 
-                      curren_hoist_id={current_host}/>
+        <PaymentPage
+          current_host_nickname={current_host_nickname}
+          current_host_id={current_host_id}
+        />
       </span>
     </span>
   );
