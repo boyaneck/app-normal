@@ -9,14 +9,13 @@ interface Props {
 
 const layout = ({ children }: Props) => {
   return (
-    <div className="pt-10 border border-emerald-100  ">
+    <>
       <Navbar />
-      sssss
-      <div className="grid border border-purple">
-        {/* <Sidebar /> */}eeeee
+      <div className=" mt-20 bg-red-100 h-[calc(100vh-5rem)]">
+        {/* <Sidebar /> */}
         {children}
       </div>
-    </div>
+    </>
   );
 };
 
