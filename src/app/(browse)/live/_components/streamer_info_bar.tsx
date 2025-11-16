@@ -29,7 +29,7 @@ const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
           {
             // "opacity-100": show,
             "opacity-0": !show,
-            "animate-raiseUpBar": show,
+            "animate-raise-up-bar": show,
           }
         )}
       >
