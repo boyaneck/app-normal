@@ -27,9 +27,11 @@ export default function Home() {
         collapsed ? "ml-[150px] " : " ml-[260px] "
       )}
     >
-      <Main_banner />
-      <Screen />
-      <Button />
+      <div className="h-screen">
+        <Main_banner />
+        <Screen />
+        <Button />
+      </div>
     </div>
   );
 }

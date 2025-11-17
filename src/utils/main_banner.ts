@@ -1,6 +1,6 @@
-export const MAIN_BANNER_SLIDE_DURATION = 2000;
+export const MAIN_BANNER_SLIDE_DURATION = 4000;
 export const MAIN_BANNER_VIDEO_DURATION = 240;
-
+export const MAIN_BANNER_VISIBLE_COUNT = 4;
 export const LIVE_STREAMS = [
   {
     id: 1,
