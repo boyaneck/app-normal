@@ -23,20 +23,17 @@ const Main_banner = () => {
   const [progres_key, set_progress_key] = useState(0);
   const [carousel_start_idx, set_carousel_start_idx] = useState<number>(0);
   const [control_visible, set_control_visible] = useState<boolean>(false);
-  const setCarouselSlide = useCallback(
-    (idx: number) => {
-      if (idx >= carousel_start_idx + MAIN_BANNER_VISIBLE_COUNT) {
-        set_carousel_start_idx(idx - MAIN_BANNER_VISIBLE_COUNT + 1);
-      } else if (idx < carousel_start_idx) {
-        set_carousel_start_idx(idx);
-      } else if (idx === 0) {
-        set_carousel_start_idx(0);
-      }
+  const setCarouselSlide = useCallback((idx: number) => {
+    if (idx >= carousel_start_idx + MAIN_BANNER_VISIBLE_COUNT) {
+      set_carousel_start_idx(idx - MAIN_BANNER_VISIBLE_COUNT + 1);
+    } else if (idx < carousel_start_idx) {
+      set_carousel_start_idx(idx);
+    } else if (idx === 0) {
+      set_carousel_start_idx(0);
+    }
 
-      return;
-    },
-    [carousel_start_idx]
-  );
+    return;
+  }, []);
   const formatTime = (seconds: number): string => {
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
