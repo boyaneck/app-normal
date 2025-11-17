@@ -1,13 +1,48 @@
 import { createIngress, getLiveUser } from "@/api";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Video from "../../live/_components/video";
 import { useViewerToken } from "@/hooks/useViewerToken";
 import { useQuery } from "@tanstack/react-query";
+import { User } from "@/types/user";
+import {
+  LIVE_STREAMS,
+  MAIN_BANNER_SLIDE_DURATION,
+  MAIN_BANNER_VIDEO_DURATION,
+  MAIN_BANNER_VISIBLE_COUNT,
+  UPCOMING_VIDEOS,
+} from "@/utils/main_banner";
 
 const Main_banner = () => {
   const [live_user, set_live_user] = useState<User[]>([]);
+  const [curr_idx, set_curr_idx] = useState<number>(0);
+  const [slider_stop, set_slider_stop] = useState<boolean>(false);
+  const [video_time, set_video_time] = useState<number | undefined>(0);
+  const [video_play, set_video_play] = useState<boolean>(true);
+  const [progres_key, set_progress_key] = useState(0);
+  const [carousel_start_idx, set_carousel_start_idx] = useState<number>(0);
+  const [control_visible, set_control_visible] = useState<boolean>(false);
+  const setCarouselSlide = useCallback((idx: number) => {
+    if (idx >= carousel_start_idx + MAIN_BANNER_VISIBLE_COUNT) {
+      set_carousel_start_idx(idx - MAIN_BANNER_VISIBLE_COUNT + 1);
+    } else if (idx < carousel_start_idx) {
+      set_carousel_start_idx(idx);
+    } else if (idx === 0) {
+      set_carousel_start_idx(0);
+    }
+
+    return;
+  }, []);
+  const formatTime = (seconds: number): string => {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+  };
+  const SLIDER_ITEMS = [...LIVE_STREAMS, ...UPCOMING_VIDEOS];
+
+  const curr_items = SLIDER_ITEMS[curr_idx];
+  const all_items = SLIDER_ITEMS.length;
   const { user } = useUserStore((state) => state);
   const {
     data: LiveUser,
@@ -20,35 +55,100 @@ const Main_banner = () => {
 
   const { token } = useViewerToken("Guest");
 
+  //미리 보기 라이브 영상 2초로 설정,2초마다 슬라이드 됨
+  useEffect(() => {
+    if (slider_stop || all_items === 0) return;
+
+    const timeout = setTimeout(() => {
+      set_curr_idx((prev) => (prev + 1) % all_items);
+    }, MAIN_BANNER_SLIDE_DURATION);
+
+    return () => clearTimeout(timeout);
+  }, [curr_idx, slider_stop, all_items]);
+
+  useEffect(() => {
+    if (video_time || curr_items.is_live) {
+      set_video_time(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      set_video_time((prev) => {
+        if (prev !== undefined) {
+          const next_time = prev + 1;
+          if (next_time >= MAIN_BANNER_VIDEO_DURATION) {
+            return 0;
+          }
+        }
+      });
+    }, 1000);
+  }, [video_play, curr_idx, curr_items.is_live]);
+
+  const handle_silde_click = (idx: number) => {};
+  const mouseEnter = useCallback(() => set_slider_stop(false), []);
+  const mouseLeave = useCallback(() => set_slider_stop(false), []);
   return (
     <div
-      className="h-[500px] border border-green-500"
-      onMouseOver={() => {
-        setTimeout(() => {}, 1000);
-      }}
+      className="relative h-1/2 border border-orange-400-500 rounded-xl overflow-hidden
+     "
+      onMouseEnter={mouseEnter}
+      onMouseLeave={mouseLeave}
     >
-      Main_bannersss
-      {/* {token && (
-      \
-      
-        <LiveKitRoom
-          video={true}
-          audio={true}
-          token={token}
-          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-          // room={room}
-          className="border border-purple-500 grid grid-cols-1 lg:gap-y-0 lg:grid-cols-3
-          xl:grid-cols-3 2xl:grid-cols-6 h-full"
-        >
-          <div className="space-y-4 col-span-1 lg:col-span-2 xl:col-span-2 2xl:col-span-5 lg:overflow-y-auto hidden-scrollbar">
-            <Video
-              host_name={current_host_nickname}
-              host_identity={current_host_id}
-              token={token}
-            />
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
+        style={{
+          backgroundImage: `url(${curr_items.thumbnailUrl})`,
+          filter: "brightness(0.9)",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent "></div>
+        메인 배너 화면이 들어가는 곳
+      </div>
+
+      {/* 여기다가 onmouse를 해야하나? */}
+      <div
+        className="relative
+      z-10 h-full w-full p-8 flex flex-col justify-between text-white border border-black "
+      >
+        그렇고 말구
+        <div className=" w-full border border-sky-800 space-x-2">
+          <h2 className="text-2xl font-black">
+            현재 스트림{curr_items.is_live ? "라이브" : "예정된"}
+          </h2>
+          {/*  */}
+          <div
+            className="flex space-x-3 text-sm text-gray-400 transition-transform duration-500 ease-in-out
+        "
+          >
+            {SLIDER_ITEMS.map((item, idx) => {
+              const is_active = idx === curr_idx;
+              return (
+                <div
+                  key={item.id}
+                  className={`relative duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
+                    is_active
+                      ? `opacity-100 border-2 border-white`
+                      : `opacity-70 border-2 border-transparent`
+                  }`}
+                >
+                  <img
+                    src={item.thumbnailUrl}
+                    alt={item.title}
+                    className="w-full rounded-lg object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-500 overflow-hidden">
+                    <div
+                      className={` h-full bg-white ${
+                        is_active ? "animate-slide-progress" : "w-0"
+                      }`}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+            <span className="">채널 이름</span>
           </div>
-        </LiveKitRoom>
-      )} */}
+        </div>
+      </div>
     </div>
   );
 };

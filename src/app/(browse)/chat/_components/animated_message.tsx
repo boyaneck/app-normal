@@ -46,7 +46,7 @@ export const AnimatedMessage = ({
         <div
           className={
             is_visible
-              ? "animate-fadeOutUp pt-1 text-sm text-gray-500"
+              ? "animate-fade-out-up pt-1 text-sm text-gray-500"
               : "pt-1 text-sm text-gray-500"
           }
         >

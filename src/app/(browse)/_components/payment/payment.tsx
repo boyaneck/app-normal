@@ -152,7 +152,7 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
         className="bg-green-500 hover:bg-green-700 text-white font-bold rounded"
         onClick={openModal}
       >
-        <span className="hover:animate-moneyFlap">💰</span>
+        <span className="hover:animate-money-flap">💰</span>
       </button>
 
       {is_modal_open && (
