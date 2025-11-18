@@ -60,7 +60,10 @@ const Main_banner = () => {
     if (slider_stop || all_items === 0) return;
 
     const timeout = setTimeout(() => {
+      const new_idx = (curr_idx + 1) % all_items;
       set_curr_idx((prev) => (prev + 1) % all_items);
+      set_progress_key((prev) => prev + 1); // 프로그레스 바 애니메이션 리셋
+      set_carousel_start_idx(new_idx); // 캐러셀 위치 업데이트
     }, MAIN_BANNER_SLIDE_DURATION);
 
     return () => clearTimeout(timeout);
@@ -86,6 +89,7 @@ const Main_banner = () => {
   const handle_silde_click = (idx: number) => {};
   const mouseEnter = useCallback(() => set_slider_stop(false), []);
   const mouseLeave = useCallback(() => set_slider_stop(false), []);
+  const THUMBNAIL_WIDTH_PLUS_MARGIN = 140;
   return (
     <div
       className="relative h-1/2 border border-orange-400-500 rounded-xl overflow-hidden
@@ -110,7 +114,14 @@ const Main_banner = () => {
       z-10 h-full w-full p-8 flex flex-col justify-between text-white border border-black "
       >
         그렇고 말구
-        <div className=" w-full border border-sky-800 space-x-2">
+        <div
+          className=" w-full border border-sky-800 space-x-2"
+          style={{
+            maxWidth: `${
+              MAIN_BANNER_VISIBLE_COUNT * THUMBNAIL_WIDTH_PLUS_MARGIN
+            }`,
+          }}
+        >
           <h2 className="text-2xl font-black">
             현재 스트림{curr_items.is_live ? "라이브" : "예정된"}
           </h2>
@@ -118,6 +129,13 @@ const Main_banner = () => {
           <div
             className="flex space-x-3 text-sm text-gray-400 transition-transform duration-500 ease-in-out
         "
+            style={{
+              transform: `translateX(-${
+                carousel_start_idx * THUMBNAIL_WIDTH_PLUS_MARGIN
+              }px;
+})`,
+              width: `${all_items * THUMBNAIL_WIDTH_PLUS_MARGIN}`,
+            }}
           >
             {SLIDER_ITEMS.map((item, idx) => {
               const is_active = idx === curr_idx;
