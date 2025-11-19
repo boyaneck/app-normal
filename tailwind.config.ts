@@ -1,3 +1,4 @@
+import { transform } from "next/dist/build/swc";
 import { MdWidthFull } from "react-icons/md";
 import type { Config } from "tailwindcss";
 module.exports = {
@@ -13,6 +14,10 @@ module.exports = {
         transitionBar: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
       },
       keyframes: {
+        "slide-animation-down": {
+          "0%": { transform: "translateY(0)", oopacity: "1" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
+        },
         "slide-progress-animation": {
           from: { width: "0%" },
           to: { width: "100%" },
@@ -80,6 +85,7 @@ module.exports = {
         },
       },
       animation: {
+        "slide-out-down": "slide-out-down-animation 0.3s ease-in-out forwards",
         "slide-progress": "slide-progress-animation 4000ms linear forwards",
         slideIn: "slideInFromRight 0.3s ease-out forwards",
         slideOut: "slideOutToRight 0.3s ease-in forwards",

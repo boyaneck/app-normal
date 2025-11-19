@@ -23,15 +23,12 @@ export default function Home() {
   return (
     <div
       className={cn(
-        "grid transition-all duration-300 ease-in-out bg-grey-50 ,",
-        collapsed ? "ml-[150px] " : " ml-[260px] "
+        "grid transition-all duration-300 ease-in-out mr-6 ",
+        collapsed ? "ml-[160px]" : " ml-[210px] "
       )}
     >
-      <div className="h-screen">
-        <Main_banner />
-        <Screen />
-        <Button />
-      </div>
+      <Main_banner />
+      <Screen />
     </div>
   );
 }
