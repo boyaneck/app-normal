@@ -68,112 +68,31 @@ const Screen = () => {
   };
 
   const user_email = user?.user_email === undefined ? "" : user.user_email;
-  const follow = (target_user_email: string, target_user_id: string) => {
-    followMutation.mutate({
-      current_user_email: user_email,
-      current_user_id,
-      target_user_email,
-      target_user_id,
-    });
-    alert("팔로우가 되었습니다");
-  };
+  // const follow = (target_user_email: string, target_user_id: string) => {
+  //   followMutation.mutate({
+  //     current_user_email: user_email,
+  //     current_user_id,
+  //     target_user_email,
+  //     target_user_id,
+  //   });
+  //   alert("팔로우가 되었습니다");
+  // };
 
   return (
-    // <div className="grid grid-cols-4 gap-2">
-    //   {liveuser.length > 0 ? (
-    //     liveuser.map((user) => (
-    //       <div
-    //         key={user.id}
-    //         className="p-4 bg-white rounded-lg shadow-lg"
-    //         onClick={() => {
-    //           onHandlerRouter(user.id, user.user_nickname);
-    //           alert(user.user_nickname);
-    //         }}
-    //       >
-    //         {/* 스크린 컨테이너 */}
-    //         <div
-    //           className="relative h-40 mb-4 rounded-md flex items-center justify-center"
-    //           onClick={() => {
-    //             follow(user.user_email, user.id);
-    //           }}
-    //           onMouseEnter={(e) => {
-    //             setTimeout(() => {
-    //               callit(user.id, user.user_nickname, e);
-    //             }, 1000);
-    //           }}
-    //           onMouseLeave={() => {
-    //             setHost_id("");
-    //             setHost_nickname("");
-    //             setChkPreviewForToken("");
-    //             alert("마우스 때기 ");
-    //           }}
-    //         >
-    //           {token === chkPreviewForToken && user.id === host_id && (
-    //             <div className="absolute top-0 left-0 w-full h-full">
-    //               {/* span 대신 div 사용 */}
-    //               <div className="absolute top-0 left-0 w-full h-full border border-red-400">
-    //                 {/* 자식 div에 border 지정 */}
-    //                 <LiveKitRoom
-    //                   video={true}
-    //                   audio={true}
-    //                   token={token}
-    //                   serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-    //                 >
-    //                   <Video
-    //                     host_name={host_nickname}
-    //                     host_identity={host_id}
-    //                     token={chkPreviewForToken}
-    //                   />
-    //                 </LiveKitRoom>
-    //               </div>
-    //             </div>
-    //           )}
-    //           <span className="absolute top-0 left-0 text-xl font-semibold text-gray-700 border border-red-500">
-    //             aaa
-    //           </span>
-    //         </div>
-    //         <div className="border border-green-400">제목</div>
-
-    //         {/* 아바타와 제목이 왼쪽 정렬 */}
-    //         <div className="flex flex-col items-start">
-    //           <div className="flex items-center mb-2">
-    //             {user.avatar_url && (
-    //               <img
-    //                 src={user.avatar_url}
-    //                 alt={`${user.name}'s avatar`}
-    //                 className="w-12 h-12 rounded-full mr-2"
-    //               />
-    //             )}
-    //             <h3 className="text-lg font-semibold">{user.user_nickname}</h3>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     ))
-    //   ) : (
-    //     <span>No users found</span>
-    //   )}
-    // </div>
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-4 gap-4">
       {liveuser.length > 0 ? (
         liveuser.map((user) => (
+          //가장 큰 div
           <div
             key={user.id}
-            // h-80: 카드의 최소/고정 높이를 명시적으로 설정하여 group-hover:inset-0의 기준을 제공합니다.
-            className="p-4 bg-white rounded-lg shadow-lg relative group overflow-hidden h-80"
+            className="p-4 bg-white rounded-lg shadow-lg"
             onClick={() => {
               onHandlerRouter(user.id, user.user_nickname);
-              alert(user.user_nickname);
+              // alert(user.user_nickname);
             }}
           >
-            {/* 스크린 컨테이너 (비디오 영역) */}
             <div
-              className="relative h-40 rounded-md flex items-center justify-center 
-                     transition-all duration-300 ease-in-out 
-                     // group-hover 시 h-80을 꽉 채우도록 inset-0 적용
-                     group-hover:absolute group-hover:inset-0 group-hover:z-10"
-              onClick={() => {
-                follow(user.user_email, user.id);
-              }}
+              className="relative h-40 mb-4 rounded-md flex items-center justify-center"
               onMouseEnter={(e) => {
                 setTimeout(() => {
                   callit(user.id, user.user_nickname, e);
@@ -183,52 +102,42 @@ const Screen = () => {
                 setHost_id("");
                 setHost_nickname("");
                 setChkPreviewForToken("");
-                alert("마우스 때기 ");
               }}
             >
               {token === chkPreviewForToken && user.id === host_id && (
-                // 비디오 래퍼도 w-full h-full 유지
-                <div className="absolute top-0 left-0 w-full h-full">
-                  <div className="absolute top-0 left-0 w-full h-full border border-red-400">
-                    <LiveKitRoom
-                      video={true}
-                      audio={true}
-                      token={token}
-                      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-                    >
-                      <Video
-                        host_name={host_nickname}
-                        host_identity={host_id}
-                        token={chkPreviewForToken}
-                      />
-                    </LiveKitRoom>
-                  </div>
+                <div className="">
+                  {/* span 대신 div 사용 */}
+                  {/* 자식 div에 border 지정 */}
+                  <LiveKitRoom
+                    video={true}
+                    audio={true}
+                    token={token}
+                    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+                  >
+                    <Video
+                      host_name={host_nickname}
+                      host_identity={host_id}
+                      token={chkPreviewForToken}
+                    />
+                  </LiveKitRoom>
                 </div>
               )}
-              {/* 비디오가 확장되어도 'aaa'가 보이도록 z-index 유지 */}
-              <span className="absolute top-0 left-0 text-xl font-semibold text-gray-700 border border-red-500 z-20">
-                aaa
-              </span>
             </div>
+            <div className="border border-green-400">제목</div>
 
-            {/* 제목 컨테이너 (group-hover 시 아래로 사라짐) */}
-            <div className="relative z-0 mt-4 transition-transform duration-300 ease-in-out group-hover:translate-y-full group-hover:opacity-0">
-              <div className="border border-green-400">제목</div>
-
-              {/* 아바타와 제목이 왼쪽 정렬 */}
-              <div className="flex flex-col items-start">
-                <div className="flex items-center mb-2">
-                  {user.avatar_url && (
-                    <img
-                      src={user.avatar_url}
-                      alt={`${user.name}'s avatar`}
-                      className="w-12 h-12 rounded-full mr-2"
-                    />
-                  )}
-                  <h3 className="text-lg font-semibold">
-                    {user.user_nickname}
-                  </h3>
-                </div>
+            {/* 아바타와 제목이 왼쪽 정렬 */}
+            <div className="flex flex-col items-start">
+              <div className="flex items-center mb-2">
+                {user.avatar_url && (
+                  <img
+                    src={user.avatar_url}
+                    alt={`${user.name}'s avatar`}
+                    className="w-12 h-12 rounded-full mr-2"
+                  />
+                )}
+                <h3 className="text-lg font-semibold">
+                  {user.user_nickname} 내용 들어갈 곳
+                </h3>
               </div>
             </div>
           </div>

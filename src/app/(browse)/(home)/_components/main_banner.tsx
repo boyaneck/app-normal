@@ -61,13 +61,17 @@ const Main_banner = () => {
 
     const timeout = setTimeout(() => {
       const new_idx = (curr_idx + 1) % all_items;
-      set_curr_idx((prev) => (prev + 1) % all_items);
-      set_progress_key((prev) => prev + 1); // 프로그레스 바 애니메이션 리셋
-      set_carousel_start_idx(new_idx); // 캐러셀 위치 업데이트
+      set_curr_idx(new_idx);
+      set_progress_key((prev) => prev + 1);
+      if (new_idx === 0) {
+        set_carousel_start_idx(0);
+      } else {
+        set_carousel_start_idx(new_idx);
+      }
     }, MAIN_BANNER_SLIDE_DURATION);
 
     return () => clearTimeout(timeout);
-  }, [curr_idx, slider_stop, all_items]);
+  }, [curr_idx, all_items]);
 
   useEffect(() => {
     if (video_time || curr_items.is_live) {
@@ -92,7 +96,7 @@ const Main_banner = () => {
   const THUMBNAIL_WIDTH_PLUS_MARGIN = 140;
   return (
     <div
-      className="relative h-1/2 border border-orange-400-500 rounded-xl overflow-hidden
+      className="relative h-full border rounded-xl overflow-hidden
      "
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
@@ -100,7 +104,7 @@ const Main_banner = () => {
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
         style={{
-          backgroundImage: `url(${curr_items.thumbnailUrl})`,
+          backgroundImage: `url(${curr_items.thumb_url})`,
           filter: "brightness(0.9)",
         }}
       >
@@ -113,13 +117,16 @@ const Main_banner = () => {
         className="relative
       z-10 h-full w-full p-8 flex flex-col justify-between text-white border border-black "
       >
-        그렇고 말구
+        <div>제목</div>
+        <div>로고 , 유튜버 이름</div>
+        <div>시청자수</div>
+        <div>시청자수</div>
         <div
-          className=" w-full border border-sky-800 space-x-2"
+          className=" w-full  space-x-2 overflow-hidden"
           style={{
             maxWidth: `${
               MAIN_BANNER_VISIBLE_COUNT * THUMBNAIL_WIDTH_PLUS_MARGIN
-            }`,
+            }px`,
           }}
         >
           <h2 className="text-2xl font-black">
@@ -132,9 +139,8 @@ const Main_banner = () => {
             style={{
               transform: `translateX(-${
                 carousel_start_idx * THUMBNAIL_WIDTH_PLUS_MARGIN
-              }px;
-})`,
-              width: `${all_items * THUMBNAIL_WIDTH_PLUS_MARGIN}`,
+              }px)`,
+              width: `${all_items * THUMBNAIL_WIDTH_PLUS_MARGIN}px`,
             }}
           >
             {SLIDER_ITEMS.map((item, idx) => {
@@ -142,16 +148,16 @@ const Main_banner = () => {
               return (
                 <div
                   key={item.id}
-                  className={`relative duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
+                  className={`relative w-32 flex-shrink-0 duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
                     is_active
                       ? `opacity-100 border-2 border-white`
-                      : `opacity-70 border-2 border-transparent`
+                      : `opacity-25 border-2 border-transparent`
                   }`}
                 >
                   <img
-                    src={item.thumbnailUrl}
+                    src={item.thumb_url}
                     alt={item.title}
-                    className="w-full rounded-lg object-cover"
+                    className="w-full h-full placeholder:rounded-lg object-cover"
                   />
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-500 overflow-hidden">
                     <div
@@ -163,7 +169,6 @@ const Main_banner = () => {
                 </div>
               );
             })}
-            <span className="">채널 이름</span>
           </div>
         </div>
       </div>
