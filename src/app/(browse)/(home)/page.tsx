@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <div
       className={cn(
-        "grid transition-all duration-300 ease-in-out mr-6 ",
+        "grid transition-all duration-300 ease-in-out mr-6 pt-6 ",
         collapsed ? "ml-[160px]" : " ml-[210px] "
       )}
     >
