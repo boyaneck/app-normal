@@ -129,7 +129,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         h-full w-full 
         relative 
          transition-all duration-300
-         border border-black rounded-xl`,
+         rounded-xl`,
         {
           " animate-curtainUp": is_info_active,
           "animate-curtainDown": !is_info_active,

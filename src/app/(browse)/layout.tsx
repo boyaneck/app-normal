@@ -11,7 +11,7 @@ const layout = ({ children }: Props) => {
   return (
     <>
       <Navbar />
-      <div className=" mt-20 bg-red-100 h-[calc(100vh-5rem)]">
+      <div className=" mt-20  h-[calc(100vh-5rem)]">
         <Sidebar />
         {children}
       </div>

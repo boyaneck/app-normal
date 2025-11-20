@@ -79,16 +79,15 @@ const Screen = () => {
   // };
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {liveuser.length > 0 ? (
         liveuser.map((user) => (
           //가장 큰 div
           <div
             key={user.id}
-            className="p-4 bg-white rounded-lg shadow-lg"
+            className="p-4 bg-white rounded-lg shadow-lg transition-all duraion-500 ease-in-out"
             onClick={() => {
               onHandlerRouter(user.id, user.user_nickname);
-              // alert(user.user_nickname);
             }}
           >
             <div
@@ -105,7 +104,7 @@ const Screen = () => {
               }}
             >
               {token === chkPreviewForToken && user.id === host_id && (
-                <div className="">
+                <>
                   {/* span 대신 div 사용 */}
                   {/* 자식 div에 border 지정 */}
                   <LiveKitRoom
@@ -120,24 +119,21 @@ const Screen = () => {
                       token={chkPreviewForToken}
                     />
                   </LiveKitRoom>
-                </div>
+                </>
               )}
             </div>
-            <div className="border border-green-400">제목</div>
-
-            {/* 아바타와 제목이 왼쪽 정렬 */}
-            <div className="flex flex-col items-start">
-              <div className="flex items-center mb-2">
-                {user.avatar_url && (
-                  <img
-                    src={user.avatar_url}
-                    alt={`${user.name}'s avatar`}
-                    className="w-12 h-12 rounded-full mr-2"
-                  />
-                )}
-                <h3 className="text-lg font-semibold">
-                  {user.user_nickname} 내용 들어갈 곳
-                </h3>
+            <div>
+              <div className="flex space-x-3">
+                <img
+                  className="object-cover w-8 h-8 rounded-full"
+                  src="https://plus.unsplash.com/premium_photo-1691095182210-a1b3c46a31d6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyfHx8ZW58MHx8fHx8"
+                ></img>
+                <span>
+                  <div className="font-bold">제목</div>
+                  <div className="">아이디</div>
+                  <span>조회수</span>
+                  <span className="ml-3">년수</span>
+                </span>
               </div>
             </div>
           </div>
