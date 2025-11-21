@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
 import { User } from "@/types/user";
 
-const Screen = () => {
+const LiveList = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
   const { user } = useUserStore((state) => state);
   const current_user_email =
@@ -85,23 +85,33 @@ const Screen = () => {
           //가장 큰 div
           <div
             key={user.id}
-            className="p-4 bg-white rounded-lg shadow-lg transition-all duraion-500 ease-in-out"
+            className={`
+             
+              relative 
+              group 
+              p-4 rounded-lg shadow-lg 
+              transition-all duraion-500 ease-in-out
+              overflow-hidden
+              group-hover:border-gray-500
+                group-hover:shadow-2xl
+              `}
             onClick={() => {
               onHandlerRouter(user.id, user.user_nickname);
             }}
           >
             <div
-              className="relative h-40 mb-4 rounded-md flex items-center justify-center"
-              onMouseEnter={(e) => {
-                setTimeout(() => {
-                  callit(user.id, user.user_nickname, e);
-                }, 1000);
-              }}
-              onMouseLeave={() => {
-                setHost_id("");
-                setHost_nickname("");
-                setChkPreviewForToken("");
-              }}
+              className={`
+                group
+                bg-transparent
+                flex items-center justify-center
+                h-40 mb-4 rounded-md
+                transition-all duration-500 ease-in-out
+                group-hover:scale-y-[1.2]
+                group-hover:scale-x-[1.2]
+                group-hover:h-full
+                group-hover:w-full
+                
+                `}
             >
               {token === chkPreviewForToken && user.id === host_id && (
                 <>
@@ -123,7 +133,16 @@ const Screen = () => {
               )}
             </div>
             <div>
-              <div className="flex space-x-3">
+              <div
+                className={`
+                flex space-x-3
+                transition-all duration-500 
+                group-hover:translate-y-full group-hover:opacity-0
+                group-hover:border-red-500
+                hover:cursor-pointer
+                
+                `}
+              >
                 <img
                   className="object-cover w-8 h-8 rounded-full"
                   src="https://plus.unsplash.com/premium_photo-1691095182210-a1b3c46a31d6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyfHx8ZW58MHx8fHx8"
@@ -145,4 +164,4 @@ const Screen = () => {
   );
 };
 
-export default Screen;
+export default LiveList;

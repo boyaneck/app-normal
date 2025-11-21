@@ -1,8 +1,6 @@
-import { createIngress, getLiveUser } from "@/api";
+import { getLiveUser } from "@/api";
 import useUserStore from "@/store/user";
-import { LiveKitRoom } from "@livekit/components-react";
-import React, { useCallback, useEffect, useState } from "react";
-import Video from "../../live/_components/video";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useViewerToken } from "@/hooks/useViewerToken";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
@@ -43,6 +41,25 @@ const Main_banner = () => {
 
   const curr_items = SLIDER_ITEMS[curr_idx];
   const all_items = SLIDER_ITEMS.length;
+  const [banner_title_in, set_banner_title_in] = useState<boolean>(true);
+  const [banner_title_out, set_banner_title_out] = useState<boolean>(true);
+  useEffect(() => {
+    set_banner_title_in(true);
+    const timer = setTimeout(() => {
+      set_banner_title_in(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [curr_idx]);
+  const bannerTitleTrans = useMemo(() => {
+    if (banner_title_out) {
+      return `translate-y-[-100%] opacity-0`;
+    }
+    if (banner_title_in) {
+      return `translate-y-[100%] opacity-0`;
+    }
+
+    return `translate-y-0 opacity-100`;
+  }, [banner_title_out, banner_title_in]);
   const { user } = useUserStore((state) => state);
   const {
     data: LiveUser,
@@ -58,10 +75,18 @@ const Main_banner = () => {
   //미리 보기 라이브 영상 2초로 설정,2초마다 슬라이드 됨
   useEffect(() => {
     if (slider_stop || all_items === 0) return;
-
+    const EXIT_DELAY = MAIN_BANNER_SLIDE_DURATION - 300;
+    const exit_timer = setTimeout(() => {
+      set_banner_title_out(true);
+    }, EXIT_DELAY);
     const timeout = setTimeout(() => {
       const new_idx = (curr_idx + 1) % all_items;
       set_curr_idx(new_idx);
+
+      set_banner_title_out(false);
+      const sss = setTimeout(() => {
+        set_banner_title_out(false);
+      }, 2000);
       set_progress_key((prev) => prev + 1);
       if (new_idx === 0) {
         set_carousel_start_idx(0);
@@ -78,16 +103,16 @@ const Main_banner = () => {
       set_video_time(0);
       return;
     }
-    const interval = setInterval(() => {
-      set_video_time((prev) => {
-        if (prev !== undefined) {
-          const next_time = prev + 1;
-          if (next_time >= MAIN_BANNER_VIDEO_DURATION) {
-            return 0;
-          }
-        }
-      });
-    }, 1000);
+    // const interval = setInterval(() => {
+    //   set_video_time((prev) => {
+    //     if (prev !== undefined) {
+    //       const next_time = prev + 1;
+    //       if (next_time >= MAIN_BANNER_VIDEO_DURATION) {
+    //         return 0;
+    //       }
+    //     }
+    //   });
+    // }, 1000);
   }, [video_play, curr_idx, curr_items.is_live]);
 
   const handle_silde_click = (idx: number) => {};
@@ -114,13 +139,24 @@ const Main_banner = () => {
 
       {/* 여기다가 onmouse를 해야하나? */}
       <div
-        className="relative
-      z-10 h-full w-full p-8 flex flex-col justify-between text-white border border-black "
+        className={`relative flex flex-col justify-between
+      z-10 h-full w-full p-8 
+      text-white border border-black `}
       >
-        <div>제목</div>
-        <div>로고 , 유튜버 이름</div>
-        <div>시청자수</div>
-        <div>시청자수</div>
+        <span
+          className={`mb-5
+            inline-block
+            border border-yellow-300
+          transition-all duration-300 ease-in-out
+       
+          ${bannerTitleTrans}
+          `}
+        >
+          <div>{curr_items.title}</div>
+          <div>{curr_items.ch_logo}</div>
+          <div>{curr_items.viewers}</div>
+          <div>시청자수</div>
+        </span>
         <div
           className=" w-full  space-x-2 overflow-hidden"
           style={{
@@ -129,9 +165,7 @@ const Main_banner = () => {
             }px`,
           }}
         >
-          <h2 className="text-2xl font-black">
-            현재 스트림{curr_items.is_live ? "라이브" : "예정된"}
-          </h2>
+          <h2 className="text-2xl font-black"></h2>
           {/*  */}
           <div
             className="flex space-x-3 text-sm text-gray-400 transition-transform duration-500 ease-in-out
