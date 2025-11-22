@@ -8,7 +8,7 @@ interface OfflineVideoProps {
 
 const Offline_Video = ({ user_name }: OfflineVideoProps) => {
   return (
-    <div className="h-full flex flex-col space-y-4 justify-center items-center">
+    <div className="">
       <WifiOff className="h-10 w-10 text-muted-foreground" />
       <p className="text-muted">{user_name} is Offline</p>
       Offline_Video

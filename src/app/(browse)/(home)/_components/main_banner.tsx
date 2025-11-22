@@ -98,23 +98,6 @@ const Main_banner = () => {
     return () => clearTimeout(timeout);
   }, [curr_idx, all_items]);
 
-  useEffect(() => {
-    if (video_time || curr_items.is_live) {
-      set_video_time(0);
-      return;
-    }
-    // const interval = setInterval(() => {
-    //   set_video_time((prev) => {
-    //     if (prev !== undefined) {
-    //       const next_time = prev + 1;
-    //       if (next_time >= MAIN_BANNER_VIDEO_DURATION) {
-    //         return 0;
-    //       }
-    //     }
-    //   });
-    // }, 1000);
-  }, [video_play, curr_idx, curr_items.is_live]);
-
   const handle_silde_click = (idx: number) => {};
   const mouseEnter = useCallback(() => set_slider_stop(false), []);
   const mouseLeave = useCallback(() => set_slider_stop(false), []);
@@ -146,15 +129,12 @@ const Main_banner = () => {
         <span
           className={`mb-5
             inline-block
-            border border-yellow-300
           transition-all duration-300 ease-in-out
        
           ${bannerTitleTrans}
           `}
         >
           <div>{curr_items.title}</div>
-          <div>{curr_items.ch_logo}</div>
-          <div>{curr_items.viewers}</div>
           <div>시청자수</div>
         </span>
         <div
