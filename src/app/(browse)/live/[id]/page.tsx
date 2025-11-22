@@ -100,11 +100,13 @@ const LivePage = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
+      <div className="grid grid-cols-12 h-[75vh] relative ">
         {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
         <div
           ref={videoRef}
-          className="col-start-2 col-span-9 h-full relative"
+          className="col-start-2 col-span-7 h-full  
+        
+          bg-pink-300"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -114,14 +116,12 @@ const LivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            // ✅ 중복 클래스 제거 및 부모에 맞게 채우도록 변경
-            className="w-full h-full"
+            className="h-full w-3/4 bg-yellow-300"
           >
             <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-              className="w-full h-full object-contain "
             />
           </LiveKitRoom>
           <ChatPage
@@ -136,16 +136,16 @@ const LivePage = () => {
             show={show_streamer_info_bar}
           />
 
-          <button
+          {/* <button
             onClick={handleFullScreen}
             className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
           >
             {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
-          </button>
+          </button> */}
         </div>
       </div>
 
-      <div>
+      {/* <div>
         방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         <StreamerInfo
           live_information={live_information}
@@ -153,7 +153,7 @@ const LivePage = () => {
           current_host_email={current_host_nickname}
         />
         새로운 공간
-      </div>
+      </div> */}
     </div>
   );
 };

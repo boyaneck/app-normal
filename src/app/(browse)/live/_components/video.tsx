@@ -84,40 +84,18 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
-    content = (
-      <p>
-        Loading... room이 생성중 잠시만 기다려주세요요
-        <p>
-          <Loading_Video label={connection_state} />
-        </p>
-      </p>
-    );
+    content = <Loading_Video label={connection_state} />;
   } else if (!host_participant) {
-    content = (
-      <p>
-        호스트가 방송중이 아닙니다다
-        <p className="font-extrabold">is Offline !!@</p>
-        <p>
-          <Offline_Video user_name={host_name} />
-        </p>
-      </p>
-    );
+    content = <Offline_Video user_name={host_name} />;
   } else if (tracks.length === 0) {
     content = (
       <p>
         {host_participant?.identity}
-        ///////
-        <p>
-          <Loading_Video label={connection_state} />
-        </p>
+        <Loading_Video label={connection_state} />
       </p>
     );
   } else if (true) {
-    content = (
-      <div>
-        <LiveVideo participant={host_participant} />
-      </div>
-    );
+    content = <LiveVideo participant={host_participant} />;
   }
 
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
@@ -125,9 +103,10 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
   return (
     <div
       className={clsx(
-        `object-contain
-        h-full w-full 
+        `
+        h-full w-full
         relative 
+        border border-red-500
          transition-all duration-300
          rounded-xl`,
         {
@@ -142,8 +121,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         set_show_streamer_info_bar(false);
       }}
     >
-      {content}
-      <div>현재 모든 시청자 수 {total_viewer}</div>
+      z{/* {content} */}
+      {/* <div>현재 모든 시청자 수 {total_viewer}</div> */}
       {/* {show_streamer_info_bar && (
         <div
           className={clsx(
