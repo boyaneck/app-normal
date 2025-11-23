@@ -34,7 +34,6 @@ const LivePage = () => {
     queryKey: ["get_user_info_about_live"],
     queryFn: () => getUserInfoAboutLive(current_host_id),
   });
-
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
@@ -45,12 +44,7 @@ const LivePage = () => {
   const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
-  const { token, name, identity } = useViewerToken(
-    user?.user_id,
-    user?.user_nickname,
-    current_host_id
-  );
-
+  const { token, name, identity } = useViewerToken(current_host_id);
   const icon = useStreamingBarStore((state) => state.icon);
   const [streaming_timer, set_streaming_timer] = useState<string | null>(null);
   const [is_info_active, set_is_info_active] = useState(false);
@@ -64,14 +58,12 @@ const LivePage = () => {
         const res = await axios.post(URL, { id: "Alicia Doe" });
         const data = res.data;
         set_streaming_timer(data.time);
-        console.log("Redis 에있는 시간데이터를 서버를 통해서 받기:", data.time);
       } catch (error) {
         console.error("API 호출 중 오류 발생:", error);
       }
     };
 
     getStreamingStartAt();
-    console.log("HTTP 요청이 이루어짐");
   }, []);
   useEffect(() => {
     const info_active_check = icon.includes("streamer");
@@ -88,7 +80,6 @@ const LivePage = () => {
   }, []);
 
   if (!token || !name || !identity) {
-    console.log("token,name,identity");
     // return <div>Cannot watch the stream</div>;
   }
   const videoRef = useRef<HTMLDivElement>(null);
@@ -115,11 +106,13 @@ const LivePage = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
+      <div className="grid grid-cols-12 h-[75vh] relative ">
         {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
         <div
           ref={videoRef}
-          className="col-start-2 col-span-7 h-4/5 relative"
+          className="col-start-2 col-span-7 h-full  
+        
+          bg-pink-300"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -129,8 +122,7 @@ const LivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            // ✅ 중복 클래스 제거 및 부모에 맞게 채우도록 변경
-            className="w-full h-full"
+            className="h-full w-3/4 bg-yellow-300"
           >
             <Video
               host_name={current_host_nickname}
@@ -138,7 +130,10 @@ const LivePage = () => {
               token={token}
             />
           </LiveKitRoom>
-          <ChatPage current_host_nickname={current_host_nickname} />
+          <ChatPage
+            current_host_nickname={current_host_nickname}
+            current_host_id={current_host_id}
+          />
 
           {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
           {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
@@ -147,12 +142,30 @@ const LivePage = () => {
             show={show_streamer_info_bar}
           />
 
-          <button
+          {/* <button
             onClick={handleFullScreen}
             className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
           >
             {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
-          </button>
+          </button> */}
+        </div>
+        {/*채팅과 라이브목록 슬라이드 */}
+        <div
+          className={`col-start-9 col-span-3 
+          h-4/5 ml-4
+          rounded-xl 
+          border border-black
+          `}
+        >
+          <div className="">
+            <button onClick={SlideToggle}>
+              {slide_toggle ? (
+                <ChatPage current_host_nickname={current_host_nickname} />
+              ) : (
+                "라이브 목록"
+              )}
+            </button>
+          </div>
         </div>
         {/*채팅과 라이브목록 슬라이드 */}
         <div
@@ -174,7 +187,7 @@ const LivePage = () => {
         </div>
       </div>
 
-      <div>
+      {/* <div>
         방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         <StreamerInfo
           live_information={live_information}
@@ -182,7 +195,7 @@ const LivePage = () => {
           current_host_email={current_host_nickname}
         />
         새로운 공간
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
+import { post_live_stats_props } from "@/types/live";
 
 //Ingress API
 export const insertIngress = async (
@@ -27,7 +28,6 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
     .from("users")
     .select(
       `
-       
       live_information (
         *    
       )
@@ -42,4 +42,41 @@ export const getUserInfoAboutLive = async (user_id: string | undefined) => {
   }
 
   return userInfoLive;
+};
+export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
+  const { data: post_live_stats, error } = await supabaseForClient
+    .from("post_live_stats")
+    .select("*")
+    .eq("broad_num", room_name)
+    .order("live_started_at", { ascending: false })
+    .limit(7);
+
+  if (error) {
+    console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생", error.message);
+    throw new Error(error.message);
+  }
+
+  return post_live_stats ? post_live_stats : null;
+};
+
+export const getWeekleyPost = async (room_name: string) => {
+  const today = new Date();
+  const end_date = today.toISOString();
+  const a_week_ago = new Date(today);
+  a_week_ago.setDate(today.getDate() - 6);
+  a_week_ago.setHours(0, 0, 0, 0);
+  const start_date = a_week_ago.toISOString();
+  const { data: weekly_data, error } = await supabaseForClient
+    .from("post_live_stats")
+    .select("*")
+    .eq("broad_num", room_name)
+    .gte("live_started_at", start_date)
+    .lte("live_started_at", end_date)
+    .order("live_started_at", { ascending: false });
+
+  if (error) {
+    console.log("7일치 데이터 로드시 오류 ", error);
+    return [];
+  }
+  return weekly_data;
 };

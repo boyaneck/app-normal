@@ -9,15 +9,21 @@ const StudioPage = () => {
     set_select_menu(menu);
   };
   return (
-    <div className=" border border-black grid grid-cols-3 ">
-      <div className="border border-red-300">
-        <div onClick={() => onHandlerMenu("manage_revenue")}>수익관리</div>
-        <div onClick={() => onHandlerMenu("manage_viewer")}>시청자관리</div>
+    <div
+      className=" border border-red-500 grid grid-cols-10 h-1/2
+  "
+    >
+      <div className="col-span-2">
+        <div onClick={() => onHandlerMenu("live_stat")}>라이브 통계</div>
+        <div onClick={() => onHandlerMenu("live_setting")}>
+          라이브 및 방송 설정
+        </div>
         <div onClick={() => onHandlerMenu("analysis")}>분석</div>
         <div onClick={() => onHandlerMenu("notice")}>공지사항</div>
       </div>
-      <StudioMainBanner selected_menu={select_menu} />
-      <div className="border border-green-400">메인컨텐츠</div>
+      <div className="col-span-8 h-1/2 bg-orange-200">
+        <StudioMainBanner selected_menu={select_menu} />
+      </div>
     </div>
   );
 };

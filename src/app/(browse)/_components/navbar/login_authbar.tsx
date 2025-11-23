@@ -1,13 +1,14 @@
 "use client";
 import useSigninAndLogout from "@/hooks/useSigninAndLogout";
 import useUserStore from "@/store/user";
-import { supabaseForClient } from "@/supabase/supabase_client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { LuLampDesk } from "react-icons/lu";
 
 const Login_authbar = () => {
+  const supabaseForClient = createClientComponentClient();
   const [LoginTooltipVisible, setLoginTooltipVisible] =
     useState<boolean>(false);
 

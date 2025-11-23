@@ -95,11 +95,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
       </p>
     );
   } else if (true) {
-    content = (
-      <div>
-        <LiveVideo participant={host_participant} />
-      </div>
-    );
+    content = <LiveVideo participant={host_participant} />;
   }
 
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
@@ -108,10 +104,11 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
     <div
       className={clsx(
         `
-        h-full w-full 
+        h-full w-full
         relative 
+        border border-red-500
          transition-all duration-300
-         border border-black rounded-xl`,
+         rounded-xl`,
         {
           " animate-curtainUp": is_info_active,
           "animate-curtainDown": !is_info_active,
@@ -124,8 +121,8 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         set_show_streamer_info_bar(false);
       }}
     >
-      {content}
-      <div>현재 모든 시청자 수 {total_viewer}</div>
+      z{/* {content} */}
+      {/* <div>현재 모든 시청자 수 {total_viewer}</div> */}
       {/* {show_streamer_info_bar && (
         <div
           className={clsx(

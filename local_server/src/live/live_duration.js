@@ -24,7 +24,6 @@ export const livekitWebhook = async (req, res) => {
       console.log(
         `🚀 Redis 저장  '${room_name}'의 방송 정보가 새롭게 저장되었습니다.`
       );
-      ㄹ;
       if (room_exist === 1) {
       } else if (room_exist === 0) {
         console.log(`🔥이미 존재하는 데이터가 있습니다`);

@@ -1,15 +1,16 @@
 import useUserStore from "@/store/user";
-import { supabaseForClient } from "@/supabase/supabase_client";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/api";
 import { userInfo } from "os";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 // import { addFollow } from "@/api/follow";
 interface Props {
   arbre: string;
 }
 
 const useSigninAndLogout = () => {
+  const supabaseForClient = createClientComponentClient();
   const { setUser } = useUserStore((state) => state);
   const [sessionUserEmail, setSessionUserEmail] = useState<string | undefined>(
     ""
@@ -23,13 +24,12 @@ const useSigninAndLogout = () => {
   useEffect(() => {
     const loginSubscription = supabaseForClient.auth.onAuthStateChange(
       (event, session) => {
+        console.log("session:", session);
         if (session) {
           if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
             setSessionUserEmail(session?.user?.email);
             console.log("세션나와랴 얍얍얍", session.user?.email);
-            console.log("도대체 뭐가 ?", fetchedUserInfo);
             if (fetchedUserInfo) {
-              console.log("잘 페치드 되어지는데 왜 ??", fetchedUserInfo);
               const userInfo = {
                 user_id: fetchedUserInfo.id,
                 user_nickname: fetchedUserInfo.user_nickname,

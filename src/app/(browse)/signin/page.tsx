@@ -1,8 +1,8 @@
 "use client";
-import { supabaseForClient } from "@/supabase/supabase_client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
-import React, { useState } from "react";
 const Signin = () => {
+  const supabaseForClient = createClientComponentClient();
   const getGoogleSocialLogin = async () => {
     try {
       await supabaseForClient.auth.signInWithOAuth({
@@ -12,7 +12,7 @@ const Signin = () => {
             access_type: "offline",
             prompt: "consent",
           },
-          // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${url}`,
+          redirectTo: "http://localhost:3000/callback",
         },
       });
     } catch (error) {
@@ -25,7 +25,7 @@ const Signin = () => {
       await supabaseForClient.auth.signInWithOAuth({
         provider: "kakao",
         options: {
-          // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${url}`,
+          redirectTo: "http://localhost:3000/callback",
         },
       });
     } catch (error) {

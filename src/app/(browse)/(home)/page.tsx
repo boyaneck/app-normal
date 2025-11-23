@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import Screen from "./_components/screen";
+import Screen from "./_components/live_list";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/bar_store";
 import Main_banner from "./_components/main_banner";
+import LiveList from "./_components/live_list";
 
 interface User {
   id: string;
@@ -23,13 +24,12 @@ export default function Home() {
   return (
     <div
       className={cn(
-        "grid transition-all duration-300 ease-in-out bg-grey-50 ,",
-        collapsed ? "ml-[150px] " : " ml-[260px] "
+        "grid transition-all duration-300 ease-in-out mr-6 pt-6 ",
+        collapsed ? "ml-[160px]" : " ml-[210px] "
       )}
     >
       <Main_banner />
-      <Screen />
-      <Button />
+      <LiveList />
     </div>
   );
 }

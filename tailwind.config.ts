@@ -1,3 +1,5 @@
+import { transform } from "next/dist/build/swc";
+import { MdWidthFull } from "react-icons/md";
 import type { Config } from "tailwindcss";
 module.exports = {
   content: [
@@ -12,16 +14,24 @@ module.exports = {
         transitionBar: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
       },
       keyframes: {
-        fadeOutUp: {
+        "slide-animation-down": {
+          "0%": { transform: "translateY(0)", oopacity: "1" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
+        },
+        "slide-progress-animation": {
+          from: { width: "0%" },
+          to: { width: "100%" },
+        },
+        "fade-out-up-animation": {
           from: { opacity: 1, transform: "translateY(0)" },
           to: { opacity: 0, transform: "translateY(-20px)" },
         },
-        moneyFlap: {
+        "money-flap-animation": {
           "0%, 100%": { transform: "rotate(-3deg)" }, // 시작 및 끝: 약간 왼쪽으로 기울임
           "50%": { transform: "rotate(3deg)" }, // 중간: 약간 오른쪽으로 기울임
         },
 
-        raiseUpBar: {
+        "raise-up-bar-animation": {
           "0%": { transform: "translateY(100%)", opacity: "0" },
           "70%": { transform: "translateY(-5%)", opacity: "1" }, // 살짝 더 올라갔다가
           "100%": { transform: "translateY(0)", opacity: "1" }, // 제자리로
@@ -46,7 +56,7 @@ module.exports = {
           // 끝: Y축 0 (제자리)으로 내려오면서 나타남
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
-        heartWave: {
+        "heart-wave-animation": {
           "0%": {
             transform: "translate(-50%, -50%) scale(1)",
             opacity: "1",
@@ -75,16 +85,16 @@ module.exports = {
         },
       },
       animation: {
+        "slide-out-down": "slide-out-down-animation 0.3s ease-in-out forwards",
+        "slide-progress": "slide-progress-animation 4000ms linear forwards",
         slideIn: "slideInFromRight 0.3s ease-out forwards",
         slideOut: "slideOutToRight 0.3s ease-in forwards",
         ripple: "ripple 1s cubic-bezier(0, 0, 0.2, 1) infinite",
-        raiseUpBar:
-          "raiseUpBar 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0) forwards",
-        fadeOutUp: "fadeOutUp 0.3s ease-out forwards",
-        moneyFlap: "moneyFlap 0.2s ease-in-out infinite",
-        // heartWave: 'heartWave 0.8s linear forwards',
-        heartWave: "heartWave 0.8s forwards",
-        // curtainUp: "curatainUp 0.7s ease-in-out forwards",
+        "raise-up-bar":
+          "raise-up-bar-animation 0.6s cubic-bezier(0.25, 0.1, 0.25, 1.0) forwards",
+        "fade-out-up": "fade-out-up-animation 0.3s ease-out forwards",
+        "money-flap": "money-flap-animation 0.2s ease-in-out infinite",
+        "heart-wave": "heart-wave-animation 0.8s forwards",
         curtainUp: "curtainUp 0.7s ease-in-out forwards",
         revealDown: "revealDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         revealFromBottom: "revealFromBottom 0.3s ease-in-out forwards",

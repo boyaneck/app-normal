@@ -1,85 +1,3 @@
-// "use client";
-// import React, { useEffect, useState } from "react";
-// import Modal from "@/components/ui/modal";
-// const PaymentPage = () => {
-//   const [is_modal_open, set_is_modal_open] = useState(false);
-
-//   const openModal = () => {
-//     set_is_modal_open(true);
-//   };
-//   const closeModal = () => {
-//     set_is_modal_open(false);
-//   };
-
-//   const pay = () => {
-//     const iamport = document.createElement("script");
-//     iamport.src = "https://cdn.iamport.kr/v1/iamport.js";
-
-//     iamport.onload = () => {
-//       alert("zzzzzzzz");
-
-//       // const { IMP } = (window as Window) as any;
-//       const { IMP } = window as Window as any;
-//       if (IMP) {
-//         IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);
-
-//         IMP.request_pay(
-//           {
-//             pg: "tosspayments",
-//             pay_method: "card",
-//             merchant_uid: `payment-${crypto.randomUUID()}`,
-//             name: "노르웨이 회전 의자",
-//             amount: 10,
-//             buyer_email: "jinxx93@naver.com",
-//             buyer_name: "홍길동",
-//             buyer_tel: "010-4242-4242",
-//             buyer_addr: "서울특별시 강남구 신사동",
-//             buyer_postcode: "01181",
-//           },
-//           function (response: any) {
-//             if (response.success) {
-//               console.log("결제 성공:", response);
-//             } else {
-//               console.error("결제 실패:", response);
-//             }
-//           }
-//         );
-//       } else {
-//         console.error("IMP 객체를 가져오는데 실패했습니다.");
-//       }
-//     };
-
-//     iamport.onerror = () => {
-//       console.error("아임포트 로딩 실패");
-//     };
-
-//     document.head.appendChild(iamport);
-//   };
-
-//   return (
-//     <div>
-//       <button onClick={pay}>결제</button>
-//       <button
-//         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-//         onClick={openModal}
-//       >
-//         Open Modal
-//       </button>
-
-//       <Modal isOpen={is_modal_open} onClose={closeModal} title="알림">
-//         <p>This is the modal content.</p>
-//         <button
-//           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-//           onClick={closeModal}
-//         >
-//           Close
-//         </button>
-//       </Modal>
-//     </div>
-//   );
-// };
-
-// export default PaymentPage;
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "@/components/ui/modal"; // 기존 Modal 컴포넌트
@@ -89,8 +7,9 @@ import useUserStore from "@/store/user";
 
 interface Props {
   current_host_nickname: string | null;
+  current_host_id: string | null;
 }
-const PaymentPage = ({ current_host_nickname }: Props) => {
+const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
   const { user } = useUserStore();
   const pay_ref = useRef<HTMLInputElement>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
@@ -141,8 +60,13 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           pay_method: "card",
           merchant_uid: `payment-${crypto.randomUUID()}`,
           name: current_host_nickname + "에게 후원",
+
+          custom_data: JSON.stringify({
+            host_id: "!!!!호스트의 아이디가 들어갈수잇도록 할것",
+            user: user?.user_nickname,
+          }),
           // amount: pay_ref?.current?.value,
-          amount: 10,
+          amount: 103,
           buyer_email: "jinxx93@naver.com",
           buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
@@ -157,6 +81,7 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
           }
         }
       );
+      console.log("결제 데이터가 잘 가는ㄴ지 확인하기", IMP.request_pay);
       closeModal(); // 결제창 닫기
     } else {
       console.error("IMP 객체를 가져오는데 실패했습니다.");
@@ -227,7 +152,7 @@ const PaymentPage = ({ current_host_nickname }: Props) => {
         className="bg-green-500 hover:bg-green-700 text-white font-bold rounded"
         onClick={openModal}
       >
-        <span className="hover:animate-moneyFlap">💰</span>
+        <span className="hover:animate-money-flap">💰</span>
       </button>
 
       {is_modal_open && (
