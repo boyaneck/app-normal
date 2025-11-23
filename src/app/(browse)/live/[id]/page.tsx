@@ -17,6 +17,8 @@ import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
 import { MdOutlineFitScreen } from "react-icons/md";
 import { AiOutlineFullscreenExit } from "react-icons/ai";
+import LiveListSlide from "../_components/live_list_slide";
+import ChattingSlide from "../_components/chatting_slide";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -91,7 +93,6 @@ const LivePage = () => {
   }
   const videoRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-
   const handleFullScreen = () => {
     if (!isFullScreen) {
       // 전체 화면 진입
@@ -107,13 +108,18 @@ const LivePage = () => {
     setIsFullScreen(!isFullScreen);
   };
 
+  const [slide_toggle, set_slide_toggle] = useState<boolean>(true);
+  const SlideToggle = () => {
+    set_slide_toggle((prev) => !prev);
+  };
+
   return (
     <div>
       <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
         {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
         <div
           ref={videoRef}
-          className="col-start-2 col-span-9 h-full relative"
+          className="col-start-2 col-span-7 h-4/5 relative"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -130,7 +136,6 @@ const LivePage = () => {
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-              className="w-full h-full object-contain "
             />
           </LiveKitRoom>
           <ChatPage current_host_nickname={current_host_nickname} />
@@ -148,6 +153,24 @@ const LivePage = () => {
           >
             {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
           </button>
+        </div>
+        {/*채팅과 라이브목록 슬라이드 */}
+        <div
+          className={`col-start-9 col-span-3 
+          h-4/5 ml-4
+          rounded-xl 
+          border border-black
+          `}
+        >
+          <div className="">
+            <button onClick={SlideToggle}>
+              {slide_toggle ? (
+                <ChatPage current_host_nickname={current_host_nickname} />
+              ) : (
+                "라이브 목록"
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
