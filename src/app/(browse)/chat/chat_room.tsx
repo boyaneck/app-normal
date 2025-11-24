@@ -196,13 +196,13 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         className={clsx(
           `grid grid-rows-10
            border border-gray-400
-           absolute top-0 right-0 w-1/4 h-full
+            w-full h-full
           rounded-xl
-          `,
-          {
-            "animate-slideIn": !is_chat_active,
-            "animate-slideOut": is_chat_active,
-          }
+          `
+          // {
+          //   "animate-slideIn": !is_chat_active,
+          //   "animate-slideOut": is_chat_active,
+          // }
         )}
       >
         <div className=" row-span-9 relative flex flex-col-reverse overflow-hidden ">
