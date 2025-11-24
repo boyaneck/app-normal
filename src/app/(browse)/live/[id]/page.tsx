@@ -107,12 +107,9 @@ const LivePage = () => {
   return (
     <div>
       <div className="grid grid-cols-12 h-[75vh] relative ">
-        {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
         <div
           ref={videoRef}
-          className="col-start-2 col-span-7 h-full  
-        
-          bg-pink-300"
+          className="col-start-2 col-span-7 h-3/4 bg-pink-300"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -122,7 +119,7 @@ const LivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="h-full w-3/4 bg-yellow-300"
+            className="h-full w-full bg-yellow-300"
           >
             <Video
               host_name={current_host_nickname}
@@ -130,10 +127,6 @@ const LivePage = () => {
               token={token}
             />
           </LiveKitRoom>
-          <ChatPage
-            current_host_nickname={current_host_nickname}
-            current_host_id={current_host_id}
-          />
 
           {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
           {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
@@ -141,50 +134,45 @@ const LivePage = () => {
             items={stream_nav_bar}
             show={show_streamer_info_bar}
           />
-
-          {/* <button
-            onClick={handleFullScreen}
-            className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+        </div>
+        <div
+          className={`col-start-9 col-span-3 
+          h-3/4 ml-4
+          rounded-xl 
+          border border-black
+          overflow-hidden relative
+          `}
+        >
+          <div className="realtive"></div>
+          <div
+            className={`
+               top-0 left-0
+              w-full h-full bg-purple-300 
+              transition-all duration-300 ease-in-out
+              ${slide_toggle ? "translate-x-0 z-10" : "translatex-full z-0"}
+              `}
           >
-            {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
-          </button> */}
-        </div>
-        {/*채팅과 라이브목록 슬라이드 */}
-        <div
-          className={`col-start-9 col-span-3 
-          h-4/5 ml-4
-          rounded-xl 
-          border border-black
-          `}
-        >
-          <div className="">
-            <button onClick={SlideToggle}>
-              {slide_toggle ? (
-                <ChatPage current_host_nickname={current_host_nickname} />
-              ) : (
-                "라이브 목록"
-              )}
-            </button>
+            <button onClick={SlideToggle}>버튼</button>
+            <ChatPage
+              current_host_nickname={current_host_nickname}
+              current_host_id={current_host_id}
+            />
+
+            <div
+              className={`
+                 top-0 left-0 
+                bg-blue-400 w-[200px] h-[200px] 
+                transition-all duration-300 ease-in-out
+                ${
+                  slide_toggle === false
+                    ? "translate-x-10 z-10 "
+                    : "translate-x-full z-0"
+                }
+                `}
+            ></div>
           </div>
         </div>
         {/*채팅과 라이브목록 슬라이드 */}
-        <div
-          className={`col-start-9 col-span-3 
-          h-4/5 ml-4
-          rounded-xl 
-          border border-black
-          `}
-        >
-          <div className="">
-            <button onClick={SlideToggle}>
-              {slide_toggle ? (
-                <ChatPage current_host_nickname={current_host_nickname} />
-              ) : (
-                "라이브 목록"
-              )}
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* <div>
