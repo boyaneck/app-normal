@@ -103,7 +103,9 @@ const LivePage = () => {
   const SlideToggle = () => {
     set_slide_toggle((prev) => !prev);
   };
-
+  const liquidEase = {
+    transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+  };
   return (
     <div>
       <div className="grid grid-cols-12 h-[75vh] relative ">
@@ -128,8 +130,6 @@ const LivePage = () => {
             />
           </LiveKitRoom>
 
-          {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
-          {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
           <StreamerInfoBar
             items={stream_nav_bar}
             show={show_streamer_info_bar}
@@ -137,40 +137,40 @@ const LivePage = () => {
         </div>
         <div
           className={`col-start-9 col-span-3 
-          h-3/4 ml-4
-          rounded-xl 
-          border border-black
-          overflow-hidden relative
+           overflow-hidden relative
+           h-3/4 ml-4 rounded-xl border border-black
           `}
         >
-          <div className="realtive"></div>
+          <button onClick={SlideToggle} className="p-2 border border-black">
+            버튼
+          </button>
           <div
             className={`
-               top-0 left-0
-              w-full h-full bg-purple-300 
-              transition-all duration-300 ease-in-out
-              ${slide_toggle ? "translate-x-0 z-10" : "translatex-full z-0"}
-              `}
+            absolute top-10 left-0
+            w-full h-[calc(100%-2.5rem)] 
+            transition-transform duration-700 z-10 cubic-bezier(0.25, 0.1, 0.25, 1)
+            ${slide_toggle ? "translate-x-0" : "translate-x-full"} 
+          `}
           >
-            <button onClick={SlideToggle}>버튼</button>
             <ChatPage
               current_host_nickname={current_host_nickname}
               current_host_id={current_host_id}
             />
-
-            <div
-              className={`
-                 top-0 left-0 
-                bg-blue-400 w-[200px] h-[200px] 
-                transition-all duration-300 ease-in-out
-                ${
-                  slide_toggle === false
-                    ? "translate-x-10 z-10 "
-                    : "translate-x-full z-0"
-                }
-                `}
-            ></div>
           </div>
+
+          <div
+            className={`
+            absolute top-10 left-0
+            w-full h-[calc(100%-2.5rem)]
+            transition-transform duration-700 z-20
+            bg-blue-600 cubic-bezier(0.25, 0.1, 0.25, 1)
+            ${
+              slide_toggle
+                ? "translate-x-full" // slide_toggle=true (Panel 1 보일 때) -> Panel 2 숨김
+                : "translate-x-0" // slide_toggle=false (Panel 2 보일 때) -> Panel 2 표시
+            }
+          `}
+          ></div>
         </div>
         {/*채팅과 라이브목록 슬라이드 */}
       </div>
