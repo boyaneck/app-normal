@@ -49,7 +49,6 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
       return;
     }
 
-    console.log("가격은 ?", pay_ref?.current?.value);
     const { IMP } = window as Window as any;
     if (IMP) {
       IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);

@@ -6,8 +6,6 @@ import { AnimatedHeart } from "./animated_heart";
 import PaymentPage from "../../_components/payment/payment";
 import useChatInput from "@/hooks/useChatInput";
 export const ChatInput = ({
-  chatInput,
-  sendMessage,
   set_show_emoji_picker,
   show_emoji_picker,
   emojiClick,
@@ -21,42 +19,50 @@ export const ChatInput = ({
   set_message,
 }: chat_input_components_props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { input, debounced, sendMsg, inputChange } = useChatInput();
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-      // 한글 조합 중 엔터 방지
-      e.preventDefault(); // form 태그 안에 있다면 submit 방지
-      //   handleSendMessage();
-    }
-  };
+  const { input_msg, debounced, sendMsg, inputChange, blankChk, limit_text } =
+    useChatInput({ current_host_id, inputRef });
 
-  const message_input_ref = useRef<HTMLInputElement>(null);
-  const chkInputDisabeld = useCallback(() => {
-    const input_element = message_input_ref.current;
-    if (!input_element) return;
-
-    const msg_trim = input_element.value.trim();
-    if (msg_trim.length === 0) {
-      alert("메세지를 입력해주세요!");
-      input_element.focus();
-      return;
-    }
-  }, []);
   return (
-    <span className="flex flex-row mt-3 ml-2 h-3/5">
+    <div className="relative h-9 rounded-full ml-1">
       <input
-        placeholder="메세지를 입력해주세요"
-        ref={message_input_ref}
-        value={message}
-        onChange={chatInput}
-        className=" bg-transparent border border-purple-400 w-2/3 h-full rounded-full"
+        placeholder="메세지를 입력하세요"
+        ref={inputRef}
+        value={input_msg}
+        onChange={inputChange}
+        onKeyDown={(e) => {
+          console.log("키보드 눌렸을때", e.code);
+          if (e.code === "Enter" && blankChk) sendMsg();
+        }}
+        className="w-full h-full 
+        transition-all duration-300
+        rounded-full pl-2
+
+        shadow-inner
+        focus:outline-none
+        focus-within:ring-2
+        focus-within:ring-gray-400
+        focus:bg-transparent
+        bg-gray-100"
       ></input>
       <button
-        onClick={sendMessage}
+        disabled={!blankChk}
+        onClick={sendMsg}
         className={`hover:cursor-pointer
-   `}
+        ${blankChk ? "bg-blue-600 " : ""}
+          `}
       >
-        <Send className="w-5 h-5" />
+        <Send
+          className={`absolute right-2 top-2 hover:bg-purple-400
+          
+          w-5 h-5`}
+        />
+      </button>
+      <button
+        className={`absolute right-3 -top-7 bg-gray-400 rounded-3xl shadow-lg transition-all duration-300
+          ${limit_text < 20 ? "bg-red-300 text-white font-semibold " : ""}
+          `}
+      >
+        d
       </button>
       {/* <button
         className="relative"
@@ -81,12 +87,12 @@ export const ChatInput = ({
         ))}
         ❤️
       </button> */}
-      <span className="flex justify-center items-center ">
+      {/* <span className="flex justify-center items-center ">
         <PaymentPage
           current_host_nickname={current_host_nickname}
           current_host_id={current_host_id}
         />
-      </span>
-    </span>
+      </span> */}
+    </div>
   );
 };
