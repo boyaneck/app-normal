@@ -57,7 +57,6 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     console.log("이유를 대라!!!!!!!!", reason);
   };
 
-  const [is_warning_modal, set_is_warning_modal] = useState(false);
   useEffect(() => {
     if (!socket) {
       connect_socket();
@@ -80,31 +79,6 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const emojiClick = (event: any, emojiObject: any) => {
     set_message((prev) => prev + event.emoji);
     // message_input_ref.current?.focus();
-  };
-
-  const sendMessage = () => {
-    const user_nickname = user_info?.user_nickname;
-    const avatar_url = user_info?.avatar_url;
-    const id = user_info?.user_id;
-    const email = user_info?.user_email;
-    const date = dayjs().toISOString();
-    const current_chat_room_number = "5";
-    console.log("현재 호스트의 아이디", current_host_id);
-    const message_info = {
-      current_host_id,
-      user_nickname,
-      avatar_url,
-      message,
-      date,
-      id,
-      email,
-      current_chat_room_number,
-    };
-    socket?.emit("send_message", {
-      roomnumber: "5",
-      message_info,
-    });
-    set_message("");
   };
 
   const chatInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,75 +165,76 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     }
   }, [icon]);
   return (
-    <>
-      <div
-        className={clsx(
-          `grid grid-rows-10
-           border border-gray-400
-            w-full h-full
+    <div
+      className={clsx(
+        `grid grid-rows-10
+          w-full h-full
           rounded-xl
+          overflow-hidden 
+          relative
           `
-        )}
-      >
-        <div className=" row-span-9 relative flex flex-col-reverse overflow-hidden ">
-          {/* --채팅메세지 */}
-          <div className="">
-            {receive_message_info.map((message_info) => {
-              const isRemoving = message_remove === message_info;
-              return (
-                <AnimatedMessage
-                  message={`${message_info.user_nickname}: ${message_info.message}`}
-                  is_visible={isRemoving}
-                  avatar_url={message_info.avatar_url}
-                  user_nickname={message_info.user_nickname}
-                  user_id={message_info.id}
-                  user_email={message_info.email}
-                  selected_message_for_modal={selected_message_for_modal}
-                  set_selected_message_for_modal={
-                    set_selected_message_for_modal
-                  }
-                  is_modal_open={is_modal_open}
-                  set_is_modal_open={set_is_modal_open}
-                />
-              );
-            })}
-          </div>
-          {/* --채팅메세지 */}
-          {is_modal_open && (
-            //모달창
-
-            <ChatSanction
-              set_is_modal_open={set_is_modal_open}
-              is_modal_open={is_modal_open}
-              set_selected_message_for_modal={set_selected_message_for_modal}
-              selected_message_for_modal={selected_message_for_modal}
-              selectWarningOption={selectWarningOption}
-              set_selected_warning_reason={set_selected_warning_reason}
-              selected_warning_reason={selected_warning_reason}
-            />
-          )}
-          {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
+      )}
+    >
+      <div className=" row-span-9  flex flex-col-reverse ">
+        {/* --채팅메세지 */}
+        <div className="">
+          {receive_message_info.map((message_info) => {
+            const isRemoving = message_remove === message_info;
+            return (
+              <AnimatedMessage
+                key={message_info.id}
+                message={`${message_info.user_nickname}: ${message_info.message}`}
+                is_visible={isRemoving}
+                avatar_url={message_info.avatar_url}
+                user_nickname={message_info.user_nickname}
+                user_id={message_info.id}
+                user_email={message_info.email}
+                selected_message_for_modal={selected_message_for_modal}
+                set_selected_message_for_modal={set_selected_message_for_modal}
+                is_modal_open={is_modal_open}
+                set_is_modal_open={set_is_modal_open}
+              />
+            );
+          })}
         </div>
+        {/* --채팅메세지 */}
+        {is_modal_open && (
+          //모달창
 
-        <div className="row-span-1">
-          <ChatInput
-            chatInput={chatInput}
-            sendMessage={sendMessage}
-            set_show_emoji_picker={set_show_emoji_picker}
-            show_emoji_picker={show_emoji_picker}
-            emojiClick={emojiClick}
-            heartClick={heartClick}
-            set_hearts={set_hearts}
-            hearts={hearts}
-            heartAnimationEnd={heartAnimationEnd}
-            current_host_nickname={current_host_nickname}
-            current_host_id={current_host_id}
-            message={message}
-            set_message={set_message}
+          <ChatSanction
+            set_is_modal_open={set_is_modal_open}
+            is_modal_open={is_modal_open}
+            set_selected_message_for_modal={set_selected_message_for_modal}
+            selected_message_for_modal={selected_message_for_modal}
+            selectWarningOption={selectWarningOption}
+            set_selected_warning_reason={set_selected_warning_reason}
+            selected_warning_reason={selected_warning_reason}
           />
-        </div>
+        )}
+        {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
       </div>
-    </>
+
+      <div className="border  row-span-1  border-black grid grid-cols-[80%_10%_10%] items-center ">
+        <ChatInput
+          set_show_emoji_picker={set_show_emoji_picker}
+          show_emoji_picker={show_emoji_picker}
+          emojiClick={emojiClick}
+          heartClick={heartClick}
+          set_hearts={set_hearts}
+          hearts={hearts}
+          heartAnimationEnd={heartAnimationEnd}
+          current_host_nickname={current_host_nickname}
+          current_host_id={current_host_id}
+          message={message}
+          set_message={set_message}
+        />
+        <div>ㅇ</div>
+        <PaymentPage
+          current_host_nickname={current_host_nickname}
+          current_host_id={current_host_id}
+        />
+      </div>
+    </div>
   );
 };
 export default ChatRoom;

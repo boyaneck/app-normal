@@ -107,8 +107,6 @@ export interface animated_component_props {
 }
 
 export interface chat_input_components_props {
-  chatInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  sendMessage: () => void;
   set_show_emoji_picker: React.Dispatch<React.SetStateAction<boolean>>;
   show_emoji_picker: boolean;
   emojiClick: (event: any, emojiObject: any) => voiid;
