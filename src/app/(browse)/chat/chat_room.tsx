@@ -214,20 +214,9 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
       </div>
 
-      <div className="border  row-span-1  border-black grid  items-center ">
-        <ChatInput
-          set_show_emoji_picker={set_show_emoji_picker}
-          show_emoji_picker={show_emoji_picker}
-          emojiClick={emojiClick}
-          heartClick={heartClick}
-          set_hearts={set_hearts}
-          hearts={hearts}
-          heartAnimationEnd={heartAnimationEnd}
-          current_host_nickname={current_host_nickname}
-          current_host_id={current_host_id}
-          message={message}
-          set_message={set_message}
-        />
+      <div className="border row-span-1  border-black grid grid-cols-[80%_10%_10%] items-center ">
+        <ChatInput current_host_id={current_host_id} />
+        <div>d</div>
         <PaymentPage
           current_host_nickname={current_host_nickname}
           current_host_id={current_host_id}

@@ -1,10 +1,13 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Modal from "@/components/ui/modal"; // 기존 Modal 컴포넌트
 import { motion } from "framer-motion";
 import { createPortal } from "react-dom"; // React 18에서 ReactDOM 대신 import
 import useUserStore from "@/store/user";
 
+
+const MAX_MONEY=100000000
+const SELECT_PM_NUM=[5000,10000,500000]
 interface Props {
   current_host_nickname: string | null;
   current_host_id: string | null;
@@ -109,6 +112,78 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
       exit: { scale: 0, opacity: 0, transition: { duration: 0.15 } },
     };
 
+    interface payment_input_props{
+      is_open:boolean,
+      is_close:
+    }
+    const [error,set_error]=useState<string>("")
+    const [shake_key,set_shake_key]=useState<number>(0)
+    const [ input_money,set_input_money]=useState<string>("")
+      const openModal = useCallback(() => {
+    set_is_modal_open(true);
+  }, []);
+
+  // 모달 닫기
+  const closeModal = useCallback(() => {
+    set_is_modal_open(false);
+    set_error("");
+    set_input_money(''); // 금액 초기화
+    set_shake_key(0); // 쉐이크 키 초기화
+  }, []);
+    const moneyChange=useCallback((e:React.ChangeEvent<HTMLInputElement>)=>{
+       let val=e.target.value.replace(/[^0-9]/g,'')
+     if(Number(val)>MAX_MONEY){
+       if(Number(input_money) ===MAX_MONEY){
+        set_shake_key(prev=>prev+1)
+        return
+       }
+       set_error(`최대 결제 금액은 ${formatNum(MAX_MONEY)}원 입니다.`)
+       val=String(MAX_MONEY)
+      set_shake_key(prev=>prev+1)
+
+      }else {
+        set_error("")
+      }
+      set_input_money(val)
+    },[input_money])
+    const pmModalVarients=({is_open,is_close}:{is_open:boolean,is_close:()=>void})=>{
+      const modalVariants={
+        hidden:{y:"100%",opacity:0},
+        visible:{
+          y:0,
+          opacity:1,
+          transition:{type:"string",stifness:300,damping:35,duration:0.3},
+          exit:{y:"100%",opacity:0 , transition:{duration:0.2}}
+        }
+      }
+    }
+    const shakeVariants={
+      shake:{x:[0,-10,10,-5,5,0], 
+        transition:{duration:0.3}
+      }
+    }
+
+   const formatNum = (num: number | string): string => {
+  if (typeof num === 'string') {
+    // 콤마 제거 및 숫자로 변환
+    num = Number(num.replace(/[^0-9]/g, '')); 
+  }
+  if (isNaN(num) || num === 0) return '';
+  return num.toLocaleString('ko-KR');
+};
+    const quickAmountButtons=()=>(
+      <div className="grid grid-cols-3 gap-x-3">
+        {SELECT_PM_NUM.map((amount))=>(
+          <button
+          key={amount}
+          onClick={()=>quickNum(amount)}>
+            +{formatNum(amount)}
+          </button>
+        )}
+      </div>
+    )
+  
+
     return createPortal(
       <div
         className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
@@ -117,15 +192,35 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
         <motion.div
           className="bg-white rounded-2xl shadow-2xl w-4/5 max-w-md p-6"
           onClick={(e) => e.stopPropagation()}
-          variants={modalVariants}
+          variants={pmModalVarients}
           initial="hidden"
           animate="visible"
           exit="exit"
         >
-          <p>결제를 진행하시겠습니까?</p>
-          <div>결제창 만들기</div>
+
+
+          <quickAmountButtons/>
+
+        <div className="">최대 {MAX_MONEY} 원 까지 힙력 가능합니다</div>
           <div>{current_host_nickname} 유저에게 입금됩니다.</div>
           <input placeholder="금액을 입력하세요" ref={pay_ref}></input>
+
+      <motion.div
+      key={}
+      variants={shakeVariants}
+      animate={error?"shake":""}
+      className="relative"
+      >
+<span>원화 
+  <input 
+  id="amount"
+  ref={}
+  placeholder="0"
+  value={formatNum()}
+  onChange={moneyChange}/>
+</span>
+
+      </motion.div>
 
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

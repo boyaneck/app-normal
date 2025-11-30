@@ -11,7 +11,7 @@ export const option_data = [
   { id: "opt7", reason: "음란물" },
 ];
 export const sanction_duration = ["60분", "12시간", "24시간", "7일", "30일"];
-export const max_messages = 6;
+export const max_messages = 11;
 
 // export const FIXED_HEIGHT_PX = 95; // 1.5줄 높이 (약 40px)
 export const FIXED_HEIGHT_PX = 35; // 1.5줄 높이 (약 40px)
