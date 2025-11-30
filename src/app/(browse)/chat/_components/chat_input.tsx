@@ -1,4 +1,3 @@
-import { chat_input_components_props } from "@/types/chat";
 import { useCallback, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import Picker from "emoji-picker-react";
@@ -6,19 +5,11 @@ import { AnimatedHeart } from "./animated_heart";
 import PaymentPage from "../../_components/payment/payment";
 import useChatInput from "@/hooks/useChatInput";
 import { FIXED_HEIGHT_PX, scroll_fading } from "@/utils/chat";
-export const ChatInput = ({
-  set_show_emoji_picker,
-  show_emoji_picker,
-  emojiClick,
-  heartClick,
-  set_hearts,
-  hearts,
-  heartAnimationEnd,
-  current_host_nickname,
-  message,
-  current_host_id,
-  set_message,
-}: chat_input_components_props) => {
+
+interface props {
+  current_host_id: string;
+}
+export const ChatInput = ({ current_host_id }: props) => {
   const {
     input_msg,
     debounced,
@@ -39,26 +30,27 @@ export const ChatInput = ({
   } = useChatInput({ current_host_id });
 
   return (
-    <div className="absolute bottom-0 left-0 w-3/4 mb-2 border border-e-red-400">
-      <script>{scroll_fading}</script>
-      <div
-        className={`relative ml-1 h-9
+    <div>
+      <div className="absolute bottom-0 left-0 w-3/4 mb-2">
+        <script>{scroll_fading}</script>
+        <div
+          className={`relative ml-1 h-9
         transition-all duration-500 ease-in-out
         ${is_overflow && is_hover ? `  top-fade-mask-active` : ""}`}
-        ref={wrapperRef}
-        style={{ height: `${FIXED_HEIGHT_PX}px` }}
-      >
-        <textarea
-          placeholder="메세지를 입력하세요"
-          ref={textareaRef}
-          value={input_msg}
-          onChange={inputChange}
-          onMouseEnter={mouseEnter}
-          onMouseLeave={mouseLeave}
-          onKeyDown={(e) => {
-            if (e.code === "Enter" && blankChk) sendMsg();
-          }}
-          className="
+          ref={wrapperRef}
+          style={{ height: `${FIXED_HEIGHT_PX}px` }}
+        >
+          <textarea
+            placeholder="메세지를 입력하세요"
+            ref={textareaRef}
+            value={input_msg}
+            onChange={inputChange}
+            onMouseEnter={mouseEnter}
+            onMouseLeave={mouseLeave}
+            onKeyDown={(e) => {
+              if (e.code === "Enter" && blankChk) sendMsg();
+            }}
+            className="
           
            rounded-xl
           w-full h-full 
@@ -71,58 +63,30 @@ export const ChatInput = ({
         focus-within:ring-gray-400
         focus:bg-transparent
         bg-gray-100"
-        />
-        <button
-          disabled={!blankChk}
-          onClick={sendMsg}
-          className={`hover:cursor-pointer
+          />
+          <button
+            disabled={!blankChk}
+            onClick={sendMsg}
+            className={`hover:cursor-pointer
         ${blankChk ? "bg-blue-600 " : ""}
           `}
-        >
-          <Send
-            className={`absolute right-2 top-2 
+          >
+            <Send
+              className={`absolute right-2 top-2 
               transition-all duration-300 ease-in-out
               w-5 h-5
 
             hover:bg-purple-400
               ${is_overflow && is_hover ? "opacity-0" : ""}
           `}
-          />
-        </button>
-        <button
-          className={`absolute right-3 -top-7 bg-gray-400 rounded-3xl shadow-lg transition-all duration-300
+            />
+          </button>
+          <button
+            className={`absolute right-3 -top-7 bg-gray-400 rounded-3xl shadow-lg transition-all duration-300
           ${limit_text < 20 ? "bg-red-300 text-white font-semibold " : ""}
           `}
-        ></button>
-        {/* <button
-        className="relative"
-        onClick={() => set_show_emoji_picker(!show_emoji_picker)}
-      >
-        🙂
-        {show_emoji_picker && (
-          <div className="absolute bottom-full left-0 z-10 transform scale-75 translate-x-[-30%] translate-y-[12.5%]">
-            <Picker onEmojiClick={emojiClick} />
-
-          </div>
-        )}
-      </button> */}
-        {/* <button className="relative" onClick={heartClick}>
-        {hearts.map((heart) => (
-          <AnimatedHeart
-            key={heart?.id}
-            id={heart?.id}
-            onAnimationEnd={heartAnimationEnd}
-            // className="absolute bottom-full left-0"
-          />
-        ))}
-        ❤️
-      </button> */}
-        {/* <span className="flex justify-center items-center ">
-        <PaymentPage
-          current_host_nickname={current_host_nickname}
-          current_host_id={current_host_id}
-        />
-      </span> */}
+          ></button>
+        </div>
       </div>
     </div>
   );
