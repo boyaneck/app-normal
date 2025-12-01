@@ -21,6 +21,7 @@ import { AnimatedMessage } from "./_components/animated_message";
 import { ChatInput } from "./_components/chat_input";
 import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
+import { createPortal } from "react-dom";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -164,6 +165,30 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
       const timer = setTimeout(() => {}, 300);
     }
   }, [icon]);
+  const [is_pm_modal_open, set_is_pm_modal_open] = useState<boolean>(false);
+  const [id_target, set_id_target] = useState<Element | null>(null);
+  useEffect(() => {
+    const portalId = "payment-modal-target";
+    const target = document.getElementById(portalId);
+    if (!target) {
+      const newTarget = document.createElement("div");
+      newTarget.id = portalId;
+      document.body.appendChild(newTarget);
+      set_id_target(newTarget);
+
+      // 컴포넌트 언마운트 시 생성한 엘리먼트를 정리하는 로직
+      // return () => {
+      //   document.body.removeChild(newTarget);
+      // };
+    } else {
+      // 3. 대상 엘리먼트가 이미 존재하면 상태에 저장합니다.
+      set_id_target(target);
+    }
+  }, []);
+
+  if (!id_target) return null;
+
+  console.log("왜 fasle 가 안ㄷ욈 >", is_pm_modal_open);
   return (
     <div
       className={clsx(
@@ -175,7 +200,10 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
           `
       )}
     >
-      <div className=" row-span-9  flex flex-col-reverse ">
+      <div
+        className=" row-span-9  flex flex-col-reverse "
+        id={"payment-modal-target"}
+      >
         {/* --채팅메세지 */}
         <div className="">
           {receive_message_info.map((message_info) => {
@@ -217,10 +245,20 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
       <div className="border row-span-1  border-black grid grid-cols-[80%_10%_10%] items-center ">
         <ChatInput current_host_id={current_host_id} />
         <div>d</div>
-        <PaymentPage
-          current_host_nickname={current_host_nickname}
-          current_host_id={current_host_id}
-        />
+        <button className="" onClick={() => set_is_pm_modal_open(true)}>
+          돈
+        </button>
+        {id_target &&
+          is_pm_modal_open &&
+          createPortal(
+            <PaymentPage
+              set_is_pm_modal_open={set_is_pm_modal_open}
+              is_pm_modal_open={is_pm_modal_open}
+              current_host_nickname={current_host_nickname}
+              current_host_id={current_host_id}
+            />,
+            id_target
+          )}
       </div>
     </div>
   );
