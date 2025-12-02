@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 import Picker from "emoji-picker-react";
@@ -22,6 +28,7 @@ import { ChatInput } from "./_components/chat_input";
 import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
 import { createPortal } from "react-dom";
+import { AnimatePresence } from "framer-motion";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -166,27 +173,17 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     }
   }, [icon]);
   const [is_pm_modal_open, set_is_pm_modal_open] = useState<boolean>(false);
-  const [id_target, set_id_target] = useState<Element | null>(null);
+  const [id_target, set_id_target] = useState<HTMLElement | null>(null);
+  const [money_amount, set_money_amount] = useState("");
+
+  const [ref_target, set_ref_target] = useState<HTMLDivElement | null>(null);
+  const paymentRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    const portalId = "payment-modal-target";
-    const target = document.getElementById(portalId);
-    if (!target) {
-      const newTarget = document.createElement("div");
-      newTarget.id = portalId;
-      document.body.appendChild(newTarget);
-      set_id_target(newTarget);
-
-      // 컴포넌트 언마운트 시 생성한 엘리먼트를 정리하는 로직
-      // return () => {
-      //   document.body.removeChild(newTarget);
-      // };
-    } else {
-      // 3. 대상 엘리먼트가 이미 존재하면 상태에 저장합니다.
-      set_id_target(target);
+    if (paymentRef.current) {
+      set_id_target(paymentRef.current);
     }
-  }, []);
-
-  if (!id_target) return null;
+  }, []); // 마운트 시 한 번 실행되어 ref를 state에 담음
 
   console.log("왜 fasle 가 안ㄷ욈 >", is_pm_modal_open);
   return (
@@ -201,8 +198,9 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
       )}
     >
       <div
-        className=" row-span-9  flex flex-col-reverse "
+        className=" row-span-9 flex flex-col-reverse "
         id={"payment-modal-target"}
+        ref={paymentRef}
       >
         {/* --채팅메세지 */}
         <div className="">
@@ -248,8 +246,8 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         <button className="" onClick={() => set_is_pm_modal_open(true)}>
           돈
         </button>
+
         {id_target &&
-          is_pm_modal_open &&
           createPortal(
             <PaymentPage
               set_is_pm_modal_open={set_is_pm_modal_open}
