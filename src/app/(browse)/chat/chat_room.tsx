@@ -29,6 +29,7 @@ import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
 import { createPortal } from "react-dom";
 import { AnimatePresence } from "framer-motion";
+import { CreditCardIcon } from "lucide-react";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -244,7 +245,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         <ChatInput current_host_id={current_host_id} />
         <div>d</div>
         <button className="" onClick={() => set_is_pm_modal_open(true)}>
-          돈
+          <CreditCardIcon />
         </button>
 
         {id_target &&
