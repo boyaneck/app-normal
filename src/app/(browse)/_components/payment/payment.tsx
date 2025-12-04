@@ -273,7 +273,7 @@ const PaymentPage = ({
                 className={`
                 bg-gray-200 rounded-full h-[2px] 
             transition-all duration-300 ease-out
-            ${is_focused_input ? "bg-blue-400 w-3/4" : "w-2/4"}
+            ${is_focused_input ? "bg-blue-500 w-3/4" : "w-2/4"}
             `}
               ></div>
             </div>
