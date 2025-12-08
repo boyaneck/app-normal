@@ -121,7 +121,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         set_show_streamer_info_bar(false);
       }}
     >
-      z{/* {content} */}
+      {content}
       {/* <div>현재 모든 시청자 수 {total_viewer}</div> */}
       {/* {show_streamer_info_bar && (
         <div
