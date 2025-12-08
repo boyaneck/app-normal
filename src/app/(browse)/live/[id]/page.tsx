@@ -111,7 +111,7 @@ const LivePage = () => {
       <div className="grid grid-cols-12 h-[75vh] relative ">
         <div
           ref={videoRef}
-          className="col-start-2 col-span-7 h-3/4 bg-pink-300"
+          className="col-start-2 col-span-7 h-3/4"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -121,7 +121,7 @@ const LivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            className="h-full w-full bg-yellow-300"
+            className="h-full w-full "
           >
             <Video
               host_name={current_host_nickname}
