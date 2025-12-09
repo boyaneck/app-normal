@@ -1,8 +1,6 @@
-import { createIngress, getLiveUser } from "@/api";
+import { getLiveUser } from "@/api";
 import useUserStore from "@/store/user";
-import { LiveKitRoom } from "@livekit/components-react";
-import React, { useCallback, useEffect, useState } from "react";
-import Video from "../../live/_components/video";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useViewerToken } from "@/hooks/useViewerToken";
 import { useQuery } from "@tanstack/react-query";
 import { User } from "@/types/user";
@@ -43,6 +41,25 @@ const Main_banner = () => {
 
   const curr_items = SLIDER_ITEMS[curr_idx];
   const all_items = SLIDER_ITEMS.length;
+  const [banner_title_in, set_banner_title_in] = useState<boolean>(true);
+  const [banner_title_out, set_banner_title_out] = useState<boolean>(true);
+  useEffect(() => {
+    set_banner_title_in(true);
+    const timer = setTimeout(() => {
+      set_banner_title_in(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [curr_idx]);
+  const bannerTitleTrans = useMemo(() => {
+    if (banner_title_out) {
+      return `translate-y-[-100%] opacity-0`;
+    }
+    if (banner_title_in) {
+      return `translate-y-[100%] opacity-0`;
+    }
+
+    return `translate-y-0 opacity-100`;
+  }, [banner_title_out, banner_title_in]);
   const { user } = useUserStore((state) => state);
   const {
     data: LiveUser,
@@ -58,37 +75,36 @@ const Main_banner = () => {
   //미리 보기 라이브 영상 2초로 설정,2초마다 슬라이드 됨
   useEffect(() => {
     if (slider_stop || all_items === 0) return;
-
+    const EXIT_DELAY = MAIN_BANNER_SLIDE_DURATION - 300;
+    const exit_timer = setTimeout(() => {
+      set_banner_title_out(true);
+    }, EXIT_DELAY);
     const timeout = setTimeout(() => {
-      set_curr_idx((prev) => (prev + 1) % all_items);
+      const new_idx = (curr_idx + 1) % all_items;
+      set_curr_idx(new_idx);
+
+      set_banner_title_out(false);
+      const sss = setTimeout(() => {
+        set_banner_title_out(false);
+      }, 2000);
+      set_progress_key((prev) => prev + 1);
+      if (new_idx === 0) {
+        set_carousel_start_idx(0);
+      } else {
+        set_carousel_start_idx(new_idx);
+      }
     }, MAIN_BANNER_SLIDE_DURATION);
 
     return () => clearTimeout(timeout);
-  }, [curr_idx, slider_stop, all_items]);
-
-  useEffect(() => {
-    if (video_time || curr_items.is_live) {
-      set_video_time(0);
-      return;
-    }
-    const interval = setInterval(() => {
-      set_video_time((prev) => {
-        if (prev !== undefined) {
-          const next_time = prev + 1;
-          if (next_time >= MAIN_BANNER_VIDEO_DURATION) {
-            return 0;
-          }
-        }
-      });
-    }, 1000);
-  }, [video_play, curr_idx, curr_items.is_live]);
+  }, [curr_idx, all_items]);
 
   const handle_silde_click = (idx: number) => {};
   const mouseEnter = useCallback(() => set_slider_stop(false), []);
   const mouseLeave = useCallback(() => set_slider_stop(false), []);
+  const THUMBNAIL_WIDTH_PLUS_MARGIN = 140;
   return (
     <div
-      className="relative h-1/2 border border-orange-400-500 rounded-xl overflow-hidden
+      className="relative h-full border rounded-xl overflow-hidden
      "
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
@@ -96,7 +112,7 @@ const Main_banner = () => {
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
         style={{
-          backgroundImage: `url(${curr_items.thumbnailUrl})`,
+          backgroundImage: `url(${curr_items.thumb_url})`,
           filter: "brightness(0.9)",
         }}
       >
@@ -106,34 +122,56 @@ const Main_banner = () => {
 
       {/* 여기다가 onmouse를 해야하나? */}
       <div
-        className="relative
-      z-10 h-full w-full p-8 flex flex-col justify-between text-white border border-black "
+        className={`relative flex flex-col justify-between
+      z-10 h-full w-full p-8 
+      text-white border border-black `}
       >
-        그렇고 말구
-        <div className=" w-full border border-sky-800 space-x-2">
-          <h2 className="text-2xl font-black">
-            현재 스트림{curr_items.is_live ? "라이브" : "예정된"}
-          </h2>
+        <span
+          className={`mb-5
+            inline-block
+          transition-all duration-300 ease-in-out
+       
+          ${bannerTitleTrans}
+          `}
+        >
+          <div>{curr_items.title}</div>
+          <div>시청자수</div>
+        </span>
+        <div
+          className=" w-full  space-x-2 overflow-hidden"
+          style={{
+            maxWidth: `${
+              MAIN_BANNER_VISIBLE_COUNT * THUMBNAIL_WIDTH_PLUS_MARGIN
+            }px`,
+          }}
+        >
+          <h2 className="text-2xl font-black"></h2>
           {/*  */}
           <div
             className="flex space-x-3 text-sm text-gray-400 transition-transform duration-500 ease-in-out
         "
+            style={{
+              transform: `translateX(-${
+                carousel_start_idx * THUMBNAIL_WIDTH_PLUS_MARGIN
+              }px)`,
+              width: `${all_items * THUMBNAIL_WIDTH_PLUS_MARGIN}px`,
+            }}
           >
             {SLIDER_ITEMS.map((item, idx) => {
               const is_active = idx === curr_idx;
               return (
                 <div
                   key={item.id}
-                  className={`relative duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
+                  className={`relative w-32 flex-shrink-0 duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
                     is_active
                       ? `opacity-100 border-2 border-white`
-                      : `opacity-70 border-2 border-transparent`
+                      : `opacity-25 border-2 border-transparent`
                   }`}
                 >
                   <img
-                    src={item.thumbnailUrl}
+                    src={item.thumb_url}
                     alt={item.title}
-                    className="w-full rounded-lg object-cover"
+                    className="w-full h-full placeholder:rounded-lg object-cover"
                   />
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-500 overflow-hidden">
                     <div
@@ -145,7 +183,6 @@ const Main_banner = () => {
                 </div>
               );
             })}
-            <span className="">채널 이름</span>
           </div>
         </div>
       </div>

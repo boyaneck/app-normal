@@ -1,15 +1,32 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Modal from "@/components/ui/modal"; // 기존 Modal 컴포넌트
-import { motion } from "framer-motion";
+import { AnimatePresence, easeInOut, motion } from "framer-motion";
 import { createPortal } from "react-dom"; // React 18에서 ReactDOM 대신 import
 import useUserStore from "@/store/user";
 
+const MAX_MONEY = 10000000;
+const SELECT_PM_NUM = [5000, 10000, 50000];
 interface Props {
   current_host_nickname: string | null;
   current_host_id: string | null;
+  is_pm_modal_open: boolean;
+  set_is_pm_modal_open: Dispatch<SetStateAction<boolean>>;
 }
-const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
+const PaymentPage = ({
+  current_host_nickname,
+  current_host_id,
+  is_pm_modal_open,
+  set_is_pm_modal_open,
+}: Props) => {
   const { user } = useUserStore();
   const pay_ref = useRef<HTMLInputElement>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
@@ -19,29 +36,17 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
   useEffect(() => {
     const iamport = document.createElement("script");
     iamport.src = "https://cdn.iamport.kr/v1/iamport.js";
-
     iamport.onload = () => {
       set_is_import_loaded(true);
     };
-
     iamport.onerror = () => {
       console.error("아임포트 로딩 실패");
     };
-
     document.head.appendChild(iamport);
-
     return () => {
       document.head.removeChild(iamport);
     };
   }, []);
-
-  const openModal = () => {
-    set_is_modal_open(true);
-  };
-
-  const closeModal = () => {
-    set_is_modal_open(false);
-  };
 
   const pay = () => {
     if (!is_import_loaded) {
@@ -49,7 +54,6 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
       return;
     }
 
-    console.log("가격은 ?", pay_ref?.current?.value);
     const { IMP } = window as Window as any;
     if (IMP) {
       IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);
@@ -66,7 +70,7 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
             user: user?.user_nickname,
           }),
           // amount: pay_ref?.current?.value,
-          amount: 103,
+          amount: input_money,
           buyer_email: "jinxx93@naver.com",
           buyer_name: user?.user_nickname,
           buyer_tel: "010-4242-4242",
@@ -88,77 +92,246 @@ const PaymentPage = ({ current_host_nickname, current_host_id }: Props) => {
     }
   };
 
-  // 자체 모달 컴포넌트 (framer-motion 적용)
-  const PaymentConfirmationModal = ({
-    isOpen,
-    onClose,
-  }: {
-    isOpen: boolean;
-    onClose: () => void;
-  }) => {
-    const modalVariants = {
-      hidden: { scale: 0 },
-      visible: {
-        scale: 1,
-        transition: {
-          type: "spring",
-          stiffness: 100,
-          damping: 20,
-          duration: 0.2,
-        },
-      },
-      exit: { scale: 0, opacity: 0, transition: { duration: 0.15 } },
-    };
+  interface payment_input_props {
+    is_open: boolean;
+    is_close: () => void;
+  }
+  const [error, set_error] = useState<string>("");
+  const [shake_key, set_shake_key] = useState<number>(0);
+  const [input_money, set_input_money] = useState<string>("");
+  const openModal = useCallback(() => {
+    set_is_modal_open(true);
+  }, []);
 
-    return createPortal(
-      <div
-        className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
-        onClick={onClose}
-      >
+  // 모달 닫기
+  const closeModal = useCallback(() => {
+    set_is_modal_open(false);
+    set_error("");
+    set_input_money(""); // 금액 초기화
+    set_shake_key(0); // 쉐이크 키 초기화
+  }, []);
+  const moneyChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let val = e.target.value.replace(/[^0-9]/g, "");
+      if (Number(val) > MAX_MONEY) {
+        if (Number(input_money) === MAX_MONEY) {
+          set_shake_key((prev) => prev + 1);
+          return;
+        }
+        set_error(`최대 결제 금액은 ${formatNum(MAX_MONEY)}원 입니다.`);
+        val = String(MAX_MONEY);
+        set_shake_key((prev) => prev + 1);
+      } else {
+        set_error("");
+      }
+      set_input_money(val);
+    },
+    [input_money]
+  );
+  const pmModalVarients = ({
+    is_open,
+    is_close,
+  }: {
+    is_open: boolean;
+    is_close: () => void;
+  }) => {};
+  const modalVariants = {
+    hidden: { y: "100%", opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 200,
+        damping: 35,
+        duration: 0.3,
+      },
+    },
+    exit: {
+      y: "100%",
+      opacity: 0,
+      transition: { duration: 0.5, ease: easeInOut },
+    },
+  };
+  const shakeVariants = {
+    shake: { x: [0, -10, 10, -5, 5, 0], transition: { duration: 0.3 } },
+  };
+
+  const formatNum = (num: number | string): string => {
+    if (typeof num === "string") {
+      // 콤마 제거 및 숫자로 변환
+      num = Number(num.replace(/[^0-9]/g, ""));
+    }
+    if (isNaN(num) || num === 0) return "";
+    return num.toLocaleString("ko-KR");
+  };
+
+  const pureAmount = useMemo(() => {
+    return Number(input_money.replace(/[^0-9]/g, ""));
+  }, [input_money]);
+
+  const quickMoneyAmount = useCallback(
+    (val: number) => {
+      let amount = pureAmount + val;
+      if (amount > MAX_MONEY) {
+        amount = MAX_MONEY;
+        set_error(`최대 결제 금액은 ${formatNum(MAX_MONEY)}원 입니다.`);
+        set_is_focused_input(true);
+        set_shake_key((prev) => prev + 1);
+      } else {
+        set_error("");
+      }
+      set_input_money(String(amount));
+      set_is_focused_input(true);
+    },
+    [pureAmount]
+  );
+
+  const moneyInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = e.target.value.replace(/[^0-9]/g, "");
+
+      if (Number(value) > MAX_MONEY) {
+        if (Number(input_money) === MAX_MONEY) {
+          set_shake_key((prev) => prev + 1);
+          return;
+        }
+        set_error(`최대 결제 금액은 ${formatNum(MAX_MONEY)}원 입니다.`);
+        value = String(MAX_MONEY);
+        set_shake_key((prev) => prev + 1);
+      } else {
+        set_error("");
+      }
+      set_input_money(value);
+    },
+    [input_money]
+  );
+  const QuickAmountButtons = () => (
+    <div className="grid grid-cols-3 gap-x-3 text-sm mt-5">
+      {SELECT_PM_NUM.map((amount) => (
+        <button
+          key={amount}
+          onClick={() => quickMoneyAmount(amount)}
+          className="bg-gray-1 rounded-xl
+          border h-11
+          flex items-center justify-center
+          transition-all duration-500 ease-in-out 
+          focus:outline-none
+          hover:cursor-pointer hover:font-semibold hover:bg-gray-100 hover
+          "
+        >
+          +{formatNum(amount)}
+        </button>
+      ))}
+    </div>
+  );
+
+  const [is_focused_input, set_is_focused_input] = useState<boolean>(false);
+
+  return (
+    <AnimatePresence>
+      {is_pm_modal_open && (
+        // <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-300 bg-opacity-50 z-50 ">
         <motion.div
-          className="bg-white rounded-2xl shadow-2xl w-4/5 max-w-md p-6"
+          className="absolute bottom-20 left-9 bg-white rounded-2xl h-3/4 shadow-2xl w-4/5 max-w-md p-6"
           onClick={(e) => e.stopPropagation()}
           variants={modalVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
         >
-          <p>결제를 진행하시겠습니까?</p>
-          <div>결제창 만들기</div>
-          <div>{current_host_nickname} 유저에게 입금됩니다.</div>
-          <input placeholder="금액을 입력하세요" ref={pay_ref}></input>
+          <div className="flex items-center justify-center font-bold text-lg mb-2">
+            스트리머에게 후원하기
+          </div>
+          <div className="text-sm">
+            이 금액은{" "}
+            <span className="font-bold"> {current_host_nickname}</span> 유저에게
+            입금됩니다.
+          </div>
 
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={pay} // 결제 진행 함수 호출
+          <QuickAmountButtons />
+          <div className="flex  justify-center items-center"></div>
+          <motion.div
+            key={shake_key}
+            variants={shakeVariants}
+            animate={error ? "shake" : ""}
+            className="relative"
           >
-            결제 진행
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={onClose}
-          >
-            취소
-          </button>
+            <div className="flex flex-col items-center w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={formatNum(input_money)}
+                onChange={moneyInputChange}
+                placeholder="0"
+                onFocus={() => set_is_focused_input(true)}
+                onBlur={() => set_is_focused_input(false)}
+                ref={pay_ref}
+                className="w-full text-center outline-none mt-6 font-semibold p-2"
+              />
+              <div
+                className={`
+                bg-gray-200 rounded-full h-[2px] 
+            transition-all duration-300 ease-out
+            ${is_focused_input ? "bg-blue-500 w-3/4" : "w-2/4"}
+            `}
+              ></div>
+            </div>
+          </motion.div>
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="text-red-500 text-sm mt-1 mb-1 text-center font-medium"
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
+          <div className="grid grid-rows-2 gap-y-5 mt-6">
+            <div className="">
+              <button
+                disabled={Number(input_money) > MAX_MONEY || input_money === ""}
+                className={`bg-blue-400 shadow-md shadow-blue-300
+                transition-all duration-300 ease-in-out 
+                active:shadow-lg
+                w-full
+                text-white font-bold py-2 px-4 rounded
+                disabled:opacity-40
+                
+                ${input_money ? "hover:cursr-pointer hover:bg-blue-600" : ""}
+                `}
+                onClick={pay} // 결제 진행 함수 호출
+              >
+                {`${formatNum(input_money)}`} 결제
+              </button>
+            </div>
+
+            <div>
+              <button
+                className="w-full
+                
+                text-gray-400 font-bold py-2 px-4 rounded
+                tansition-all duration-300 ease-in-out
+                hover:cursor-pointer hover:font-semibold hover:text-black
+                hover:focus:ring-2 hover:focus:ring-gray-300
+                hover:bg-gray-100
+              "
+                onClick={() => {
+                  set_is_pm_modal_open(false);
+                  set_input_money("");
+                }}
+              >
+                취소
+              </button>
+            </div>
+          </div>
         </motion.div>
-      </div>,
-      document.body
-    );
-  };
-
-  return (
-    <div>
-      <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold rounded"
-        onClick={openModal}
-      >
-        <span className="hover:animate-money-flap">💰</span>
-      </button>
-
-      {is_modal_open && (
-        <PaymentConfirmationModal isOpen={is_modal_open} onClose={closeModal} /> // 자체 모달 사용
+        // </div>
       )}
-    </div>
+    </AnimatePresence>
   );
 };
 

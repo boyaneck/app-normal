@@ -9,7 +9,7 @@ const LiveSettingPage = () => {
   const { user } = useUserStore((state) => state);
   const { token, name, identity } = useViewerToken(user?.user_id);
   return (
-    <div className="grid grid-row-3 gap-2 bg-gray-500">
+    <div className="grid grid-row-3 gap-2 border border-red-400">
       {/* connect는 state 로 관리하여, 연결 유무 버튼을 통해 연결하기, */}
       <LiveKitRoom
         token={token}
@@ -18,9 +18,9 @@ const LiveSettingPage = () => {
         audio={false}
       >
         <LiveScreen />
-        <MetadataSetting />
-        <NetworkSetting />
       </LiveKitRoom>
+      <MetadataSetting />
+      <NetworkSetting />
     </div>
   );
 };

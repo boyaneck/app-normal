@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
 import { User } from "@/types/user";
 
-const Screen = () => {
+const LiveList = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
   const { user } = useUserStore((state) => state);
   const current_user_email =
@@ -68,83 +68,91 @@ const Screen = () => {
   };
 
   const user_email = user?.user_email === undefined ? "" : user.user_email;
-  const follow = (target_user_email: string, target_user_id: string) => {
-    followMutation.mutate({
-      current_user_email: user_email,
-      current_user_id,
-      target_user_email,
-      target_user_id,
-    });
-    alert("팔로우가 되었습니다");
-  };
+  // const follow = (target_user_email: string, target_user_id: string) => {
+  //   followMutation.mutate({
+  //     current_user_email: user_email,
+  //     current_user_id,
+  //     target_user_email,
+  //     target_user_id,
+  //   });
+  //   alert("팔로우가 되었습니다");
+  // };
 
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-3 gap-4">
       {liveuser.length > 0 ? (
         liveuser.map((user) => (
+          //가장 큰 div
           <div
             key={user.id}
-            className="p-4 bg-white rounded-lg shadow-lg"
+            className={`
+             
+              relative 
+              group 
+              p-4 rounded-lg shadow-lg 
+              transition-all duraion-500 ease-in-out
+              overflow-hidden
+              group-hover:border-gray-500
+                group-hover:shadow-2xl
+              `}
             onClick={() => {
               onHandlerRouter(user.id, user.user_nickname);
-              alert(user.user_nickname);
             }}
           >
-            {/* 스크린 컨테이너 */}
             <div
-              className="relative h-40 mb-4 rounded-md flex items-center justify-center"
-              onClick={() => {
-                follow(user.user_email, user.id);
-              }}
-              onMouseEnter={(e) => {
-                setTimeout(() => {
-                  callit(user.id, user.user_nickname, e);
-                }, 1000);
-              }}
-              onMouseLeave={() => {
-                setHost_id("");
-                setHost_nickname("");
-                setChkPreviewForToken("");
-                alert("마우스 때기 ");
-              }}
+              className={`
+                group
+                bg-transparent
+                flex items-center justify-center
+                h-40 mb-4 rounded-md
+                transition-all duration-500 ease-in-out
+                group-hover:scale-y-[1.2]
+                group-hover:scale-x-[1.2]
+                group-hover:h-full
+                group-hover:w-full
+                
+                `}
             >
               {token === chkPreviewForToken && user.id === host_id && (
-                <div className="absolute top-0 left-0 w-full h-full">
+                <>
                   {/* span 대신 div 사용 */}
-                  <div className="absolute top-0 left-0 w-full h-full border border-red-400">
-                    {/* 자식 div에 border 지정 */}
-                    <LiveKitRoom
-                      video={true}
-                      audio={true}
-                      token={token}
-                      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-                    >
-                      <Video
-                        host_name={host_nickname}
-                        host_identity={host_id}
-                        token={chkPreviewForToken}
-                      />
-                    </LiveKitRoom>
-                  </div>
-                </div>
+                  {/* 자식 div에 border 지정 */}
+                  <LiveKitRoom
+                    video={true}
+                    audio={true}
+                    token={token}
+                    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+                  >
+                    <Video
+                      host_name={host_nickname}
+                      host_identity={host_id}
+                      token={chkPreviewForToken}
+                    />
+                  </LiveKitRoom>
+                </>
               )}
-              <span className="absolute top-0 left-0 text-xl font-semibold text-gray-700 border border-red-500">
-                aaa
-              </span>
             </div>
-            <div className="border border-green-400">제목</div>
-
-            {/* 아바타와 제목이 왼쪽 정렬 */}
-            <div className="flex flex-col items-start">
-              <div className="flex items-center mb-2">
-                {user.avatar_url && (
-                  <img
-                    src={user.avatar_url}
-                    alt={`${user.name}'s avatar`}
-                    className="w-12 h-12 rounded-full mr-2"
-                  />
-                )}
-                <h3 className="text-lg font-semibold">{user.user_nickname}</h3>
+            <div>
+              <div
+                className={`
+                flex space-x-3
+                transition-all duration-500 
+                group-hover:translate-y-full group-hover:opacity-0
+                group-hover:border-red-500
+                hover:cursor-pointer
+                
+                `}
+              >
+                <img
+                  className="object-cover w-8 h-8 rounded-full"
+                  src="https://plus.unsplash.com/premium_photo-1691095182210-a1b3c46a31d6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyfHx8ZW58MHx8fHx8"
+                ></img>
+                <span>
+                  <div className="font-bold">제목</div>
+                  <div className="">아이디</div>
+                  <span>조회수</span>
+                  <span className="ml-3">년수</span>
+                </span>
               </div>
             </div>
           </div>
@@ -156,4 +164,4 @@ const Screen = () => {
   );
 };
 
-export default Screen;
+export default LiveList;

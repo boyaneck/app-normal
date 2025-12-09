@@ -17,6 +17,8 @@ import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
 import { MdOutlineFitScreen } from "react-icons/md";
 import { AiOutlineFullscreenExit } from "react-icons/ai";
+import LiveListSlide from "../_components/live_list_slide";
+import ChattingSlide from "../_components/chatting_slide";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -82,7 +84,6 @@ const LivePage = () => {
   }
   const videoRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-
   const handleFullScreen = () => {
     if (!isFullScreen) {
       // 전체 화면 진입
@@ -98,13 +99,19 @@ const LivePage = () => {
     setIsFullScreen(!isFullScreen);
   };
 
+  const [slide_toggle, set_slide_toggle] = useState<boolean>(true);
+  const SlideToggle = () => {
+    set_slide_toggle((prev) => !prev);
+  };
+  const liquidEase = {
+    transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+  };
   return (
     <div>
-      <div className="grid grid-cols-12 h-[75vh] relative overflow-hidden">
-        {/* ✅ 1. 비디오 컨테이너: 비디오와 그 위로 올라갈 UI를 모두 감쌉니다. */}
+      <div className="grid grid-cols-12 h-[75vh] relative ">
         <div
           ref={videoRef}
-          className="col-start-2 col-span-9 h-full relative"
+          className="col-start-2 col-span-7 h-3/4"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -114,38 +121,61 @@ const LivePage = () => {
             audio={true}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-            // ✅ 중복 클래스 제거 및 부모에 맞게 채우도록 변경
-            className="w-full h-full"
+            className="h-full w-full "
           >
             <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
               token={token}
-              className="w-full h-full object-contain "
             />
           </LiveKitRoom>
-          <ChatPage
-            current_host_nickname={current_host_nickname}
-            current_host_id={current_host_id}
-          />
 
-          {/* ✅ 2. 비디오 위로 올라가는 UI (전체화면 버튼, 정보 바) */}
-          {/* StreamerInfoBar는 show prop에 따라 숨겨질 것입니다. */}
           <StreamerInfoBar
             items={stream_nav_bar}
             show={show_streamer_info_bar}
           />
-
-          <button
-            onClick={handleFullScreen}
-            className="absolute bottom-4 right-4 z-10 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-          >
-            {isFullScreen ? <AiOutlineFullscreenExit /> : "전체"}
-          </button>
         </div>
+        <div
+          className={`col-start-9 col-span-3 
+           overflow-hidden relative
+           h-3/4 ml-4 rounded-xl border border-black
+          `}
+        >
+          <button onClick={SlideToggle} className="p-2 border border-black">
+            버튼
+          </button>
+          <div
+            className={`
+            absolute top-10 left-0
+            w-full h-[calc(100%-2.5rem)] 
+            transition-transform duration-700 z-10 cubic-bezier(0.25, 0.1, 0.25, 1)
+            ${slide_toggle ? "translate-x-0" : "translate-x-full"} 
+          `}
+          >
+            <ChatPage
+              current_host_nickname={current_host_nickname}
+              current_host_id={current_host_id}
+            />
+          </div>
+
+          <div
+            className={`
+            absolute top-10 left-0
+            w-full h-[calc(100%-2.5rem)]
+            transition-transform duration-700 z-20
+            bg-blue-600 cubic-bezier(0.25, 0.1, 0.25, 1)
+            ${
+              slide_toggle
+                ? "translate-x-full" // slide_toggle=true (Panel 1 보일 때) -> Panel 2 숨김
+                : "translate-x-0" // slide_toggle=false (Panel 2 보일 때) -> Panel 2 표시
+            }
+          `}
+          ></div>
+        </div>
+        {/*채팅과 라이브목록 슬라이드 */}
       </div>
 
-      <div>
+      {/* <div>
         방송 경과 시간: <span ref={timerRef}>{live_time}</span>
         <StreamerInfo
           live_information={live_information}
@@ -153,7 +183,7 @@ const LivePage = () => {
           current_host_email={current_host_nickname}
         />
         새로운 공간
-      </div>
+      </div> */}
     </div>
   );
 };

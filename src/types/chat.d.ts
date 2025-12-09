@@ -106,21 +106,20 @@ export interface animated_component_props {
   set_is_modal_open: React.Dispatch<React.SetStateAction<booelan>>;
 }
 
-export interface chat_input_components_props {
-  chatInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  sendMessage: () => void;
-  set_show_emoji_picker: React.Dispatch<React.SetStateAction<boolean>>;
-  show_emoji_picker: boolean;
-  emojiClick: (event: any, emojiObject: any) => voiid;
-  heartClick: () => void;
-  set_hearts: React.Dispatch<React.SetStateAction<heart[]>>;
-  hearts: heart[];
-  heartAnimationEnd: (id: heart) => void;
-  current_host_nickname: string;
-  current_host_id: string;
-  message: string;
-  set_message: React.Dispatch<React.SetStateAction<string>>;
-}
+// export interface chat_input_components_props {
+//   chatInput: (event: React.ChangeEventHandler<HTMLTextAreaElement>) => void;
+//   set_show_emoji_picker: React.Dispatch<React.SetStateAction<boolean>>;
+//   show_emoji_picker: boolean;
+//   emojiClick: (event: any, emojiObject: any) => voiid;
+//   heartClick: () => void;
+//   set_hearts: React.Dispatch<React.SetStateAction<heart[]>>;
+//   hearts: heart[];
+//   heartAnimationEnd: (id: heart) => void;
+//   current_host_nickname: string;
+//   current_host_id: string;
+//   message: string;
+//   set_message: React.Dispatch<React.SetStateAction<string>>;
+// }
 
 export interface chat_sanction_component_props {
   set_is_modal_open: React.Dispatch<React.SetStateAction<boolean>>;
