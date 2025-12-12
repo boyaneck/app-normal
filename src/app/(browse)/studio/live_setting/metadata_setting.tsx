@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-type drage_event = (e: DragEvent<HTMLInputElement>) => void;
+type drage_event = (e: React.DragEvent<HTMLDivElement>) => void;
 
 const MetadataSetting = () => {
   const [thumb_url, set_thumb_url] = useState<string | null>(null);
@@ -63,40 +63,64 @@ const MetadataSetting = () => {
   const dropThumb: drage_event = useCallback((e) => {
     e.preventDefault();
     set_is_dragging(false);
-
-    const files = e.dataTransfers.fi;
   }, []);
 
+  const [title, set_title] = useState<string>("");
+  const [desc, set_desc] = useState<string>("");
+
   return (
-    <div>
-      <div>
-        <label htmlFor="live-title" className="">
-          방송제목
-        </label>
+    <div className="ml-2">
+      <div className="flex flex-col ">
+        <div className="flex justify-between w-2/4 items-center">
+          <label htmlFor="live-title" className="">
+            방송제목
+          </label>
+          <p className="text-xs text-gray-400 items-end">
+            {title.length > 0 ? (
+              <span className="text-black">{title.length}</span>
+            ) : (
+              0
+            )}
+            /50
+          </p>
+        </div>
+
         <input
           id="live-title"
           type="text"
+          value={title}
+          onChange={(e) => set_title(e.target.value)}
           placeholder="방송의 제목을 입력하세요."
           maxLength={50}
-          className="p-1"
+          className={`p-1 pl-2 w-2/4 rounded-lg border-none 
+            ${title.length > 0 ? "bg-white" : "bg-gray-100"}`}
         />
-        <p className="text-ts text-gray-400 ">/50</p>
-      </div>
-      <div>
-        <label htmlFor="live-description">방송 설명</label>
-        <textarea
-          name=""
-          id="live-description"
-          placeholder="방송에 대한 설명을 입력하세요."
-          className="overflow-hidden resize-none"
-        />
-        <p className=" text-xs text-gray-400 ">/200</p>
+        <div>
+          <div className="flex justify-between w-2/4 mt-2 items-center">
+            <label htmlFor="live-description">방송 설명</label>
+            <p className=" text-xs text-gray-400 text-">
+              {desc.length > 0 ? (
+                <span className="text-black">{desc.length}</span>
+              ) : (
+                0
+              )}
+              /200
+            </p>
+          </div>
+          <textarea
+            name=""
+            id="live-description"
+            value={desc}
+            onChange={(e) => set_desc(e.target.value)}
+            placeholder="방송에 대한 설명을 입력하세요."
+            className={`overflow-hidden resize-none w-2/4 h-[150px] rounded-lg p-2
+              ${desc.length > 0 ? "bg-white" : "bg-gray-100"}
+              `}
+          />
+        </div>
       </div>
       <div>
         썸네일 업로드
-        <div>
-          <Image className="w-4 h-4 " />
-        </div>
         <div
           onDragOver={dragOverThumb}
           onDragEnter={dragEnterThumb}
@@ -106,11 +130,11 @@ const MetadataSetting = () => {
         >
           <div className="flex items-center space-x-4">
             {/* 미리보기 영역 */}
-            <div className="w-32 h-20 flex-shrink-0 bg-gray-700 rounded-lg overflow-hidden border-gray-500"></div>
+            <div className="w-32 h-20 flex-shrink-0 bg-gray-300 rounded-lg overflow-hidden border-gray-500"></div>
             {thumb_url ? (
               <img src={thumb_url} alt="썸네일 미리보기" />
             ) : (
-              <div className="w-full h-full flex flex-col text-gray-500 text-ts text-center">
+              <div className="w-full h-full flex flex-col text-gray-400 text-ts text-center">
                 <Image className="w-5 h-5 " />
                 <span>이미지 없음</span>
               </div>

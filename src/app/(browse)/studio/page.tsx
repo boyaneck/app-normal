@@ -21,7 +21,7 @@ const StudioPage = () => {
         <div onClick={() => onHandlerMenu("analysis")}>분석</div>
         <div onClick={() => onHandlerMenu("notice")}>공지사항</div>
       </div>
-      <div className="col-span-8 h-1/2 bg-orange-200">
+      <div className="col-span-8 h-1/2 ">
         <StudioMainBanner selected_menu={select_menu} />
       </div>
     </div>
