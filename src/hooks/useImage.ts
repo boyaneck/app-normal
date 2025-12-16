@@ -1,56 +1,23 @@
 import { useCallback, useRef, useState } from "react";
-import { useDropzone, FileRejection, DropEvent } from "react-dropzone";
+import Dropzone, {
+  useDropzone,
+  FileRejection,
+  DropEvent,
+} from "react-dropzone";
 
 export const useImage = () => {
-  const [is_process, set_is_process] = useState<boolean>(false);
   const [preview, set_preview] = useState<string | null>(null);
   const [is_drag, set_is_drag] = useState<boolean>(false);
+  const [is_loading, set_is_loading] = useState(false);
+  const [error_msg, set_error_msg] = useState<string | null>(null);
   const [upload_success, set_upload_success] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onDrop = useCallback(
-    async (accepdted_files: File[], file_rejection: any[]) => {
-      //   if (file_rejection.length > 0) {
-      //     const { errors } = file_rejection[0];
-      //     if (errors[0].code === "file-too-large") {
-      //       console.log("파일 크기가 너무 큽니다.");
-      //     } else if (errors[0].code === "file-invalid-type") {
-      //       console.log("지원하지 않는 파일의 형식");
-      //     } else {
-      //       console.log("이미지 업로드 중 오류가 발생");
-      //     }
-      //     return;
-      //   }
-      //   if (accepdted_files.length > 0) {
-      //     const file = accepdted_files[0];
-      //     set_is_process(true);
-      //     try {
-      //       const compressed_prev = await compressImage(file, 800, 0.8);
-      //       set_preview(compressed_prev);
-      //       set_upload_success(true);
-      //     } catch (error) {}
-      //   }
-    },
-    []
-  );
-  const {
-    getRootProps,
-    getInputProps,
-    isDragAccept,
-    isDragActive,
-    isDragReject,
-  } = useDropzone({
-    onDrop,
-    accept: {
-      "image/jpeg": [],
-      "image/png": [],
-      "image/wbep": [],
-    },
-    maxFiles: 1,
-    maxSize: 5 * 1024 * 1024,
-    noKeyboard: true,
-  });
-  const compressImage = (file: File, max_width: number, quality: number) => {
+  const compressImage = (
+    file: File,
+    max_width: number,
+    quality: number
+  ): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!file.type.startsWith("image/")) {
         return reject(new Error("File is not an image type."));
@@ -87,7 +54,61 @@ export const useImage = () => {
       reader.onerror = (error) => reject(error);
     });
   };
+  const onDrop = useCallback(
+    async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      set_is_loading(true);
+      set_preview(null);
+      set_error_msg(null);
 
+      if (acceptedFiles.length > 0) {
+        try {
+          const file = acceptedFiles[0];
+          const MAX_WIDTH = 800;
+          const QUALITY = 0.8;
+
+          // Canvas를 사용한 리사이징 및 압축 실행
+          const compressedDataUrl = await compressImage(
+            file,
+            MAX_WIDTH,
+            QUALITY
+          );
+
+          set_preview(compressedDataUrl);
+        } catch (error) {
+          console.error("Image processing error:", error);
+          set_error_msg("이미지 처리 중 오류가 발생했습니다.");
+        }
+      }
+      set_is_loading(false);
+    },
+    []
+  );
+  const {
+    getRootProps,
+    getInputProps,
+    isDragAccept,
+    isDragActive,
+    isDragReject,
+    open,
+  } = useDropzone({
+    onDrop,
+    accept: {
+      "image/jpeg": [],
+      "image/png": [],
+      "image/wbep": [],
+    },
+    maxFiles: 1,
+    maxSize: 5 * 1024 * 1024,
+    noKeyboard: true,
+  });
+
+  const removePreview = useCallback(() => {
+    set_preview(null);
+    set_error_msg(null);
+  }, []);
+  const thumbnailChangeForClick = useCallback(async () => {
+    open();
+  }, [open]);
   return {
     preview,
     set_preview,
@@ -99,5 +120,8 @@ export const useImage = () => {
     isDragAccept,
     isDragActive,
     isDragReject,
+    thumbnailChangeForClick,
+    removePreview,
+    is_loading,
   };
 };
