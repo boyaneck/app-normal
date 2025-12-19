@@ -75,7 +75,6 @@ const MetadataSetting = () => {
               `}
           />
         </div>
-        썸네일 업로드
         <ThumbUpload />
       </div>
       <div></div>

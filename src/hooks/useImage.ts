@@ -1,16 +1,11 @@
 import { useCallback, useRef, useState } from "react";
-import Dropzone, {
-  useDropzone,
-  FileRejection,
-  DropEvent,
-} from "react-dropzone";
+import Dropzone, { useDropzone, FileRejection } from "react-dropzone";
 
 export const useImage = () => {
   const [preview, set_preview] = useState<string | null>(null);
   const [is_drag, set_is_drag] = useState<boolean>(false);
   const [is_loading, set_is_loading] = useState(false);
   const [error_msg, set_error_msg] = useState<string | null>(null);
-  const [upload_success, set_upload_success] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const compressImage = (
