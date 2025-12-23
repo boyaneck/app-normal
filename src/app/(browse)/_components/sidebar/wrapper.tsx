@@ -12,7 +12,12 @@ const Wrapper = ({ children }: WrapperProps) => {
   return (
     <aside
       className={cn(
-        "fixed top-40 ml-2 left-0 h-[500px] w-56 flex flex-col bg-gray-100 z-50 rounded-lg transition-all duration-300 ease-in-out ",
+        `fixed top-40 ml-2 left-0 h-[500px] w-56 flex flex-col
+         bg-white/40 backdrop-blur-2xl 
+         border border-white/60
+         shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]
+         z-50 rounded-lg transition-all duration-300 ease-in-out `,
+
         collapsed && "w-[70px]"
       )}
     >

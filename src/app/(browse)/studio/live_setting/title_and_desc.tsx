@@ -1,33 +1,14 @@
-import { useImage } from "@/hooks/useImage";
-import { useConnectionState } from "@livekit/components-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Image, Move, Upload } from "lucide-react";
-import React, {
-  ChangeEvent,
-  DragEventHandler,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
-import ThumbUpload from "./thumb_upload";
+import { useLiveSettingStore } from "@/store/live_setting_store";
+import React, { useRef, useState } from "react";
 type drage_event = (e: React.DragEvent<HTMLDivElement>) => void;
 
-const MetadataSetting = () => {
-  const { preview, set_preview, is_drag } = useImage();
-  // const [preview, set_previewe] = useState<string | null>(null);
-  const [is_processing, set_is_processing] = useState<boolean>(false);
-  const [upload_up, set_upload_up] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  /////////////
-  const [thumb_url, set_thumb_url] = useState<string | null>(null);
-  const [is_dragging, set_is_dragging] = useState<boolean>(false);
-
-  const [title, set_title] = useState<string>("");
-  const [desc, set_desc] = useState<string>("");
+const TitleAndDescription = () => {
+  const { title, set_title, desc, set_desc } = useLiveSettingStore(
+    (state) => state
+  );
 
   return (
-    <div className="ml-2">
+    <div className="">
       <div className="flex flex-col ">
         <div className="flex justify-between w-2/4 items-center">
           <label htmlFor="live-title" className="">
@@ -75,12 +56,10 @@ const MetadataSetting = () => {
               `}
           />
         </div>
-        썸네일 업로드
-        <ThumbUpload />
       </div>
       <div></div>
     </div>
   );
 };
 
-export default MetadataSetting;
+export default TitleAndDescription;

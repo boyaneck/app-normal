@@ -1,16 +1,12 @@
+import { useLiveSettingStore } from "@/store/live_setting_store";
 import { useCallback, useRef, useState } from "react";
-import Dropzone, {
-  useDropzone,
-  FileRejection,
-  DropEvent,
-} from "react-dropzone";
+import Dropzone, { useDropzone, FileRejection } from "react-dropzone";
 
 export const useImage = () => {
-  const [preview, set_preview] = useState<string | null>(null);
+  const { thumb_url, set_thumb_url } = useLiveSettingStore((state) => state);
   const [is_drag, set_is_drag] = useState<boolean>(false);
   const [is_loading, set_is_loading] = useState(false);
   const [error_msg, set_error_msg] = useState<string | null>(null);
-  const [upload_success, set_upload_success] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const compressImage = (
@@ -57,7 +53,7 @@ export const useImage = () => {
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       set_is_loading(true);
-      set_preview(null);
+      set_thumb_url("");
       set_error_msg(null);
 
       if (acceptedFiles.length > 0) {
@@ -73,7 +69,7 @@ export const useImage = () => {
             QUALITY
           );
 
-          set_preview(compressedDataUrl);
+          set_thumb_url(compressedDataUrl);
         } catch (error) {
           console.error("Image processing error:", error);
           set_error_msg("이미지 처리 중 오류가 발생했습니다.");
@@ -103,15 +99,15 @@ export const useImage = () => {
   });
 
   const removePreview = useCallback(() => {
-    set_preview(null);
+    set_thumb_url("");
     set_error_msg(null);
   }, []);
   const thumbnailChangeForClick = useCallback(async () => {
     open();
   }, [open]);
   return {
-    preview,
-    set_preview,
+    thumb_url,
+    set_thumb_url,
     is_drag,
     set_is_drag,
     fileInputRef,
