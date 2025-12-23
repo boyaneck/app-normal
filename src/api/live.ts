@@ -1,6 +1,12 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 import { post_live_stats_props } from "@/types/live";
-
+interface live_info_insert_props {
+  user_email?: string;
+  thumb_url: string;
+  title: string;
+  desc: string;
+  user_id?: string;
+}
 //Ingress API
 export const insertIngress = async (
   user_id: string | undefined,
@@ -79,4 +85,33 @@ export const getWeekleyPost = async (room_name: string) => {
     return [];
   }
   return weekly_data;
+};
+
+interface props {
+  user_email?: string;
+  thumb_url: string;
+  title: string;
+}
+export const insertAndUpdateLiveInfo = async ({
+  user_id,
+  thumb_url,
+  title,
+  desc,
+}: live_info_insert_props) => {
+  console.log("방송관련 정보 넣기", user_id, thumb_url, title, desc);
+  const { data, error } = await supabaseForClient
+    .from("live_information")
+    .upsert(
+      {
+        user_id,
+        thumb_url,
+        title,
+        desc,
+      },
+      { onConflict: "user_id" }
+    );
+  if (error) {
+    console.error("저장 중 오류 발생:", error.message);
+    return null;
+  }
 };

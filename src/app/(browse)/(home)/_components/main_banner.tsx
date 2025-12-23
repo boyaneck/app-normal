@@ -98,13 +98,12 @@ const Main_banner = () => {
     return () => clearTimeout(timeout);
   }, [curr_idx, all_items]);
 
-  const handle_silde_click = (idx: number) => {};
   const mouseEnter = useCallback(() => set_slider_stop(false), []);
   const mouseLeave = useCallback(() => set_slider_stop(false), []);
   const THUMBNAIL_WIDTH_PLUS_MARGIN = 140;
   return (
     <div
-      className="relative h-full border rounded-xl overflow-hidden
+      className="relative h-[50vh] border rounded-xl overflow-hidden
      "
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
@@ -115,16 +114,13 @@ const Main_banner = () => {
           backgroundImage: `url(${curr_items.thumb_url})`,
           filter: "brightness(0.9)",
         }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent "></div>
-        메인 배너 화면이 들어가는 곳
-      </div>
+      ></div>
 
       {/* 여기다가 onmouse를 해야하나? */}
       <div
         className={`relative flex flex-col justify-between
       z-10 h-full w-full p-8 
-      text-white border border-black `}
+      text-white border  `}
       >
         <span
           className={`mb-5

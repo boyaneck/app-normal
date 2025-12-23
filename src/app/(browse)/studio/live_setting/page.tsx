@@ -1,26 +1,29 @@
 import React from "react";
 import LiveScreen from "./live_screen";
-import MetadataSetting from "./metadata_setting";
-import NetworkSetting from "./network_setting";
 import { LiveKitRoom } from "@livekit/components-react";
 import useUserStore from "@/store/user";
 import { useViewerToken } from "@/hooks/useViewerToken";
+import ThumbUpload from "./thumb_upload";
+import TitleAndDescription from "./title_and_desc";
+import LiveSetting from "../live_setting";
+import LiveSettingButton from "./live_setting_button";
 const LiveSettingPage = () => {
   const { user } = useUserStore((state) => state);
   const { token, name, identity } = useViewerToken(user?.user_id);
   return (
-    <div className="grid grid-row-3 gap-2 border border-red-400">
+    <div className="">
       {/* connect는 state 로 관리하여, 연결 유무 버튼을 통해 연결하기, */}
-      <LiveKitRoom
+      {/* <LiveKitRoom
         token={token}
         serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
         connect={true}
         audio={false}
       >
         <LiveScreen />
-      </LiveKitRoom>
-      <MetadataSetting />
-      <NetworkSetting />
+      </LiveKitRoom> */}
+      <TitleAndDescription />
+      <ThumbUpload />
+      <LiveSettingButton />
     </div>
   );
 };
