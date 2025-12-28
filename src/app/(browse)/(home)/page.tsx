@@ -1,5 +1,5 @@
 "use client";
-import { getLiveUser } from "@/api";
+import { getLiveListNow, getLiveUser } from "@/api";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -19,6 +19,11 @@ interface User {
 }
 
 export default function Home() {
+  const { data: live_list_now } = useQuery({
+    queryKey: ["live_list"],
+    queryFn: getLiveListNow,
+  });
+
   const { collapsed } = useSidebarStore();
 
   return (
