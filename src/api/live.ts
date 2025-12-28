@@ -1,5 +1,7 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 import { post_live_stats_props } from "@/types/live";
+import axios from "axios";
+import { randomUUID } from "crypto";
 interface live_info_insert_props {
   user_email?: string;
   thumb_url: string;
@@ -98,7 +100,6 @@ export const insertAndUpdateLiveInfo = async ({
   title,
   desc,
 }: live_info_insert_props) => {
-  console.log("방송관련 정보 넣기", user_id, thumb_url, title, desc);
   const { data, error } = await supabaseForClient
     .from("live_information")
     .upsert(
@@ -114,4 +115,11 @@ export const insertAndUpdateLiveInfo = async ({
     console.error("저장 중 오류 발생:", error.message);
     return null;
   }
+};
+
+export const getLiveListNow = async () => {
+  console.log("얍얍얍얍ㅇ뱡뱡뱡뱌");
+  try {
+    const res = await axios.get("http://localhost:3001/live/live_list_now");
+  } catch (error) {}
 };
