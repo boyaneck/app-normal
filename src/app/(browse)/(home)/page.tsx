@@ -23,7 +23,7 @@ export default function Home() {
     queryKey: ["live_list"],
     queryFn: getLiveListNow,
   });
-
+  console.log("메인베너에 들어갈 시청자가 가장많은 7개의 방송", live_list_now);
   const { collapsed } = useSidebarStore();
 
   return (
@@ -33,7 +33,7 @@ export default function Home() {
         collapsed ? "ml-[160px]" : " ml-[210px] "
       )}
     >
-      <Main_banner />
+      <Main_banner live_list_now={live_list_now} />
       <LiveList />
     </div>
   );

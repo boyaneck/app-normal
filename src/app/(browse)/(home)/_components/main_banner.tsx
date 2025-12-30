@@ -1,9 +1,5 @@
-import { getLiveUser } from "@/api";
-import useUserStore from "@/store/user";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useViewerToken } from "@/hooks/useViewerToken";
-import { useQuery } from "@tanstack/react-query";
-import { User } from "@/types/user";
 import {
   LIVE_STREAMS,
   MAIN_BANNER_SLIDE_DURATION,
@@ -11,16 +7,29 @@ import {
   MAIN_BANNER_VISIBLE_COUNT,
   UPCOMING_VIDEOS,
 } from "@/utils/main_banner";
+import { LiveKitRoom } from "@livekit/components-react";
+import { Users } from "lucide-react";
+import MainVideo from "./main_video";
+import BannerVideo from "./banner_video";
 
-const Main_banner = () => {
-  const [live_user, set_live_user] = useState<User[]>([]);
+interface banner_props {
+  score: number;
+  thumb_url: string;
+  title: string;
+  user_id: string;
+}
+
+interface banner_obj_props {
+  live_list_now: banner_props[];
+}
+
+const Main_banner = ({ live_list_now }: banner_obj_props) => {
   const [curr_idx, set_curr_idx] = useState<number>(0);
   const [slider_stop, set_slider_stop] = useState<boolean>(false);
-  const [video_time, set_video_time] = useState<number | undefined>(0);
-  const [video_play, set_video_play] = useState<boolean>(true);
   const [progres_key, set_progress_key] = useState(0);
   const [carousel_start_idx, set_carousel_start_idx] = useState<number>(0);
-  const [control_visible, set_control_visible] = useState<boolean>(false);
+  const [banner_title_in, set_banner_title_in] = useState<boolean>(true);
+  const [banner_title_out, set_banner_title_out] = useState<boolean>(true);
   const setCarouselSlide = useCallback((idx: number) => {
     if (idx >= carousel_start_idx + MAIN_BANNER_VISIBLE_COUNT) {
       set_carousel_start_idx(idx - MAIN_BANNER_VISIBLE_COUNT + 1);
@@ -37,12 +46,13 @@ const Main_banner = () => {
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10 ? "0" : ""}${sec}`;
   };
-  const SLIDER_ITEMS = [...LIVE_STREAMS, ...UPCOMING_VIDEOS];
+
+  //보여줘야 할 모든 배열
+  const SLIDER_ITEMS = live_list_now || [];
 
   const curr_items = SLIDER_ITEMS[curr_idx];
   const all_items = SLIDER_ITEMS.length;
-  const [banner_title_in, set_banner_title_in] = useState<boolean>(true);
-  const [banner_title_out, set_banner_title_out] = useState<boolean>(true);
+
   useEffect(() => {
     set_banner_title_in(true);
     const timer = setTimeout(() => {
@@ -60,15 +70,6 @@ const Main_banner = () => {
 
     return `translate-y-0 opacity-100`;
   }, [banner_title_out, banner_title_in]);
-  const { user } = useUserStore((state) => state);
-  const {
-    data: LiveUser,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["LiveUser"],
-    queryFn: getLiveUser,
-  });
 
   const { token } = useViewerToken("Guest");
 
@@ -100,6 +101,9 @@ const Main_banner = () => {
 
   const mouseEnter = useCallback(() => set_slider_stop(false), []);
   const mouseLeave = useCallback(() => set_slider_stop(false), []);
+  if (all_items === 0) {
+    return <span>sss</span>;
+  }
   const THUMBNAIL_WIDTH_PLUS_MARGIN = 140;
   return (
     <div
@@ -110,11 +114,19 @@ const Main_banner = () => {
     >
       <div
         className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
-        style={{
-          backgroundImage: `url(${curr_items.thumb_url})`,
-          filter: "brightness(0.9)",
-        }}
-      ></div>
+        // style={{
+        //   backgroundImage: `url(${curr_items.thumb_url})`,
+        //   filter: "brightness(0.9)",
+        // }}
+      >
+        <LiveKitRoom
+          video={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
+        >
+          <BannerVideo user_id={curr_items?.user_id} token={token} />
+        </LiveKitRoom>
+      </div>
 
       {/* 여기다가 onmouse를 해야하나? */}
       <div
@@ -130,8 +142,30 @@ const Main_banner = () => {
           ${bannerTitleTrans}
           `}
         >
-          <div>{curr_items.title}</div>
-          <div>시청자수</div>
+          <div className="flex items-center space-x-2 ">
+            {" "}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center bg-red-600/90 backdrop-blur-xl px-2.5 py-1 rounded-[8px] border border-white/10 shadow-lg">
+                <span className="relative flex h-1.5 w-1.5 mr-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                </span>
+                <span className="text-[10px] font-bold tracking-widest text-white leading-none">
+                  LIVE
+                </span>
+              </div>
+
+              <div className="flex items-center bg-white/10 backdrop-blur-2xl px-3 py-1 rounded-[8px] border border-white/10 shadow-lg">
+                <Users size={13} className="mr-2 text-white/80" />
+                <span className="text-[11px] font-semibold tracking-tight text-white/90 tabular-nums">
+                  {curr_items.score.toLocaleString()} 명 시청
+                </span>
+              </div>
+            </div>
+          </div>
+          <h1 className="text-5xl md:text-5xl font-extrabold tracking-tighter text-white mb-6 leading-[1.05] max-w-3xl drop-shadow-sm">
+            {curr_items.title}
+          </h1>
         </span>
         <div
           className=" w-full  space-x-2 overflow-hidden"
@@ -157,7 +191,7 @@ const Main_banner = () => {
               const is_active = idx === curr_idx;
               return (
                 <div
-                  key={item.id}
+                  key={item.user_id}
                   className={`relative w-32 flex-shrink-0 duration-300 cursor-pointer rounded-lg overflow-hidden transition-all aspect-video ${
                     is_active
                       ? `opacity-100 border-2 border-white`

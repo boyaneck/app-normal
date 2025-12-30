@@ -9,6 +9,10 @@ interface live_info_insert_props {
   desc: string;
   user_id?: string;
 }
+
+interface viewer {
+  value: string;
+}
 //Ingress API
 export const insertIngress = async (
   user_id: string | undefined,
@@ -118,8 +122,39 @@ export const insertAndUpdateLiveInfo = async ({
 };
 
 export const getLiveListNow = async () => {
-  console.log("얍얍얍얍ㅇ뱡뱡뱡뱌");
   try {
-    const res = await axios.get("http://localhost:3001/live/live_list_now");
+    const viewers_top7 = await axios.get(
+      "http://localhost:3001/live/live_list_now"
+    );
+    const viewers_top7_info = viewers_top7.data;
+    if (!viewers_top7_info || viewers_top7_info.length === 0) return [];
+    const score_map = new Map(
+      viewers_top7_info.map((item: any) => [item.value, item.score])
+    );
+    const room_name = viewers_top7_info.map((item: viewer) => item.value);
+    // const viwers_top7=viewers_top7_info.map((item)=>item.)
+    const { data: live_info, error: live_info_error } = await supabaseForClient
+      .from("live_information")
+      .select("*")
+      .in("user_id", room_name)
+      .eq("is_live", true);
+    const combined_info = live_info?.map((info) => {
+      return {
+        user_id: info.user_id,
+        title: info.title,
+        thumb_url: info.thumb_url,
+        score: score_map.get(info.user_id) || 0,
+      };
+    });
+
+    if (live_info_error) {
+      console.error(
+        " 현재 라이브가 많은 상위 7개의 영상 Supabase 상세 조회 중 에러 발생:",
+        live_info_error
+      );
+      throw live_info_error;
+    }
+
+    return combined_info;
   } catch (error) {}
 };
