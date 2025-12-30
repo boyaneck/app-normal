@@ -36,6 +36,7 @@ export const liveParticipantWebhook = async (req, res) => {
   const LIVE_PEAK_VIEW = `LIVE_PEAK_VIEW:${room_name}`;
   const LIVE_AVG_RATE = `LIVE_AVG_RATE:${room_name}`;
   const LIVE_STAY_MINUTE = `LIVE_STAY_MINUTE:${room_name}`;
+  const LIVE_VIEWER_RANK = `LIVE_VIEWER_RANK`;
   try {
     // get('Authorization') 대신 headers.authorization을 사용합니다.
     //최대 동시 시청자 수ㅇ
@@ -74,6 +75,11 @@ export const liveParticipantWebhook = async (req, res) => {
         await redis_client.sAdd(LIVE_VIEWERS, viewer);
         const current_viewers = await redis_client.sCard(LIVE_VIEWERS);
 
+        //해당 방에 유저 접속시,그 유저를 Count 하여 한번에 비교할 수 있도록
+        if (current_viewers) {
+          await redis_client.zIncrBy(LIVE_VIEWER_RANK, 1, room_name);
+        }
+
         // 최대 동시 시청자 수 갱신 로직 (간소화)
         const current_top_viewer_str = await redis_client.hGet(
           LIVE_PEAK_VIEW,
@@ -96,6 +102,15 @@ export const liveParticipantWebhook = async (req, res) => {
       }
       case "participant_left": {
         if (!viewer) break;
+
+        //유정 이탈시 SET에서 제거후, Count하여 숫자판에서도 제거-------
+        const viewer_remove = await redis_client.sRem(LIVE_VIEWERS, viewer);
+
+        if (viewer_remove) {
+          await redis_client.zIncrBy(LIVE_VIEWER_RANK, -1, room_name);
+        }
+        //------------------------
+
         const end_at = Date.now();
         const get_start_at = await redis_client.hGet(LIVE_AVG_RATE, viewer);
 
