@@ -8,24 +8,60 @@ interface banner_props {
 }
 
 const BannerVideo = ({ token, user_id }: banner_props) => {
-  const tracks = useTracks([Track.Source.Camera]).filter(
-    (track) => track.participant.identity === user_id
-  );
-  const connect = useConnectionState();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const connectionState = useConnectionState();
+
+  // 1. 트랙 구독 최적화 (카메라와 마이크)
+  const remoteTracks = useTracks([
+    Track.Source.Camera,
+    Track.Source.Microphone,
+  ]);
+
+  // 2. 특정 사용자의 트랙만 메모이제이션하여 추출
+  const participantTracks = useMemo(() => {
+    return remoteTracks.filter(
+      (track) => track.participant.identity === user_id
+    );
+  }, [remoteTracks, user_id]);
+
+  // 3. 비디오 트랙 수동 제어 (실력의 핵심: Lifecycle Management)
   useEffect(() => {
-    console.log("비디오 컴포넌트의 트랙", videoRef.current);
-  }, [user_id]);
-  useTracks([Track.Source.Microphone, Track.Source.Camera])
-    .filter((track) => track.participant.identity === user_id)
-    .forEach((track) => {
-      if (videoRef.current) track.publication.track?.attach(videoRef.current);
-    });
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const videoTrack = participantTracks.find(
+      (t) => t.source === Track.Source.Camera
+    )?.publication?.track;
+
+    if (videoTrack) {
+      videoTrack.attach(videoElement);
+
+      // 언마운트 시 반드시 Detach하여 메모리 누수 방지 (시니어급 포인트)
+      return () => {
+        videoTrack.detach(videoElement);
+      };
+    }
+  }, [participantTracks, videoRef]);
+
+  // 4. 상태 플래그 정의
+  const isConnecting =
+    connectionState === ConnectionState.Connecting ||
+    connectionState === ConnectionState.Reconnecting;
+  const isOffline = !participantTracks.some(
+    (t) => t.source === Track.Source.Camera
+  );
+
   return (
     <div>
       <div ref={wrapperRef} className="relative h-full flex">
-        <video ref={videoRef} width="100%" />
+        <video
+          ref={videoRef}
+          className={`w-full h-full object-cover transition-opacity duration-1000 ${
+            isOffline ? "opacity-0" : "opacity-100"
+          }`}
+          autoPlay
+          muted
+          playsInline
+        />
       </div>
     </div>
   );

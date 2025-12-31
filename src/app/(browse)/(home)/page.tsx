@@ -22,6 +22,8 @@ export default function Home() {
   const { data: live_list_now } = useQuery({
     queryKey: ["live_list"],
     queryFn: getLiveListNow,
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60,
   });
   console.log("메인베너에 들어갈 시청자가 가장많은 7개의 방송", live_list_now);
   const { collapsed } = useSidebarStore();
