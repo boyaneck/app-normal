@@ -11,6 +11,7 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { Users } from "lucide-react";
 import MainVideo from "./main_video";
 import BannerVideo from "./banner_video";
+import { UseQueryResult } from "@tanstack/react-query";
 
 interface banner_props {
   score: number;
@@ -21,9 +22,10 @@ interface banner_props {
 
 interface banner_obj_props {
   live_list_now: banner_props[];
+  tokenResults: UseQueryResult<string, Error>[];
 }
 
-const Main_banner = ({ live_list_now }: banner_obj_props) => {
+const Main_banner = ({ live_list_now, tokenResults }: banner_obj_props) => {
   const [curr_idx, set_curr_idx] = useState<number>(0);
   const [slider_stop, set_slider_stop] = useState<boolean>(false);
   const [progres_key, set_progress_key] = useState(0);
@@ -121,7 +123,7 @@ const Main_banner = ({ live_list_now }: banner_obj_props) => {
       >
         <LiveKitRoom
           video={true}
-          token={token}
+          token={tokenResults[curr_idx].data}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
         >
           <BannerVideo user_id={curr_items?.user_id} token={token} />
