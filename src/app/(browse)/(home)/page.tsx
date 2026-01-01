@@ -1,7 +1,7 @@
 "use client";
-import { getLiveListNow, getLiveUser } from "@/api";
+import { createViewerToken, getLiveListNow, getLiveUser } from "@/api";
 import { Button } from "@/components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Screen from "./_components/live_list";
@@ -22,10 +22,23 @@ export default function Home() {
   const { data: live_list_now } = useQuery({
     queryKey: ["live_list"],
     queryFn: getLiveListNow,
-    staleTime: 1000 * 60 * 60,
-    gcTime: 1000 * 60 * 60,
   });
-  console.log("메인베너에 들어갈 시청자가 가장많은 7개의 방송", live_list_now);
+
+  const tokenResults = useQueries({
+    queries: (live_list_now ?? []).map((item) => ({
+      queryKey: ["top7_viewers_token", item.user_id], // 각 쿼리를 식별할 수 있도록 value(ID)를 키에 포함
+      queryFn: () => createViewerToken(item.user_id),
+      enabled: !!item.user_id, // ID가 있을 때만 실행
+      staleTime: 1000 * 60 * 5, // 5분간 캐싱
+    })),
+  });
+
+  console.log(
+    "토큰은 과연 나왔는가",
+    tokenResults.map((item) => {
+      item.data;
+    })
+  );
   const { collapsed } = useSidebarStore();
 
   return (
@@ -35,7 +48,7 @@ export default function Home() {
         collapsed ? "ml-[160px]" : " ml-[210px] "
       )}
     >
-      <Main_banner live_list_now={live_list_now} />
+      <Main_banner live_list_now={live_list_now} tokenResults={tokenResults} />
       <LiveList />
     </div>
   );
