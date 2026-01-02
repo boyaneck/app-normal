@@ -21,8 +21,6 @@ export const insertIngress = async (
   server_url: string | undefined,
   ingress_id: string | undefined
 ) => {
-  console.log(user_id, target_user_email, stream_key, server_url, ingress_id);
-  console.log("타입알아보기", typeof user_id);
   const { data, error } = await supabaseForClient.rpc("abc", {
     user_id: user_id,
     target_user_email: target_user_email,
@@ -35,7 +33,6 @@ export const insertIngress = async (
 };
 
 export const getUserInfoAboutLive = async (user_id: string | undefined) => {
-  console.log("API 에서 확인하기", user_id);
   const { data: userInfoLive, error: userInfoError } = await supabaseForClient
     .from("users")
     .select(
@@ -133,6 +130,7 @@ export const getLiveListNow = async () => {
     );
     const room_name = viewers_top7_info.map((item: viewer) => item.value);
     // const viwers_top7=viewers_top7_info.map((item)=>item.)
+
     const { data: live_info, error: live_info_error } = await supabaseForClient
       .from("live_information")
       .select("*")
@@ -154,7 +152,6 @@ export const getLiveListNow = async () => {
       );
       throw live_info_error;
     }
-
     return combined_info;
   } catch (error) {}
 };

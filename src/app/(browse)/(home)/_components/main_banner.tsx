@@ -25,7 +25,7 @@ interface banner_obj_props {
   tokenResults: UseQueryResult<string, Error>[];
 }
 
-const Main_banner = ({ live_list_now, tokenResults }: banner_obj_props) => {
+const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
   const [curr_idx, set_curr_idx] = useState<number>(0);
   const [slider_stop, set_slider_stop] = useState<boolean>(false);
   const [progres_key, set_progress_key] = useState(0);
@@ -222,4 +222,4 @@ const Main_banner = ({ live_list_now, tokenResults }: banner_obj_props) => {
   );
 };
 
-export default Main_banner;
+export default MainBanner;
