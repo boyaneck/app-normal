@@ -25,16 +25,17 @@ const createGuestUser = () => {
  */
 export const createViewerToken = async (host_id: string | undefined) => {
   let now_user_info;
+  console.log("호스트의 아이디 확인하기", host_id);
   try {
     //1.로그인시 supabase로 부터 세션 정보를 받아 브라우저 쿠키에 저장
-    //2.서버 컴포넌트에게 브라우저에서 받은 쿠키를 넘겨줌
+    //2.next.js 서버에게 브라우저에서 받은 쿠키를 자동으로 넘겨줌
+    //3.서버에 도착한 쿠키들 중 supabase 관련 credit을 꺼내어 supabase에게 유효성 검사진행
     const supabase = createServerComponentClient({ cookies });
 
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser();
-    console.log("토큰이 유효한 토큰인지 확인", user);
     if (user && !error) {
       now_user_info = {
         id: user.id,
@@ -64,7 +65,6 @@ export const createViewerToken = async (host_id: string | undefined) => {
     }
   );
 
-  console.log("생성된 토큰 확인해보기", token);
   token.addGrant({
     room: host_id,
     roomJoin: true,
@@ -72,5 +72,9 @@ export const createViewerToken = async (host_id: string | undefined) => {
     canPublishData: true,
   });
 
-  return token.toJwt();
+  console.log("만든 토큰 확인하기", token);
+
+  const tokenStr = token.toJwt();
+  console.log("타입은 무엇입니까 ??", typeof tokenStr);
+  return tokenStr;
 };
