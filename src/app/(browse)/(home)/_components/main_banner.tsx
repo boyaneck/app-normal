@@ -22,7 +22,8 @@ interface banner_props {
 
 interface banner_obj_props {
   live_list_now: banner_props[];
-  tokenResults: UseQueryResult<string, Error>[];
+  // tokenResults: UseQueryResult<string, Error>[];
+  tokenResults: (string | undefined)[];
 }
 
 const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
@@ -43,11 +44,8 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
 
     return;
   }, []);
-  const formatTime = (seconds: number): string => {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-  };
+
+  console.log("메인베너에서 받은 토큰 결과값", tokenResults);
 
   //보여줘야 할 모든 배열
   const SLIDER_ITEMS = live_list_now || [];
@@ -55,6 +53,7 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
   const curr_items = SLIDER_ITEMS[curr_idx];
   const all_items = SLIDER_ITEMS.length;
 
+  const curr_token = tokenResults[curr_idx];
   useEffect(() => {
     set_banner_title_in(true);
     const timer = setTimeout(() => {
@@ -114,18 +113,30 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
       onMouseEnter={mouseEnter}
       onMouseLeave={mouseLeave}
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
-        // style={{
-        //   backgroundImage: `url(${curr_items.thumb_url})`,
-        //   filter: "brightness(0.9)",
-        // }}
-      >
+      <div>
         <LiveKitRoom
           video={true}
-          token={tokenResults[curr_idx].data}
+          token={"tokenResults?[curr_idx]."}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
         >
+          {curr_token ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 "
+              style={{
+                backgroundImage: `url(${curr_items.thumb_url})`,
+                filter: "brightness(0.9)",
+              }}
+            ></div>
+          )}
           <BannerVideo user_id={curr_items?.user_id} token={token} />
         </LiveKitRoom>
       </div>
