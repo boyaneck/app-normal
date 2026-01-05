@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Video from "../../live/_components/video";
 import { User } from "@/types/user";
+import LiveListVideo from "./live_list_video";
 
 const LiveList = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
@@ -123,11 +124,7 @@ const LiveList = () => {
                     token={token}
                     serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
                   >
-                    <Video
-                      host_name={host_nickname}
-                      host_identity={host_id}
-                      token={chkPreviewForToken}
-                    />
+                    <LiveListVideo />
                   </LiveKitRoom>
                 </>
               )}
