@@ -2,10 +2,8 @@
 import React from "react";
 import Wrapper from "./wrapper";
 import Toggle from "./toggle";
-import FollowingPage from "../../(home)/following/page";
 import { useRouter } from "next/navigation";
 import Following_user from "./follwing_user";
-import Recommendation from "./recommendation";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -19,9 +17,10 @@ const Sidebar = () => {
         onClick={onRouterHandler}
         className="hover cursor-pointer border border-black"
       >
+        팔로우 유저
         <Following_user />
+        팔로우 유저컴포넌트
       </span>
-      <Recommendation />
     </Wrapper>
   );
 };
