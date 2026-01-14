@@ -1,17 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useViewerToken } from "@/hooks/useViewerToken";
 import {
-  LIVE_STREAMS,
   MAIN_BANNER_SLIDE_DURATION,
-  MAIN_BANNER_VIDEO_DURATION,
   MAIN_BANNER_VISIBLE_COUNT,
-  UPCOMING_VIDEOS,
 } from "@/utils/main_banner";
 import { LiveKitRoom } from "@livekit/components-react";
 import { Users } from "lucide-react";
-import MainVideo from "./main_video";
 import BannerVideo from "./banner_video";
-import { UseQueryResult } from "@tanstack/react-query";
 
 interface banner_props {
   score: number;
@@ -116,7 +111,7 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
       <div>
         <LiveKitRoom
           video={true}
-          token={"tokenResults?[curr_idx]."}
+          token={curr_token}
           serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
         >
           {curr_token ? (
