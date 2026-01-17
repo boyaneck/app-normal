@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import Wrapper from "./wrapper";
-import Toggle from "./toggle";
 import { useRouter } from "next/navigation";
 import Following_user from "./follwing_user";
+import ToggleButton from "./toggle";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -12,7 +12,7 @@ const Sidebar = () => {
   };
   return (
     <Wrapper>
-      <Toggle />
+      <ToggleButton />
       <span
         onClick={onRouterHandler}
         className="hover cursor-pointer border border-black"

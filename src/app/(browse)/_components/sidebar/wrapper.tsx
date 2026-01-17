@@ -29,7 +29,7 @@ const Wrapper = ({ children }: WrapperProps) => {
         ease: "easeInOut",
       }}
       className={cn(
-        `fixed top-40 ml-2 left-4 h-[300px] flex flex-col
+        `fixed top-40 ml-2 left-4 h-[300px] flex flex-col 
          bg-white/40 backdrop-blur-2xl
          border border-black
          shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]
@@ -39,7 +39,7 @@ const Wrapper = ({ children }: WrapperProps) => {
       {children}
       <div className="border border-black rounded-xl">
         <div className="flex items-center">
-          <div className="border border-black rounded-full w-11 h-11 overflow-hidden  ">
+          <div className="border border-black rounded-full w-11 h-11 overflow-visible  ">
             <img
               src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie"
               alt="User"
