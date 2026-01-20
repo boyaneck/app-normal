@@ -26,8 +26,7 @@ export default function Home() {
       queryKey: ["top7_viewers_token", item.user_id], // 각 쿼리를 식별할 수 있도록 value(ID)를 키에 포함
       queryFn: async () => {
         const res = await createViewerToken(item.user_id);
-        const final_token = res.map((res) => res.data);
-        return res.map;
+        return res;
       },
       enabled: !!item.user_id, // ID가 있을 때만 실행
       staleTime: 1000 * 60 * 5, // 5분간 캐싱
@@ -43,7 +42,7 @@ export default function Home() {
     <div
       className={cn(
         "grid transition-all duration-300 ease-in-out mr-6 pt-6 ",
-        collapsed ? "ml-[160px]" : " ml-[210px] "
+        collapsed ? "ml-[160px]" : " ml-[210px] ",
       )}
     >
       <MainBanner live_list_now={live_list_now} tokenResults={tokensOnly} />
