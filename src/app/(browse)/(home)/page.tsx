@@ -33,6 +33,8 @@ export default function Home() {
     })),
   });
 
+  console.log("병렬식 토큰 확인하기", tokenResults[0].data);
+
   const tokensOnly = useMemo(() => {
     return tokenResults.map((result) => result.data);
   }, [tokenResults]);
