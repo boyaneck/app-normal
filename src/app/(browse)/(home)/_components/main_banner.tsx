@@ -34,6 +34,7 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
   const curr_items = SLIDER_ITEMS[curr_idx];
   const all_items = SLIDER_ITEMS.length;
 
+  //로그인을 하나 안하나 게스트용 토큰으로 사용 ?
   const { token: guestToken } = useViewerToken("Guest");
 
   // 아이템 변경 시 타이틀 애니메이션 및 영상 전환 타이머
@@ -143,13 +144,6 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-[1.1] max-w-2xl mb-10 drop-shadow-2xl">
             {curr_items.title}
           </h1>
-
-          <button className="flex items-center gap-3 bg-white text-black px-8 py-4 rounded-2xl font-black transition-all hover:bg-neutral-200 active:scale-95 shadow-xl group/btn">
-            <div className="bg-black rounded-full p-1 group-hover/btn:scale-110 transition-transform">
-              <Play size={14} fill="white" className="text-white ml-0.5" />
-            </div>
-            <span>라이브 시청하기</span>
-          </button>
         </div>
       </div>
 
