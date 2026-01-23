@@ -33,11 +33,6 @@ export default function Home() {
     })),
   });
 
-  console.log("병렬식 토큰 확인하기", tokenResults[0].data);
-
-  const tokensOnly = useMemo(() => {
-    return tokenResults.map((result) => result.data);
-  }, [tokenResults]);
   const { collapsed } = useSidebarStore();
 
   return (
@@ -47,7 +42,7 @@ export default function Home() {
         collapsed ? "ml-[160px]" : " ml-[210px] ",
       )}
     >
-      <MainBanner live_list_now={live_list_now} tokenResults={tokensOnly} />
+      <MainBanner live_list_now={live_list_now} tokenResults={tokenResults} />
       <LiveList />
     </div>
   );
