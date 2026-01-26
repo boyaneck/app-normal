@@ -144,6 +144,17 @@ const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter leading-[1.1] max-w-2xl mb-10 drop-shadow-2xl">
             {curr_items.title}
           </h1>
+          <span
+            className="w-8 h-8
+          overflow-hidden
+            "
+          >
+            <img
+              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie"
+              className="h-8 w-8 rounded-full
+              bg-white"
+            />
+          </span>
         </div>
       </div>
 
