@@ -1,6 +1,18 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
 import { post_live_stats_props } from "@/types/live";
+import axios from "axios";
+import { randomUUID } from "crypto";
+interface live_info_insert_props {
+  user_email?: string;
+  thumb_url: string;
+  title: string;
+  desc: string;
+  user_id?: string;
+}
 
+interface viewer {
+  value: string;
+}
 //Ingress API
 export const insertIngress = async (
   user_id: string | undefined,
@@ -9,8 +21,6 @@ export const insertIngress = async (
   server_url: string | undefined,
   ingress_id: string | undefined
 ) => {
-  console.log(user_id, target_user_email, stream_key, server_url, ingress_id);
-  console.log("타입알아보기", typeof user_id);
   const { data, error } = await supabaseForClient.rpc("abc", {
     user_id: user_id,
     target_user_email: target_user_email,
@@ -23,7 +33,6 @@ export const insertIngress = async (
 };
 
 export const getUserInfoAboutLive = async (user_id: string | undefined) => {
-  console.log("API 에서 확인하기", user_id);
   const { data: userInfoLive, error: userInfoError } = await supabaseForClient
     .from("users")
     .select(
@@ -79,4 +88,70 @@ export const getWeekleyPost = async (room_name: string) => {
     return [];
   }
   return weekly_data;
+};
+
+interface props {
+  user_email?: string;
+  thumb_url: string;
+  title: string;
+}
+export const insertAndUpdateLiveInfo = async ({
+  user_id,
+  thumb_url,
+  title,
+  desc,
+}: live_info_insert_props) => {
+  const { data, error } = await supabaseForClient
+    .from("live_information")
+    .upsert(
+      {
+        user_id,
+        thumb_url,
+        title,
+        desc,
+      },
+      { onConflict: "user_id" }
+    );
+  if (error) {
+    console.error("저장 중 오류 발생:", error.message);
+    return null;
+  }
+};
+
+export const getLiveListNow = async () => {
+  try {
+    const viewers_top7 = await axios.get(
+      "http://localhost:3001/live/live_list_now"
+    );
+    const viewers_top7_info = viewers_top7.data;
+    if (!viewers_top7_info || viewers_top7_info.length === 0) return [];
+    const score_map = new Map(
+      viewers_top7_info.map((item: any) => [item.value, item.score])
+    );
+    const room_name = viewers_top7_info.map((item: viewer) => item.value);
+    // const viwers_top7=viewers_top7_info.map((item)=>item.)
+
+    const { data: live_info, error: live_info_error } = await supabaseForClient
+      .from("live_information")
+      .select("*")
+      .in("user_id", room_name)
+      .eq("is_live", true);
+    const combined_info = live_info?.map((info) => {
+      return {
+        user_id: info.user_id,
+        title: info.title,
+        thumb_url: info.thumb_url,
+        score: score_map.get(info.user_id) || 0,
+      };
+    });
+
+    if (live_info_error) {
+      console.error(
+        " 현재 라이브가 많은 상위 7개의 영상 Supabase 상세 조회 중 에러 발생:",
+        live_info_error
+      );
+      throw live_info_error;
+    }
+    return combined_info;
+  } catch (error) {}
 };

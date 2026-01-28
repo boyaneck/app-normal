@@ -1,7 +1,5 @@
 "use client";
 import { getLiveUser } from "@/api";
-import { Button } from "@/components/ui/button";
-import useFollow from "@/hooks/useFollow";
 import { useViewerToken } from "@/hooks/useViewerToken";
 import { useSidebarStore } from "@/store/bar_store";
 import useUserStore from "@/store/user";
@@ -9,8 +7,8 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import Video from "../../live/_components/video";
 import { User } from "@/types/user";
+import LiveListVideo from "./live_list_video";
 
 const LiveList = () => {
   const [liveuser, setLiveUser] = useState<User[]>([]);
@@ -19,7 +17,6 @@ const LiveList = () => {
     typeof user?.user_email === "string" ? user?.user_email : "";
   const current_user_id = user?.user_id !== undefined ? user.user_id : "";
   const { collapsed } = useSidebarStore();
-  const { followMutation } = useFollow();
   const {
     data: LiveUser,
     error,
@@ -32,7 +29,7 @@ const LiveList = () => {
   const router = useRouter();
   const [host_id, setHost_id] = useState("");
   const [host_nickname, setHost_nickname] = useState<string | undefined>(
-    "유저없음"
+    "유저없음",
   );
 
   const [chkPreviewForToken, setChkPreviewForToken] = useState("");
@@ -52,7 +49,7 @@ const LiveList = () => {
   const callit = (
     user_id: string,
     user_nickname: string | undefined,
-    e: React.MouseEvent<HTMLElement>
+    e: React.MouseEvent<HTMLElement>,
   ) => {
     setHost_id(user_id);
     setHost_nickname(user_nickname);
@@ -60,10 +57,10 @@ const LiveList = () => {
 
   const onHandlerRouter = (
     user_id: string,
-    user_nickname: string | undefined
+    user_nickname: string | undefined,
   ) => {
     router.push(
-      `/live/+?host_id=${user_id}&host_nickname=${user_nickname}&host_email=${user_email}`
+      `/live/+?host_id=${user_id}&host_nickname=${user_nickname}&host_email=${user_email}`,
     );
   };
 
@@ -123,11 +120,7 @@ const LiveList = () => {
                     token={token}
                     serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
                   >
-                    <Video
-                      host_name={host_nickname}
-                      host_identity={host_id}
-                      token={chkPreviewForToken}
-                    />
+                    <LiveListVideo />
                   </LiveKitRoom>
                 </>
               )}
