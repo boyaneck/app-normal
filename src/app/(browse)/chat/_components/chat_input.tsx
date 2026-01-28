@@ -31,8 +31,8 @@ export const ChatInput = ({ current_host_id }: props) => {
 
   return (
     <div>
-      <div className="absolute bottom-0 left-0 w-3/4 mb-2">
-        <script>{scroll_fading}</script>
+      <div className=" absolute bottom-0 left-0 w-3/4 ">
+        {/* <script>{scroll_fading}</script> */}
         <div
           className={`relative ml-1 h-9
         transition-all duration-500 ease-in-out
@@ -51,7 +51,6 @@ export const ChatInput = ({ current_host_id }: props) => {
               if (e.code === "Enter" && blankChk) sendMsg();
             }}
             className="
-          
            rounded-xl
           w-full h-full 
         transition-all duration-300
@@ -59,9 +58,11 @@ export const ChatInput = ({ current_host_id }: props) => {
         resize-none
         shadow-inner
         focus:outline-none
-        focus-within:ring-2
         focus-within:ring-gray-400
         focus:bg-transparent
+        [scrollbar-width:none]
+        [-ms-overflow-style:none] 
+    [&::-webkit-scrollbar]:display-none
         bg-gray-100"
           />
           <button
@@ -72,11 +73,8 @@ export const ChatInput = ({ current_host_id }: props) => {
           `}
           >
             <Send
-              className={`absolute right-2 top-2 
+              className={`absolute right-2 top-2 w-5 h-5
               transition-all duration-300 ease-in-out
-              w-5 h-5
-
-            hover:bg-purple-400
               ${is_overflow && is_hover ? "opacity-0" : ""}
           `}
             />
