@@ -12,21 +12,21 @@ interface props {
 export const ChatInput = ({ current_host_id }: props) => {
   const {
     input_msg,
-    debounced,
+    // debounced,
     sendMsg,
     inputChange,
     blankChk,
     limit_text,
-    inputRef,
-    scrollFixRef,
+    // inputRef,
+    // scrollFixRef,
     wrapperRef,
     textareaRef,
     mouseLeave,
-    chkTextLength,
+    // chkTextLength,
     is_overflow,
     is_hover,
     mouseEnter,
-    set_is_overflow,
+    // set_is_overflow,
   } = useChatInput({ current_host_id });
 
   return (
@@ -35,7 +35,7 @@ export const ChatInput = ({ current_host_id }: props) => {
         {/* <script>{scroll_fading}</script> */}
         <div
           className={`relative ml-1 h-9
-        transition-all duration-500 ease-in-out
+        transition-[height] duration-500 ease-in-out
         ${is_overflow && is_hover ? `  top-fade-mask-active` : ""}`}
           ref={wrapperRef}
           style={{ height: `${FIXED_HEIGHT_PX}px` }}
@@ -53,7 +53,6 @@ export const ChatInput = ({ current_host_id }: props) => {
             className="
            rounded-xl
           w-full h-full 
-        transition-all duration-300
         pl-2 pr-5 py-[6px] text-sm leading-tight
         resize-none
         shadow-inner
@@ -62,7 +61,7 @@ export const ChatInput = ({ current_host_id }: props) => {
         focus:bg-transparent
         [scrollbar-width:none]
         [-ms-overflow-style:none] 
-    [&::-webkit-scrollbar]:display-none
+         [&::-webkit-scrollbar]:display-none
         bg-gray-100"
           />
           <button
@@ -74,7 +73,7 @@ export const ChatInput = ({ current_host_id }: props) => {
           >
             <Send
               className={`absolute right-2 top-2 w-5 h-5
-              transition-all duration-300 ease-in-out
+              transition-colors duration-300 ease-in-out
               ${is_overflow && is_hover ? "opacity-0" : ""}
           `}
             />
