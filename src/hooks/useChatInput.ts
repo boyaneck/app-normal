@@ -43,7 +43,10 @@ const useChatInput = ({ current_host_id }: props) => {
 
   const mouseLeave = useCallback(() => {
     set_is_hover(false);
-
+    if (textareaRef.current) {
+      const tx = textareaRef.current;
+      tx.scrollTop = tx.scrollHeight;
+    }
     // 애니메이션(축소)이 끝난 뒤 스크롤 위치를 0으로 초기화
     setTimeout(() => {
       if (textareaRef.current) {
@@ -77,6 +80,9 @@ const useChatInput = ({ current_host_id }: props) => {
     tx.style.height = "100%";
 
     tx.style.overflowY = expand ? "hidden" : "auto";
+    if (!expand) {
+      tx.scrollTop = 0; // 확장 상태가 아닐 때도 스크롤 위치를 고정
+    }
   }, [is_hover, input_msg]);
   // 5. 메시지 전송 로직
   const sendMsg = () => {
