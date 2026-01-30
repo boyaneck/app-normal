@@ -51,18 +51,21 @@ export const ChatInput = ({ current_host_id }: props) => {
               if (e.code === "Enter" && blankChk) sendMsg();
             }}
             className="
-           rounded-xl
-          w-full h-full 
-        pl-2 pr-5 py-[6px] text-sm leading-tight
-        resize-none
-        shadow-inner
-        focus:outline-none
-        focus-within:ring-gray-400
-        focus:bg-transparent
-        [scrollbar-width:none]
-        [-ms-overflow-style:none] 
-         [&::-webkit-scrollbar]:display-none
-        bg-gray-100"
+          rounded-xl
+    w-full h-full 
+    box-border        
+    pl-2 pr-10       
+    py-[10px]        
+    text-sm 
+    leading-6         
+    resize-none
+    shadow-inner
+    focus:outline-none
+    [scrollbar-width:none]
+    bg-gray-100
+    block             
+    align-top
+            "
           />
           <button
             disabled={!blankChk}
