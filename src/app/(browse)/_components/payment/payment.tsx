@@ -8,9 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Modal from "@/components/ui/modal"; // 기존 Modal 컴포넌트
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
-import { createPortal } from "react-dom"; // React 18에서 ReactDOM 대신 import
 import useUserStore from "@/store/user";
 
 const MAX_MONEY = 10000000;
@@ -83,7 +81,7 @@ const PaymentPage = ({
           } else {
             console.error("결제 실패:", response);
           }
-        }
+        },
       );
       console.log("결제 데이터가 잘 가는ㄴ지 확인하기", IMP.request_pay);
       closeModal(); // 결제창 닫기
@@ -126,7 +124,7 @@ const PaymentPage = ({
       }
       set_input_money(val);
     },
-    [input_money]
+    [input_money],
   );
   const pmModalVarients = ({
     is_open,
@@ -184,7 +182,7 @@ const PaymentPage = ({
       set_input_money(String(amount));
       set_is_focused_input(true);
     },
-    [pureAmount]
+    [pureAmount],
   );
 
   const moneyInputChange = useCallback(
@@ -204,7 +202,7 @@ const PaymentPage = ({
       }
       set_input_money(value);
     },
-    [input_money]
+    [input_money],
   );
   const QuickAmountButtons = () => (
     <div className="grid grid-cols-3 gap-x-3 text-sm mt-5">
@@ -233,7 +231,7 @@ const PaymentPage = ({
       {is_pm_modal_open && (
         // <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-300 bg-opacity-50 z-50 ">
         <motion.div
-          className="absolute bottom-20 left-9 bg-white rounded-2xl h-3/4 shadow-2xl w-4/5 max-w-md p-6"
+          className="absolute bottom-24 left-9 bg-white rounded-2xl h-4/5 shadow-2xl w-4/5 max-w-md p-6"
           onClick={(e) => e.stopPropagation()}
           variants={modalVariants}
           initial="hidden"

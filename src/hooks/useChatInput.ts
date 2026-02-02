@@ -44,13 +44,16 @@ const useChatInput = ({ current_host_id }: props) => {
   const mouseLeave = useCallback(() => {
     set_is_hover(false);
     if (textareaRef.current) {
-      const tx = textareaRef.current;
-      tx.scrollTop = tx.scrollHeight;
+      // textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+      textareaRef.current.scrollTo({
+        top: textareaRef.current.scrollHeight,
+        behavior: "auto",
+      });
     }
     // 애니메이션(축소)이 끝난 뒤 스크롤 위치를 0으로 초기화
     setTimeout(() => {
       if (textareaRef.current) {
-        textareaRef.current.scrollTop = 0;
+        textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
       }
     }, TRANSITION_DURATION_MS);
   }, []);
@@ -63,7 +66,14 @@ const useChatInput = ({ current_host_id }: props) => {
 
     const currentWrapHeight = wrap.style.height;
 
-    tx.style.height = "0px"; // scrollHeight를 정확히 측정하기 위해 초기화
+    // [수정된 부분]
+    // 1. 측정할 때만 0px로 리셋합니다.
+    // 이미 확장(is_hover && is_overflow)된 상태라면 리셋을 건너뛰어야 떨리지 않습니다.
+    if (!(is_hover && is_overflow)) {
+      tx.style.height = "0px";
+    }
+
+    // 2. 이 아래에 있던 중복된 tx.style.height = "0px"; 줄은 반드시 삭제해야 합니다!
     const curr_scroll_height = tx.scrollHeight;
 
     // 2. 오버플로우 판단
@@ -73,17 +83,22 @@ const useChatInput = ({ current_host_id }: props) => {
     const expand = is_hover && hasOverflow;
     const targetHeight = expand ? curr_scroll_height : FIXED_HEIGHT_PX;
 
+    // 3. 높이 적용
     if (currentWrapHeight !== `${targetHeight}px`) {
       wrap.style.height = `${targetHeight}px`;
     }
 
     tx.style.height = "100%";
 
+    // expand 상태일 때는 텍스트가 다 보이니까 스크롤이 필요 없고(hidden),
+    // 줄어든 상태일 때는 스크롤이 가능해야 합니다(auto).
     tx.style.overflowY = expand ? "hidden" : "auto";
+
+    // 4. 텍스트 고정
     if (!expand) {
-      tx.scrollTop = 0; // 확장 상태가 아닐 때도 스크롤 위치를 고정
+      tx.scrollTop = tx.scrollHeight;
     }
-  }, [is_hover, input_msg]);
+  }, [is_hover, input_msg, LIMIT_HEIGHT_PX, FIXED_HEIGHT_PX, is_overflow]); // is_overflow 추가
   // 5. 메시지 전송 로직
   const sendMsg = () => {
     if (!input_msg.trim()) return;
