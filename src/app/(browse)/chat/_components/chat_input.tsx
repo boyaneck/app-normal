@@ -31,7 +31,7 @@ export const ChatInput = ({ current_host_id }: props) => {
 
   return (
     <div>
-      <div className=" absolute bottom-0 left-0 w-3/4 ">
+      <div className=" absolute bottom-2 left-0 w-3/4 ">
         {/* <script>{scroll_fading}</script> */}
         <div
           className={`relative ml-1 h-9
