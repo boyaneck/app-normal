@@ -138,12 +138,38 @@ const LivePage = () => {
         <div
           className={`col-start-9 col-span-3 
            overflow-hidden relative
-           h-3/4 ml-4 rounded-xl border border-black
+           h-full ml-4 rounded-xl border border-black
           `}
         >
-          <button onClick={SlideToggle} className="p-2 border border-black">
-            버튼
+          <button
+            onClick={SlideToggle}
+            className="relative flex items-center gruop
+           w-14 h-6 bg-black/5 rounded-full border border-white/40
+            backdrop-blur-2xl shadow-inner
+            overflow-hidden 
+            "
+          >
+            <div
+              className={`absolute transition-all duration-500
+            h-5 w-full bg-transparent  shadow-md 
+            ease-[cubic-bezier(0.4,0,0.2,1)]
+           ${
+             slide_toggle
+               ? "left-[53%] w-[44%] rounded-[22px]" // 오른쪽 도착
+               : "left-[3%] w-[44%] rounded-[22px]" // 왼쪽 도착
+           } 
+        active:w-[52%] rounded-[22px]`}
+            ></div>
+            <div>
+              <span className={`text-sm ${slide_toggle ? "" : "opacity-35"}`}>
+                목록
+              </span>
+              <span className={`text-sm ${slide_toggle ? "opacity-35" : ""}`}>
+                채팅
+              </span>
+            </div>
           </button>
+
           <div
             className={`
             absolute top-10 left-0

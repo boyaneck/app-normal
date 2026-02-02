@@ -38,7 +38,9 @@ export const ChatInput = ({ current_host_id }: props) => {
         transition-[height] duration-500 ease-in-out
         ${is_overflow && is_hover ? `  top-fade-mask-active` : ""}`}
           ref={wrapperRef}
-          style={{ height: `${FIXED_HEIGHT_PX}px` }}
+          style={{
+            height: `${FIXED_HEIGHT_PX}px`,
+          }}
         >
           <textarea
             placeholder="메세지를 입력하세요"
@@ -52,40 +54,24 @@ export const ChatInput = ({ current_host_id }: props) => {
             }}
             className="
           rounded-xl
-    w-full h-full 
-    box-border        
-    pl-2 pr-10       
-    py-[10px]        
-    text-sm 
-    leading-6         
-    resize-none
-    shadow-inner
-    focus:outline-none
-    [scrollbar-width:none]
-    bg-gray-100
-    block             
-    align-top
+      w-full h-full 
+      box-border
+      pl-3 pr-10
+      
+      /* [세로 중앙 정렬 핵심] */
+      /* py를 줄이고 leading을 조절하여 글자를 수직 중앙으로 배치 */
+      py-[6px] 
+      text-sm 
+      leading-[24px] 
+      
+      resize-none
+      shadow-inner
+      focus:outline-none
+      [scrollbar-width:none]
+      block
+    
             "
           />
-          <button
-            disabled={!blankChk}
-            onClick={sendMsg}
-            className={`hover:cursor-pointer
-        ${blankChk ? "bg-blue-600 " : ""}
-          `}
-          >
-            <Send
-              className={`absolute right-2 top-2 w-5 h-5
-              transition-colors duration-300 ease-in-out
-              ${is_overflow && is_hover ? "opacity-0" : ""}
-          `}
-            />
-          </button>
-          <button
-            className={`absolute right-3 -top-7 bg-gray-400 rounded-3xl shadow-lg transition-all duration-300
-          ${limit_text < 20 ? "bg-red-300 text-white font-semibold " : ""}
-          `}
-          ></button>
         </div>
       </div>
     </div>
