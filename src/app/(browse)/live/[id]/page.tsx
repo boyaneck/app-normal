@@ -169,7 +169,6 @@ const LivePage = () => {
               채팅
             </span>
 
-            {/* 텍스트 2: 목록 */}
             <span
               className={`relative z-10 w-1/2 text-center text-sm transition-colors duration-300
       ${!slide_toggle ? "font-bold text-gray-800" : "text-gray-500/70"}`}
