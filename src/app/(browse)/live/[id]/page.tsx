@@ -143,31 +143,38 @@ const LivePage = () => {
         >
           <button
             onClick={SlideToggle}
-            className="relative flex items-center gruop
-           w-14 h-6 bg-black/5 rounded-full border border-white/40
-            backdrop-blur-2xl shadow-inner
-            overflow-hidden 
-            "
+            className="
+           group relative flex items-center justify-between
+             w-28 h-10 rounded-full p-1
+             bg-white/10 backdrop-blur-md
+             border border-white/20
+             shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),_0_4px_10px_rgba(0,0,0,0.05)]
+             transition-all duration-300 active:scale-95
+          
+          "
           >
             <div
-              className={`absolute transition-all duration-500
-            h-5 w-full bg-transparent  shadow-md 
-            ease-[cubic-bezier(0.4,0,0.2,1)]
-           ${
-             slide_toggle
-               ? "left-[53%] w-[44%] rounded-[22px]" // 오른쪽 도착
-               : "left-[3%] w-[44%] rounded-[22px]" // 왼쪽 도착
-           } 
-        active:w-[52%] rounded-[22px]`}
+              className={`absolute top-1 bottom-1 rounded-full
+            bg-gradient-to-b from-white to-white/90
+            shadow-[0_2px_5px_rgba(0,0,0,0.1),_inset_0_-1px_2px_rgba(0,0,0,0.05)]
+                transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                w-[calc(50%-4px)]
+                ${slide_toggle ? "left-1" : "left-[calc(50%)]"}
+                group-active:w-[60%]`}
             ></div>
-            <div>
-              <span className={`text-sm ${slide_toggle ? "" : "opacity-35"}`}>
-                목록
-              </span>
-              <span className={`text-sm ${slide_toggle ? "opacity-35" : ""}`}>
-                채팅
-              </span>
-            </div>
+            <span
+              className={`relative z-10 w-1/2 text-center text-sm transition-colors duration-300
+      ${slide_toggle ? "font-bold text-gray-800" : "text-gray-500/70"}`}
+            >
+              채팅
+            </span>
+
+            <span
+              className={`relative z-10 w-1/2 text-center text-sm transition-colors duration-300
+      ${!slide_toggle ? "font-bold text-gray-800" : "text-gray-500/70"}`}
+            >
+              목록
+            </span>
           </button>
 
           <div
