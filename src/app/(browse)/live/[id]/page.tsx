@@ -122,11 +122,13 @@ const LivePage = () => {
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
             className="h-full w-full "
+            adaptiveStream={true}
+            dynacast={true}
+            onDis
           >
             <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
-              token={token}
             />
           </LiveKitRoom>
 

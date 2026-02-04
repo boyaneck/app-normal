@@ -19,6 +19,7 @@ import {
   UseRoomInfoOptions,
   GridLayout,
   ParticipantTile,
+  useConnectionQuality,
 } from "@livekit/components-react";
 import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
@@ -31,33 +32,32 @@ import { useStreamingBarStore } from "@/store/bar_store";
 interface VideoProps {
   host_name: string | undefined;
   host_identity: string;
-  token: string;
   className?: string;
 }
-const Video = ({ host_name, host_identity, token }: VideoProps) => {
+const Video = ({ host_name, host_identity }: VideoProps) => {
   const icon = useStreamingBarStore((state) => state.icon);
   const { socket, connect_socket } = useSocketStore();
   const participants = useParticipants();
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
   const [total_viewer, set_total_viewer] = useState<number>(0);
-
+  useCo;
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
   ]).filter(
-    (track) => track.participant.identity === host_participant?.identity
+    (track) => track.participant.identity === host_participant?.identity,
   );
   const remote_participants = participants.filter(
-    (participant) => participant instanceof RemoteParticipant
+    (participant) => participant instanceof RemoteParticipant,
   );
   const all_remote_participant = remote_participants.map(
-    (participant) => participant.identity
+    (participant) => participant.identity,
   );
 
   // 호스트를 제외한 방에 참가한 모든 유저
   const remote_participant_except_host = all_remote_participant.filter(
-    (participant) => participant !== host_identity
+    (participant) => participant !== host_identity,
   );
   useEffect(() => {
     if (!socket) {
@@ -112,7 +112,7 @@ const Video = ({ host_name, host_identity, token }: VideoProps) => {
         {
           " animate-curtainUp": is_info_active,
           "animate-curtainDown": !is_info_active,
-        }
+        },
       )}
       onMouseOver={() => {
         set_show_streamer_info_bar(true);
