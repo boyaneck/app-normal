@@ -8,17 +8,10 @@ import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfoAboutLive } from "@/api";
-import StreamerInfo from "../_components/streamer_info";
-import clsx from "clsx";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
-import { useSocketStore } from "@/store/socket_store";
 import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
-import { MdOutlineFitScreen } from "react-icons/md";
-import { AiOutlineFullscreenExit } from "react-icons/ai";
-import LiveListSlide from "../_components/live_list_slide";
-import ChattingSlide from "../_components/chatting_slide";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -122,9 +115,10 @@ const LivePage = () => {
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
             className="h-full w-full "
+            // @ts-ignore
             adaptiveStream={true}
             dynacast={true}
-            onDis
+            // @ts-ignore
           >
             <Video
               host_name={current_host_nickname}

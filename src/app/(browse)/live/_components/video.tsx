@@ -41,7 +41,6 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
   const [total_viewer, set_total_viewer] = useState<number>(0);
-  useCo;
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
