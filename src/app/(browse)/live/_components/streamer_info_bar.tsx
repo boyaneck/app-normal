@@ -17,7 +17,7 @@ const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
   console.log("아이콘 확인하기", icon);
   return (
     <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-      <div
+      {/* <div
         className={clsx(
           ` h-8 mb-2 px-4
             bg-white/10
@@ -45,7 +45,7 @@ const StreamerInfoBar = ({ show, items }: StreamerInfoBarProps) => {
             {item.icon}
           </button>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

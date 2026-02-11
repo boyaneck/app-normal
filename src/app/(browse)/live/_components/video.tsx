@@ -1,25 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  ConnectionState,
-  Track,
-  Participant,
-  Room,
-  ConnectionCheck,
-  RemoteParticipant,
-  RoomEvent,
-} from "livekit-client";
+import { ConnectionState, Track, RemoteParticipant } from "livekit-client";
 import {
   useConnectionState,
   useTracks,
   useRemoteParticipant,
   useParticipants,
-  useRoomInfo,
-  UseRoomInfoOptions,
-  GridLayout,
-  ParticipantTile,
-  useConnectionQuality,
 } from "@livekit/components-react";
 import Offline_Video from "./offline_video";
 import Loading_Video from "./loading_video";
@@ -99,6 +86,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
 
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
 
+  //스트리밍 페이지 메인 화면
   return (
     <div
       className={clsx(
