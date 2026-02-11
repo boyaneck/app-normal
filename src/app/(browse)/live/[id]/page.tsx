@@ -104,7 +104,7 @@ const LivePage = () => {
       <div className="grid grid-cols-12 h-[75vh] relative ">
         <div
           ref={videoRef}
-          className="col-start-2 col-span-7 h-3/4"
+          className="col-start-2 col-span-7 h-full"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
