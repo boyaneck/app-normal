@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useConnectionState, useRoomContext } from "@livekit/components-react";
 import { ConnectionState } from "livekit-client";
 const LiveStatusChecker = () => {
   const state = useConnectionState();
   const room = useRoomContext();
-   useEffect
-  useEffect(() => {···
+  useEffect(() => {
     if (state === ConnectionState.Reconnecting) {
       // 1. 재연결 시도 중일 때 로직
       console.log("네트워크가 불안정하여 자동으로 재연결을 시도합니다...");
@@ -21,4 +20,4 @@ const LiveStatusChecker = () => {
   return <div>LiveStatusChecker</div>;
 };
 
-export default LiveStatusChecker;,
+export default LiveStatusChecker;

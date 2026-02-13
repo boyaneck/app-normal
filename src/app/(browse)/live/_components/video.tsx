@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ConnectionState, Track, RemoteParticipant } from "livekit-client";
 import {
   useConnectionState,
@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
 import clsx from "clsx";
 import { useStreamingBarStore } from "@/store/bar_store";
-
+import { useVideoStore } from "@/store/video";
+import { FaPlay } from "react-icons/fa";
 interface VideoProps {
   host_name: string | undefined;
   host_identity: string;
@@ -23,11 +24,11 @@ interface VideoProps {
 }
 const Video = ({ host_name, host_identity }: VideoProps) => {
   const icon = useStreamingBarStore((state) => state.icon);
-  const { socket, connect_socket } = useSocketStore();
-  const participants = useParticipants();
+  const participants = useParticipants(); //
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-  const [total_viewer, set_total_viewer] = useState<number>(0);
+  const { is_playing, set_is_playing, togglePlayButton } = useVideoStore();
+
   const tracks = useTracks([
     Track.Source.Camera,
     Track.Source.Microphone,
@@ -40,11 +41,13 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   const all_remote_participant = remote_participants.map(
     (participant) => participant.identity,
   );
-
-  // 호스트를 제외한 방에 참가한 모든 유저
   const remote_participant_except_host = all_remote_participant.filter(
     (participant) => participant !== host_identity,
   );
+
+  //실시간 시청자를 확인하기 위한 socket----
+  const { socket, connect_socket } = useSocketStore();
+  const [total_viewer, set_total_viewer] = useState<number>(0);
   useEffect(() => {
     if (!socket) {
       connect_socket();
@@ -52,21 +55,8 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
     }
     set_total_viewer(participants.length - 1);
     socket?.emit("user_in_out", remote_participant_except_host);
-  }, [total_viewer]);
-
-  const [is_info_active, set_is_info_active] = useState(false);
-
-  useEffect(() => {
-    const info_active_check = icon.includes("streamer");
-    console.log("아이콘 확인하기zzzzzzzzzzz", info_active_check);
-    if (info_active_check) {
-      set_is_info_active(false);
-    } else {
-      set_is_info_active(true);
-    }
-  }, [icon]);
-  let user_info = {};
-  console.log("호스트 제외한 유저 ? ", remote_participant_except_host);
+  }, []);
+  //---------------------------
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
@@ -83,7 +73,6 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   } else if (true) {
     content = <LiveVideo participant={host_participant} />;
   }
-
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
 
   //스트리밍 페이지 메인 화면
@@ -92,14 +81,11 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
       className={clsx(
         `
         h-full w-full
-        relative 
+        relative
+        bg-black/80
         border border-red-500
          transition-all duration-300
          rounded-xl`,
-        {
-          " animate-curtainUp": is_info_active,
-          "animate-curtainDown": !is_info_active,
-        },
       )}
       onMouseOver={() => {
         set_show_streamer_info_bar(true);
@@ -110,43 +96,42 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
     >
       {content}
       {/* <div>현재 모든 시청자 수 {total_viewer}</div> */}
-      {/* {show_streamer_info_bar && (
-        <div
-          className={clsx(
-            `flex flex-col  items-center justify-end 
-            hover:cursor-pointer
-            absolute inset-0
-          `,
-            {
-              "animate-raiseUpBar": show_streamer_info_bar,
-            }
-          )}
-          onClick={() => {
-            set_show_streamer_info((prev) => !prev);
-          }}
+      {host_participant && <></>}
+      <div
+        className={clsx(
+          "absolute z-10 bottom-0 flex felx-col border border-green-400 w-full",
+        )}
+      >
+        <button
+          onClick={togglePlayButton} // 클릭 시 true -> false, false -> true 토글
+          className="
+        group
+        flex items-center justify-center
+        w-12 h-12 
+        rounded-full 
+        bg-white/10 
+        backdrop-blur-md 
+        border border-white/20 
+        text-white 
+        transition-all 
+        duration-300
+        hover:bg-white/20
+        hover:scale-105
+        active:scale-95
+      "
         >
-          <div
-            className={clsx(`w-1/6 h-8  rounded-xl mb-2
-            bg-white/10
-            backdrop-blur-lg
-            border border-white/20
-            shadow-lg
-            flex items-center justify-center gap-4`)}
-          >
-            {nav_items.map((icon, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className={clsx(`hover:cursor-pointer hover:scale-110`)}
-              >
-                {icon}
-              </button>
-            ))}
-          </div>
-        </div>
-      )} */}
+          {is_playing ? (
+            /* 일시정지 아이콘 (재생 중일 때 보여줌) */
+            <div className="flex gap-1">
+              <div className="w-1 h-5 bg-white rounded-full"></div>
+              <div className="w-1 h-5 bg-white rounded-full"></div>
+            </div>
+          ) : (
+            /* 재생 아이콘 (정지 중일 때 보여줌) */
+            <FaPlay />
+          )}
+        </button>
+      </div>
     </div>
   );
 };
