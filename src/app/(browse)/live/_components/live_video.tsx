@@ -4,9 +4,11 @@ import { Video } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import {
   GridLayout,
+  useConnectionQualityIndicator,
   useConnectionState,
   useTrack,
   useTracks,
+  VideoTrack,
 } from "@livekit/components-react";
 import { useVideoStore } from "@/store/video";
 
@@ -39,32 +41,20 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapper_ref = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   console.log("비디오 컴포넌트의 트랙", videoRef.current);
-  // }, [participant]);
-  // useTracks([Track.Source.Microphone, Track.Source.Camera])
-  //   .filter((track) => track.participant.identity === participant.identity)
-  //   .forEach((track) => {
-  //     if (videoRef.current) track.publication.track?.attach(videoRef.current);
-  //   });
-  const tracks = useTracks([Track.Source.Camera]).filter(
-    (track) => track.participant.identity === participant.identity,
-  );
+  const { track: video_track, publication: video_publication } = useTrack({
+    source: Track.Source.Camera,
+    participant: participant,
+  });
+  const { track: audio_track, publication: audio_publication } = useTrack({
+    source: Track.Source.Microphone,
+    participant: participant,
+  });
+  const { track: screen_share_track, publication: screen_share_publication } =
+    useTrack({ source: Track.Source.ScreenShare, participant: participant });
 
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    const track = tracks[0]?.publication.track;
-
-    if (videoElement && track) {
-      track.attach(videoElement);
-      return () => {
-        track.detach(videoElement);
-      };
-    }
-  }, [tracks, participant.identity]); // 트랙이 바뀔 때만 실행되도록 관리
   return (
     <div>
-      <div ref={wrapper_ref} className="relative h-full flex">
+      {/* <div ref={wrapper_ref} className="relative h-full flex">
         <video
           ref={videoRef}
           onPlay={controlVideoPlay}
@@ -73,7 +63,44 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
           muted
           playsInline
         />
-      </div>
+      </div> */}
+      <VideoTrack
+        trackRef={{
+          participant: participant,
+          source: Track.Source.Camera,
+          publication: video_publication!,
+        }}
+        className="h-full w-full object-contain"
+      />
+
+      {/* 오디오 (자동 재생) */}
+      {audio_track && audio_publication && (
+        <VideoTrack
+          trackRef={{
+            participant: participant,
+            source: Track.Source.Microphone,
+            publication: audio_publication,
+          }}
+          className="hidden"
+        />
+      )}
+
+      {/* 스크린쉐어 PIP */}
+      {screen_share_track && screen_share_publication && (
+        <div className="absolute bottom-4 right-4 w-64 h-36 rounded-lg overflow-hidden border-2 border-white/30 shadow-2xl">
+          <VideoTrack
+            trackRef={{
+              participant: participant,
+              source: Track.Source.ScreenShare,
+              publication: screen_share_publication,
+            }}
+            className="h-full w-full object-contain bg-gray-900"
+          />
+          <div className="absolute top-2 left-2 backdrop-blur-xl bg-black/50 border border-white/20 rounded px-2 py-1">
+            <span className="text-white text-xs font-medium">화면 공유</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
