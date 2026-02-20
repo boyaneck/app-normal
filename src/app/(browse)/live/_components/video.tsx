@@ -9,7 +9,7 @@ import {
   useParticipants,
 } from "@livekit/components-react";
 import Offline_Video from "./offline_video";
-import Loading_Video from "./loading_video";
+import Loading_Video from "./loading-screen";
 import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket_store";
@@ -17,6 +17,7 @@ import clsx from "clsx";
 import { useStreamingBarStore } from "@/store/bar_store";
 import { useVideoStore } from "@/store/video";
 import { FaPlay } from "react-icons/fa";
+import LoadingScreen from "./loading-screen";
 interface VideoProps {
   host_name: string | undefined;
   host_identity: string;
@@ -60,14 +61,14 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   let content;
   //서버와 연결은 되었는데 아직 room이 연결되지 않았을때
   if (connection_state !== ConnectionState.Connected) {
-    content = <Loading_Video label={connection_state} />;
+    content = <LoadingScreen label={connection_state} />;
   } else if (!host_participant) {
     content = <Offline_Video user_name={host_name} />;
   } else if (tracks.length === 0) {
     content = (
       <p>
         {host_participant?.identity}
-        <Loading_Video label={connection_state} />
+        <LoadingScreen label={connection_state} />
       </p>
     );
   } else if (true) {

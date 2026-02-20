@@ -1,16 +1,12 @@
 "use client";
-import { Participant, RemoteParticipant, Track } from "livekit-client";
-import { Video } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { Participant, Track } from "livekit-client";
 import {
-  GridLayout,
-  useConnectionQualityIndicator,
   useConnectionState,
   useTrack,
-  useTracks,
   VideoTrack,
 } from "@livekit/components-react";
 import { useVideoStore } from "@/store/video";
+import { useEffect } from "react";
 
 interface LiveVideoProps {
   participant: Participant;
@@ -20,26 +16,6 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
   const { is_playing, set_is_playing, togglePlayButton } = useVideoStore(
     (state) => state,
   );
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-    if (is_playing) {
-      videoRef.current.play().catch((err) => {
-        console.log("브라우저 정책으로 인해 video play 재생 실패", err);
-      });
-    } else {
-      videoRef.current.pause();
-    }
-  }, [is_playing]);
-
-  const controlVideoPlay = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    if (!is_playing) {
-      e.currentTarget.pause();
-    }
-  };
-  const connect = useConnectionState();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const wrapper_ref = useRef<HTMLDivElement>(null);
 
   const { track: video_track, publication: video_publication } = useTrack({
     source: Track.Source.Camera,
@@ -52,18 +28,17 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
   const { track: screen_share_track, publication: screen_share_publication } =
     useTrack({ source: Track.Source.ScreenShare, participant: participant });
 
+  if (!video_publication?.isSubscribed) {
+    return (
+      <div className="h-full w-full bg-black flex items-center justify-center">
+        {/* 비디오 로딩일때의 컴포넌트 만들어야함 */}
+        <p className="text-white">📹 비디오 로딩 중...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* <div ref={wrapper_ref} className="relative h-full flex">
-        <video
-          ref={videoRef}
-          onPlay={controlVideoPlay}
-          width="100%"
-          autoPlay
-          muted
-          playsInline
-        />
-      </div> */}
       <VideoTrack
         trackRef={{
           participant: participant,
