@@ -74,64 +74,85 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   } else if (true) {
     content = <LiveVideo participant={host_participant} />;
   }
-  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
+  const [show_streaming_bar, set_show_streaming_bar] = useState(false);
 
   //스트리밍 페이지 메인 화면
   return (
     <div
-      className={clsx(
-        `
-        h-full w-full
-        relative
-        bg-black/80
-        border border-red-500
+      className={clsx(`
+        h-full w-full group/main
+        relative overflow-hidden
+        bg-black/80 
          transition-all duration-300
-         rounded-xl`,
-      )}
+         rounded-xl`)}
       onMouseOver={() => {
-        set_show_streamer_info_bar(true);
+        set_show_streaming_bar(true);
       }}
       onMouseLeave={() => {
-        set_show_streamer_info_bar(false);
+        set_show_streaming_bar(false);
       }}
     >
-      {content}
-      {/* <div>현재 모든 시청자 수 {total_viewer}</div> */}
-      {host_participant && <></>}
+      {/* {content} */}
+
       <div
         className={clsx(
-          "absolute z-10 bottom-0 flex felx-col border border-green-400 w-full",
+          "absolute bottom-0 left-0 w-full p-6 flex justify-between items-center gap-4",
+          "transition-all duration-500 ease-in-out",
+          show_streaming_bar
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-full opacity-0 pointer-events-none",
         )}
       >
-        <button
-          onClick={togglePlayButton} // 클릭 시 true -> false, false -> true 토글
-          className="
-        group
-        flex items-center justify-center
-        w-12 h-12 
-        rounded-full 
-        bg-white/10 
-        backdrop-blur-md 
-        border border-white/20 
-        text-white 
-        transition-all 
-        duration-300
-        hover:bg-white/20
-        hover:scale-105
-        active:scale-95
-      "
-        >
-          {is_playing ? (
-            /* 일시정지 아이콘 (재생 중일 때 보여줌) */
-            <div className="flex gap-1">
-              <div className="w-1 h-5 bg-white rounded-full"></div>
-              <div className="w-1 h-5 bg-white rounded-full"></div>
+        <div className="flex items-center ">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePlayButton();
+            }}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:scale-105 transition active:scale-95"
+          >
+            {is_playing ? (
+              <div className="flex gap-1">
+                <div className="w-1 h-5 bg-white rounded-full" />
+                <div className="w-1 h-5 bg-white rounded-full" />
+              </div>
+            ) : (
+              <FaPlay className="ml-1" />
+            )}
+          </button>
+
+          <div
+            className={clsx(
+              `transition-all duration-300 ease-out group/volume
+              px-2 py-1.5 rounded-2xl
+              bg-black/20 backdrop-blur-3xl
+              border border-white/10
+              shadow-[0_4px_16px_rgba(0,0,0,0.3)]
+              cursor-pointer`,
+            )}
+          >
+            <div
+              className={clsx(
+                `transition-all duration-200 ease-in-out 
+                px-3 py-1.5 rounded-xl
+                flex items-center gap-2 text-white/80 font-medium text-sm
+
+              group-hover/volume:bg-white/10 group-hover/volume:text-white`,
+              )}
+            >
+              볼륨조절
             </div>
-          ) : (
-            /* 재생 아이콘 (정지 중일 때 보여줌) */
-            <FaPlay />
-          )}
-        </button>
+          </div>
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl border-white">
+            라이브 버튼
+          </div>
+        </div>
+
+        <div>
+          <button className="text-white opacity-80 hover:opacity-100">
+            Full
+          </button>
+        </div>
       </div>
     </div>
   );
