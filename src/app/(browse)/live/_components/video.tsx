@@ -29,7 +29,8 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   const participants = useParticipants(); //
   const connection_state = useConnectionState();
   const host_participant = useRemoteParticipant(host_identity);
-  const { is_playing, set_is_playing, togglePlayButton } = useVideoStore();
+  const { isPlaying, muted, setMuted, setVolume, volume, togglePlayButton } =
+    useVideoStore();
 
   const tracks = useTracks([
     Track.Source.Camera,
@@ -77,9 +78,6 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   }
   const [show_streaming_bar, set_show_streaming_bar] = useState(false);
 
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [volume, setVolume] = useState(100);
-  const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
@@ -87,12 +85,12 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value);
     setVolume(newVolume);
-    setIsMuted(newVolume === 0);
+    setMuted(newVolume === 0);
   };
 
   // 음소거 토글
   const toggleMute = () => {
-    setIsMuted(!isMuted);
+    setMuted(!muted);
   };
 
   // 전체화면 토글
@@ -139,7 +137,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              togglePlayButton();
+              togglePlayButton(isPlaying);
             }}
             className="relative group/play flex items-center justify-center w-12 h-12 outline-none"
           >
@@ -157,7 +155,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
                 )}
               >
                 <div className="transition-all duration-100 active:scale-90 active:opacity-70">
-                  {is_playing ? (
+                  {isPlaying ? (
                     <div className="flex gap-1.5 items-center justify-center">
                       <div className="w-1 h-4 bg-white/90 rounded-full" />
                       <div className="w-1 h-4 bg-white/90 rounded-full" />
@@ -196,7 +194,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
                     onClick={toggleMute}
                     className="text-white/80 transition-colors flex items-center justify-center"
                   >
-                    {isMuted || volume === 0 ? (
+                    {muted || volume === 0 ? (
                       <FaVolumeMute className="w-[18px] h-[18px]" />
                     ) : (
                       <FaVolumeUp className="w-[18px] h-[18px]" />
@@ -218,7 +216,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
                       type="range"
                       min="0"
                       max="100"
-                      value={isMuted ? 0 : volume}
+                      value={muted ? 0 : volume}
                       onChange={handleVolumeChange}
                       className={clsx(`
               h-[2px] w-full appearance-none bg-transparent cursor-pointer flex items-center
@@ -235,7 +233,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
               active:[&::-webkit-slider-thumb]:scale-110 transition-all
             `)}
                       style={{
-                        background: isMuted
+                        background: muted
                           ? `linear-gradient(to right, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.2) 100%)`
                           : `linear-gradient(to right, white 0%, white ${volume}%, rgba(255, 255, 255, 0.2) ${volume}%, rgba(255, 255, 255, 0.2) 100%)`,
                       }}
@@ -255,7 +253,6 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
             }}
             className="relative group/full flex items-center justify-center w-12 h-12 outline-none"
           >
-            {/* [조상 레이어] 고정 베이스 */}
             <div
               className={clsx(
                 "absolute inset-0 flex items-center justify-center transition-all duration-500",
@@ -263,14 +260,12 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
                 "p-1",
               )}
             >
-              {/* [부모 레이어] 호버 발광 */}
               <div
                 className={clsx(
                   "flex items-center justify-center w-full h-full rounded-full transition-all duration-500",
                   "group-hover/full:bg-white/15",
                 )}
               >
-                {/* [아이콘 영역] 상태(isFullScreen)에 따라 아이콘 교체 및 떨림 방지 */}
                 <div className="transition-all duration-100 active:scale-90 active:opacity-70 flex items-center justify-center">
                   {is_full_screen ? (
                     <FaCompress className="text-white/90 text-[16px]" />
