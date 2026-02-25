@@ -1,13 +1,21 @@
 import { create } from "zustand";
 
 interface videoControlProps {
-  is_playing: boolean;
-  set_is_playing: (val: boolean) => void;
-  togglePlayButton: () => void;
+  isPlaying: boolean;
+  volume: number;
+  muted: boolean;
+
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  togglePlayButton: (isPlaying: boolean) => void;
 }
 
 export const useVideoStore = create<videoControlProps>((set) => ({
-  is_playing: true,
-  set_is_playing: (val) => set({ is_playing: val }),
-  togglePlayButton: () => set((state) => ({ is_playing: !state.is_playing })),
+  isPlaying: true,
+  volume: 100,
+  muted: false,
+
+  setVolume: (volume) => set({ volume }),
+  setMuted: (muted) => set({ muted }),
+  togglePlayButton: (isPlaying) => set({ isPlaying: !isPlaying }),
 }));

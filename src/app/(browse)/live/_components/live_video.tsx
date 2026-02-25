@@ -6,16 +6,37 @@ import {
   VideoTrack,
 } from "@livekit/components-react";
 import { useVideoStore } from "@/store/video";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface LiveVideoProps {
   participant: Participant;
 }
 
 const LiveVideo = ({ participant }: LiveVideoProps) => {
-  const { is_playing, set_is_playing, togglePlayButton } = useVideoStore(
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { isPlaying, volume, muted, togglePlayButton } = useVideoStore(
     (state) => state,
   );
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    if (isPlaying) {
+      videoElement.play();
+    } else {
+      videoElement.pause();
+    }
+  }, [isPlaying]);
+
+  // 볼륨 제어
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+
+    audioElement.volume = volume / 100;
+    audioElement.muted = muted;
+  }, [volume, muted]);
 
   const { track: video_track, publication: video_publication } = useTrack({
     source: Track.Source.Camera,
@@ -38,30 +59,35 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
   }
 
   return (
-    <div>
+    <div className="relative h-full w-full">
+      {/* 비디오 */}
       <VideoTrack
         trackRef={{
           participant: participant,
           source: Track.Source.Camera,
-          publication: video_publication!,
+          publication: video_publication,
         }}
         className="h-full w-full object-contain"
+        // @ts-expect-error - VideoTrack의 내부 video 엘리먼트에 ref 전달
+        onVideoPlayingStatusChanged={(playing: boolean) => {
+          if (videoRef.current) {
+            playing ? videoRef.current.play() : videoRef.current.pause();
+          }
+        }}
       />
 
-      {/* 오디오 (자동 재생) */}
-      {audio_track && audio_publication && (
-        <VideoTrack
-          trackRef={{
-            participant: participant,
-            source: Track.Source.Microphone,
-            publication: audio_publication,
-          }}
-          className="hidden"
+      {/* 오디오 */}
+      {audio_track && audio_publication?.isSubscribed && (
+        <audio
+          ref={audioRef}
+          autoPlay
+          playsInline
+          style={{ display: "none" }}
         />
       )}
 
-      {/* 스크린쉐어 PIP */}
-      {screen_share_track && screen_share_publication && (
+      {/* 화면공유 PIP */}
+      {screen_share_track && screen_share_publication?.isSubscribed && (
         <div className="absolute bottom-4 right-4 w-64 h-36 rounded-lg overflow-hidden border-2 border-white/30 shadow-2xl">
           <VideoTrack
             trackRef={{
