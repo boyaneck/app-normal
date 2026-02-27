@@ -1,4 +1,3 @@
-// 타입 정의 (기존과 동일)
 export interface Stream {
   id: string;
   category: string;
@@ -16,7 +15,7 @@ export interface UserPreference {
 }
 
 /**
- * 2. 메인 추천 함수 (수출용)
+ * 2. 메인 추천 함수
  */
 export const getRecommendations = (
   userPref: UserPreference,
@@ -73,6 +72,7 @@ export const getTrendingStreams = (
       const hoursLive =
         (Date.now() - new Date(stream.startedAt).getTime()) / (1000 * 3600);
       const penalty = Math.min(hoursLive * 0.02, 0.2);
+      5;
 
       const finalScore = trendingScore - penalty;
 
@@ -83,7 +83,7 @@ export const getTrendingStreams = (
 };
 
 /**
- * 홈 화면: 트렌딩 + 랜덤 (다양성)
+ * 홈 화면: 트렌딩 + 랜덤
  */
 export const getHomeStreams = (
   allStreams: Stream[],
