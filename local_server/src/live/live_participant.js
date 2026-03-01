@@ -162,7 +162,6 @@ export const liveParticipantWebhook = async (req, res) => {
 
       case "ingress_ended":
       case "room_finished": {
-        // 🆕 시계열 백그라운드 작업 중지
         stopTimeseriesRecording(room_name);
 
         const peak_viewer =
@@ -198,7 +197,7 @@ export const liveParticipantWebhook = async (req, res) => {
   }
 };
 
-// 🆕 시계열 데이터 기록 (백그라운드)
+// 시계열 데이터 기록 (백그라운드)
 const timeseriesIntervals = new Map(); // room_name → intervalId
 
 function startTimeseriesRecording(room_name) {
@@ -246,7 +245,7 @@ function stopTimeseriesRecording(room_name) {
     console.log(`[Timeseries] ${room_name} 기록 중지`);
   }
 }
-// 🆕 ViewerGrowth 계산 함수 (API에서 호출)
+//  ViewerGrowth 계산 함수 (API에서 호출)
 export async function getViewerGrowth(room_name) {
   const LIVE_TIMESERIES = `LIVE_TIMESERIES:${room_name}`;
   const now = Date.now();
