@@ -1,9 +1,23 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
 import { postLiveStats } from "../api/live.js";
+
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
 const receiver = new WebhookReceiver(api_key, api_secret);
+
+const getRedisKeys = (room_name) => ({
+  INFO: `live:${room_name}:info`,
+  VIEWERS: `live:${room_name}:viewers`,
+  PEAK_VIEW: `live:${room_name}:peak`,
+  AVG_RATE: `live:${room_name}:avg_rate`,
+  STAY_MINUTE: `live:${room_name}:stay`,
+  ALL_VISITORS: `live:${room_name}:all_visitors`,
+  REVISIT: `live:${room_name}:revisit`,
+  CATEGORY: `live:${room_name}:category`,
+  TIMESERIES: `live:${room_name}:timeseries`,
+  VIEWER_RANK: `live:rank`,
+});
 
 export const liveParticipantWebhook = async (req, res) => {
   let event;
@@ -26,18 +40,8 @@ export const liveParticipantWebhook = async (req, res) => {
 
   const viewer = event.participant ? event.participant.identity : null;
 
-  const getRedisKeys = (room_name) => ({
-    INFO: `LIVE_INFORMATION:${room_name}`,
-    VIEWERS: `LIVE_VIEWERS:${room_name}`,
-    PEAK_VIEW: `LIVE_PEAK_VIEW:${room_name}`,
-    AVG_RATE: `LIVE_AVG_RATE:${room_name}`,
-    STAY_MINUTE: `LIVE_STAY_MINUTE:${room_name}`,
-    VIEWER_RANK: `LIVE_VIEWER_RANK`,
-    CATEGORY: `LIVE_CATEGORY:${room_name}`,
-    TIMESERIES: `LIVE_TIMESERIES:${room_name}`,
-  });
-
   const keys = getRedisKeys(room_name);
+
   try {
     switch (event.event) {
       case "ingress_started": {
@@ -82,23 +86,38 @@ export const liveParticipantWebhook = async (req, res) => {
       case "participant_joined": {
         if (!viewer) break;
 
-        const isNewMember = await redis_client.sAdd(keys.VIEWERS, viewer);
+        //유저의 해당 방송 접속에 대한 중복 체크, 및 멀티탭 중복 체크
+        const viewerVisitCount = await redis_client.hIncrBy(
+          keys.VIEWERS,
+          viewer,
+          1,
+        );
 
-        if (isNewMember > 0) {
-          await redis_client.zIncrBy(keys.VIEWER_RANK, 1, room_name);
-        }
-
-        // 최대 동시 시청자 수 업데이트
-        const current_viewers = await redis_client.sCard(keys.VIEWERS);
-        const peak_str = await redis_client.hGet(keys.PEAK_VIEW, "peak_view");
-        const peak_val = peak_str ? parseInt(peak_str, 10) : 0;
-
-        if (current_viewers > peak_val) {
-          await redis_client.hSet(
+        //처음입장인 경우
+        if (viewerVisitCount === 1) {
+          const currentViewers = await redis_client.hLen(keys.VIEWERS);
+          const peakViewersStr = await redis_client.hGet(
             keys.PEAK_VIEW,
             "peak_view",
-            current_viewers.toString(),
           );
+          //현재 방송 중인 총시청자수 순위에 해당 방송 시청자수 +1
+          await redis_client.zIncrBy(keys.VIEWER_RANK, 1, room_name);
+          const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
+
+          if (currentViewers > peakViewers) {
+            await redis_client.hSet(
+              keys.PEAK_VIEW,
+              "peak_view",
+              currentViewers.toString(),
+            );
+          }
+
+          //누적방문자수 (해당 방에 처음으로 접속할 때만 해당 로직을 실행)
+          await redis_client.sAdd(keys.ALL_VISITORS, viewer);
+        }
+        //두번째 입장 혹은 같은 페이지의 탭이 2개이상 켜져 있는경우
+        else if (viewerVisitCount >= 2) {
+          //재방문 관련 로직은 아직 붎필요함으로 pass
         }
 
         // 시청 시작 시간 기록
@@ -110,9 +129,9 @@ export const liveParticipantWebhook = async (req, res) => {
       case "participant_left": {
         if (!viewer) break;
 
-        const removedCount = await redis_client.sRem(keys.VIEWERS, viewer);
+        const viewerLeftCount = await redis_client.hDel(keys.VIEWERS, viewer);
 
-        if (removedCount > 0) {
+        if (viewerLeftCount > 0) {
           await redis_client.zIncrBy(keys.VIEWER_RANK, -1, room_name);
 
           const currentScore = await redis_client.zScore(
@@ -128,12 +147,12 @@ export const liveParticipantWebhook = async (req, res) => {
         }
 
         // 시청 지속 시간 체크
-        const start_at_str = await redis_client.hGet(keys.AVG_RATE, viewer);
-        if (start_at_str) {
-          const duration = Math.round(
-            (Date.now() - parseInt(start_at_str, 10)) / 1000,
+        const joinTimeStr = await redis_client.hGet(keys.AVG_RATE, viewer);
+        if (joinTimeStr) {
+          const durationSec = Math.round(
+            (Date.now() - parseInt(joinTimeStr, 10)) / 1000,
           );
-          if (duration >= 60) {
+          if (durationSec >= 60) {
             await redis_client.sAdd(keys.STAY_MINUTE, viewer);
           }
           await redis_client.hDel(keys.AVG_RATE, viewer);
@@ -142,29 +161,52 @@ export const liveParticipantWebhook = async (req, res) => {
         break;
       }
 
-      case "ingress_ended":
+      case "ingress_ended": {
+        // 송출 종료 — 시계열 기록만 멈춤
+        stopTimeseriesRecording(room_name);
+        break;
+      }
+
       case "room_finished": {
+        //아주 낮은 확률로 서버가 터지거나, 유저가 해당 사인을 못받는 경우
+        // ingreses_ended -> room_finished 정상적으로 이행되지 않을 수 있어서 room_finished에도 interval을 제거하는 로직을 만듬
         stopTimeseriesRecording(room_name);
 
-        const peak_viewer =
-          (await redis_client.hGet(keys.PEAK_VIEW, "peak_view")) || "0";
-        const started_at = await redis_client.hGet(keys.INFO_KEY, "started_at");
-        let start_iso = started_at
-          ? new Date(parseInt(started_at, 10)).toISOString()
+        // 최대 시청자 수
+        const peakViewersStr = await redis_client.hGet(
+          keys.PEAK_VIEW,
+          "peak_view",
+        );
+        const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
+
+        // 방송 시작 시간
+        const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
+        const startISO = startedAtStr
+          ? new Date(parseInt(startedAtStr, 10)).toISOString()
           : new Date().toISOString();
 
+        // 누적 방문자 수
+        const totalVisitors = await redis_client.sCard(keys.ALL_VISITORS);
+
+        // 시청 지속률 (1분 이상 머문 사람 / 전체 방문자)
+        const stayedViewers = await redis_client.sCard(keys.STAY_MINUTE);
+        const retentionRate =
+          totalVisitors > 0 ? (stayedViewers / totalVisitors).toFixed(2) : "0";
+
+        // 랭킹보드에서 제거
         await redis_client.zRem(keys.VIEWER_RANK, room_name);
 
         // 통계 API 호출
-        await postLiveStats(parseInt(peak_viewer, 10), room_name, start_iso);
+        await postLiveStats(peakViewers, room_name, startISO);
 
         // 리소스 정리
         await redis_client.del(
           keys.VIEWERS,
           keys.PEAK_VIEW,
-          keys.INFO_KEY,
+          keys.INFO,
           keys.AVG_RATE,
           keys.STAY_MINUTE,
+          keys.ALL_VISITORS,
           keys.CATEGORY,
           keys.TIMESERIES,
         );
@@ -182,20 +224,22 @@ const timeseriesIntervals = new Map();
 
 const startTimeseriesRecording = (room_name) => {
   if (timeseriesIntervals.has(room_name)) return;
+  const viewersKey = `live:${room_name}:viewers`;
+  const timeseriesKey = `live:${room_name}:timeseries`;
 
   const intervalId = setInterval(
     async () => {
       try {
-        const currentViewers = await redis_client.sCard(keys.VIEWERS);
+        const currentViewers = await redis_client.hLen(viewersKey);
         const timestamp = Date.now();
 
-        await redis_client.zAdd(keys.TIMESERIES, {
+        await redis_client.zAdd(timeseriesKey, {
           score: timestamp,
           value: currentViewers.toString(),
         });
 
         const tenMinutesAgo = timestamp - 10 * 60 * 1000;
-        await redis_client.zRemRangeByScore(keys.TIMESERIES, 0, tenMinutesAgo);
+        await redis_client.zRemRangeByScore(timeseriesKey, 0, tenMinutesAgo);
 
         console.log(
           `[Timeseries] ${room_name}: ${currentViewers}명 (${new Date(timestamp).toISOString()})`,
@@ -221,11 +265,12 @@ const stopTimeseriesRecording = (room_name) => {
 
 // ViewerGrowth 계산
 export const getViewerGrowth = async (room_name) => {
+  const timeseriesKey = `live:${room_name}:timeseries`;
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;
 
   const recentData = await redis_client.zRangeByScoreWithScores(
-    keys.TIMESERIES,
+    timeseriesKey,
     fiveMinutesAgo,
     now,
   );
