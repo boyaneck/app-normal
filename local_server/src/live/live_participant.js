@@ -170,6 +170,7 @@ export const liveParticipantWebhook = async (req, res) => {
       case "room_finished": {
         //아주 낮은 확률로 서버가 터지거나, 유저가 해당 사인을 못받는 경우
         // ingreses_ended -> room_finished 정상적으로 이행되지 않을 수 있어서 room_finished에도 interval을 제거하는 로직을 만듬
+        console.log("room_finished 이벤트 수신:", room_name);
         stopTimeseriesRecording(room_name);
 
         // 최대 시청자 수
@@ -193,23 +194,52 @@ export const liveParticipantWebhook = async (req, res) => {
         const retentionRate =
           totalVisitors > 0 ? (stayedViewers / totalVisitors).toFixed(2) : "0";
 
+        const category = await redis_client.get(keys.CATEGORY);
+        const dateInfo = await redis_client.hGet(keys.INFO, "today");
+        const durationMin = startedAtStr
+          ? Math.round((Date.now() - parseInt(startedAtStr, 10)) / 60000)
+          : 0;
+
         // 랭킹보드에서 제거
-        await redis_client.zRem(keys.VIEWER_RANK, room_name);
 
         // 통계 API 호출
-        await postLiveStats(peakViewers, room_name, startISO);
+        const saveSuccess = await postLiveStats({
+          room_name,
+          peakViewers,
+          startISO,
+          totalVisitors,
+          stayedViewers,
+          retentionRate,
+          category,
+          durationMin,
+        });
+        if (saveSuccess) {
+          const exists = await redis_client.exists(keys.INFO);
+          console.log("INFO 키 존재 여부:", exists);
+          await redis_client.zRem(keys.VIEWER_RANK, room_name);
+
+          const keysToDelete = [
+            keys.VIEWERS,
+            keys.PEAK_VIEW,
+            keys.INFO,
+            keys.AVG_RATE,
+            keys.STAY_MINUTE,
+            keys.ALL_VISITORS,
+            keys.CATEGORY,
+            keys.TIMESERIES,
+          ];
+
+          for (const key of keysToDelete) {
+            const result = await redis_client.del(key);
+            console.log(`${key} 삭제: ${result}`);
+          }
+        } else {
+          // 실패하면 Redis 데이터 유지 + 나중에 재시도할 수 있도록 표시
+          await redis_client.hSet(keys.INFO, "save_failed", "true");
+          console.error("Supabase 저장 실패 — Redis 데이터 유지");
+        }
 
         // 리소스 정리
-        await redis_client.del(
-          keys.VIEWERS,
-          keys.PEAK_VIEW,
-          keys.INFO,
-          keys.AVG_RATE,
-          keys.STAY_MINUTE,
-          keys.ALL_VISITORS,
-          keys.CATEGORY,
-          keys.TIMESERIES,
-        );
 
         break;
       }
@@ -289,14 +319,6 @@ export const getViewerGrowth = async (room_name) => {
   const growth = (newestViewers - oldestViewers) / oldestViewers;
   return Math.max(0, Math.min(1, growth));
 };
-```
-
----
-
-## 비즈니스적으로 더 추가하면 좋을 것
-
-### 현재 있는 데이터
-```;
 
 //현재 방의 방송시작 시간 저장------
 //평균 시청 지속률
