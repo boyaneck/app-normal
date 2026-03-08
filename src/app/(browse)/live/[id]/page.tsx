@@ -7,7 +7,7 @@ import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
-import { getUserInfoAboutLive } from "@/api";
+import { getRecommendLiveList, getUserInfoAboutLive } from "@/api";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
 import axios from "axios";
@@ -23,9 +23,13 @@ const LivePage = () => {
   const current_host_nickname =
     host_nickname === null ? "유저없음" : host_nickname;
   const current_host_email = host_email === null ? "유저없음" : host_email;
-  const { data: get_user_info_about_live } = useQuery({
-    queryKey: ["get_user_info_about_live"],
-    queryFn: () => getUserInfoAboutLive(current_host_id),
+  // const { data: get_user_info_about_live } = useQuery({
+  //   queryKey: ["get_user_info_about_live"],
+  //   queryFn: () => getUserInfoAboutLive(current_host_id),
+  // });
+  const { data: recommendLiveList, error } = useQuery({
+    queryKey: ["recommendLiveList", current_host_id],
+    queryFn: () => getRecommendLiveList(current_host_id),
   });
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [

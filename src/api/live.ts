@@ -19,7 +19,7 @@ export const insertIngress = async (
   target_user_email: string | undefined,
   stream_key: string | undefined,
   server_url: string | undefined,
-  ingress_id: string | undefined
+  ingress_id: string | undefined,
 ) => {
   const { data, error } = await supabaseForClient.rpc("abc", {
     user_id: user_id,
@@ -32,25 +32,30 @@ export const insertIngress = async (
   if (error) console.log("Ingress 생성중 에러가 생겼어요!!🚀🚀", error.message);
 };
 
-export const getUserInfoAboutLive = async (user_id: string | undefined) => {
-  const { data: userInfoLive, error: userInfoError } = await supabaseForClient
-    .from("users")
-    .select(
-      `
-      live_information (
-        *    
-      )
-    `
-    )
-    .eq("id", user_id)
-    .maybeSingle();
+// export const getUserInfoAboutLive = async (user_id: string | undefined) => {
+//   const { data: userInfoLive, error: userInfoError } = await supabaseForClient
+//     .from("users")
+//     .select(
+//       `
+//       live_information (
+//         *
+//       )
+//     `
+//     )
+//     .eq("id", user_id)
+//     .maybeSingle();
 
-  if (userInfoError) {
-    console.log("유저 정보 가져오기 에러:", userInfoError.message);
-    return null; // 에러 발생 시 null 반환 또는 에러 처리
-  }
+//   if (userInfoError) {
+//     console.log("유저 정보 가져오기 에러:", userInfoError.message);
+//     return null; // 에러 발생 시 null 반환 또는 에러 처리
+//   }
 
-  return userInfoLive;
+//   return userInfoLive;
+// };
+export const getRecommendLiveList = async () => {
+  const recommendLiveList = await axios.get(
+    "http://localhost:3001/live/live-recommend",
+  );
 };
 export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
   const { data: post_live_stats, error } = await supabaseForClient
@@ -110,7 +115,7 @@ export const insertAndUpdateLiveInfo = async ({
         title,
         desc,
       },
-      { onConflict: "user_id" }
+      { onConflict: "user_id" },
     );
   if (error) {
     console.error("저장 중 오류 발생:", error.message);
@@ -121,12 +126,12 @@ export const insertAndUpdateLiveInfo = async ({
 export const getLiveListNow = async () => {
   try {
     const viewers_top7 = await axios.get(
-      "http://localhost:3001/live/live_list_now"
+      "http://localhost:3001/live/live_list_now",
     );
     const viewers_top7_info = viewers_top7.data;
     if (!viewers_top7_info || viewers_top7_info.length === 0) return [];
     const score_map = new Map(
-      viewers_top7_info.map((item: any) => [item.value, item.score])
+      viewers_top7_info.map((item: any) => [item.value, item.score]),
     );
     const room_name = viewers_top7_info.map((item: viewer) => item.value);
     // const viwers_top7=viewers_top7_info.map((item)=>item.)
@@ -148,7 +153,7 @@ export const getLiveListNow = async () => {
     if (live_info_error) {
       console.error(
         " 현재 라이브가 많은 상위 7개의 영상 Supabase 상세 조회 중 에러 발생:",
-        live_info_error
+        live_info_error,
       );
       throw live_info_error;
     }
