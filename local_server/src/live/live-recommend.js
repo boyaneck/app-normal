@@ -68,7 +68,7 @@ const algorithmRecommendations = (
  */
 export const getRecommendLiveList = async (req, res) => {
   try {
-    const currentRoomId = req.query.room_id;
+    const currentRoomId = req.query.roomName;
     const allLives = await getAllLiveList();
 
     const currentLive = allLives.find((s) => s.id === currentRoomId);

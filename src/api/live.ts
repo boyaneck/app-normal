@@ -52,10 +52,11 @@ export const insertIngress = async (
 
 //   return userInfoLive;
 // };
-export const getRecommendLiveList = async () => {
-  const recommendLiveList = await axios.get(
-    "http://localhost:3001/live/live-recommend",
+export const getRecommendLiveList = async (roomName: string) => {
+  const res = await axios.get(
+    `http://localhost:3001/live/live-recommend?roomName=${roomName}`,
   );
+  return res.data;
 };
 export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
   const { data: post_live_stats, error } = await supabaseForClient
