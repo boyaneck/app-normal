@@ -7,11 +7,12 @@ import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
-import { getRecommendLiveList, getUserInfoAboutLive } from "@/api";
+import { getRecommendLiveList } from "@/api";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
 import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
+import LiveRecommendCard from "../_components/live-recommend-card";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -31,6 +32,8 @@ const LivePage = () => {
     queryKey: ["recommendLiveList", current_host_id],
     queryFn: () => getRecommendLiveList(current_host_id),
   });
+  if (recommendLiveList) console.log("알고리즘 데이터 확인", recommendLiveList);
+
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
@@ -38,7 +41,7 @@ const LivePage = () => {
     { id: "settings", icon: "⚙️" },
     { id: "info", icon: "🎬" },
   ];
-  const live_information = get_user_info_about_live?.live_information[0];
+  // const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewerToken(current_host_id);
@@ -176,7 +179,6 @@ const LivePage = () => {
               목록
             </span>
           </button>
-
           <div
             className={`
             absolute top-10 left-0
@@ -190,20 +192,17 @@ const LivePage = () => {
               current_host_id={current_host_id}
             />
           </div>
-
           <div
             className={`
-            absolute top-10 left-0
-            w-full h-[calc(100%-2.5rem)]
-            transition-transform duration-700 z-20
-            bg-blue-600 cubic-bezier(0.25, 0.1, 0.25, 1)
-            ${
-              slide_toggle
-                ? "translate-x-full" // slide_toggle=true (Panel 1 보일 때) -> Panel 2 숨김
-                : "translate-x-0" // slide_toggle=false (Panel 2 보일 때) -> Panel 2 표시
-            }
-          `}
-          ></div>
+    absolute top-10 left-0
+    w-full h-[calc(100%-2.5rem)]
+    transition-transform duration-700 z-20
+    bg-gray-900
+    ${slide_toggle ? "translate-x-full" : "translate-x-0"}
+  `}
+          >
+            <LiveRecommendCard list={recommendLiveList || []} />
+          </div>
         </div>
         {/*채팅과 라이브목록 슬라이드 */}
       </div>
