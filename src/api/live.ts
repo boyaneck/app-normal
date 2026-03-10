@@ -58,6 +58,13 @@ export const getRecommendLiveList = async (roomName: string) => {
   );
   return res.data;
 };
+
+export const getHomeTrendingLiveList = async () => {
+  const res = await axios.get(`http://localhost:3001/live/live-home`);
+
+  return res.data;
+};
+
 export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
   const { data: post_live_stats, error } = await supabaseForClient
     .from("post_live_stats")
