@@ -47,6 +47,22 @@ export const postLiveStats = async ({
   }
 };
 
+export const insertAIReports = async (roomName, report) => {
+  try {
+    const { error } = await supabase.from("ai_reports").insert({
+      room_name: roomName,
+      report,
+    });
+    if (error) throw error;
+  } catch (error) {
+    console.error(
+      "ai_reports 테이블에 데이터 insert 중 오류가 발생했습니다.",
+      error,
+    );
+    throw error;
+  }
+};
+
 export const insertAvgKeep = async () => {};
 
 export const egressWebRTC = async () => {

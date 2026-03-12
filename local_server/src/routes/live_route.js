@@ -9,12 +9,15 @@ router.post("/live_getIn");
 router.post(
   "/webhook_participant",
   express.raw({ type: "application/webhook+json" }),
-  liveParticipantWebhook
+  liveParticipantWebhook,
 );
+router.get("/live-recommend", getRecommendLiveList);
+router.get("/live-home", getHomeLiveList);
+router.post("/live-analytics", getLiveAnalytics);
 router.post(
   "/webhook_duration",
   express.raw({ type: "application/webhook+json" }),
-  livekitWebhook
+  livekitWebhook,
 );
 
 export default router;
