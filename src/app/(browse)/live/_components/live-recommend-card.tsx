@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface LiveRecommendCardProps {
+  list: LiveItem[];
+}
 interface LiveItem {
   id: string;
   host: string;
@@ -10,7 +13,7 @@ interface LiveItem {
   viewerCount: number;
 }
 
-const LiveRecommendCard = (list: LiveItem[]) => {
+const LiveRecommendCard = ({ list }: { list: LiveItem[] }) => {
   const [loaded, setLoaded] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);

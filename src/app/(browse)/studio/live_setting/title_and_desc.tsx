@@ -1,10 +1,11 @@
 import { useLiveSettingStore } from "@/store/live_setting_store";
 import React, { useRef, useState } from "react";
+import ThumbUpload from "./thumb_upload";
 type drage_event = (e: React.DragEvent<HTMLDivElement>) => void;
 
 const TitleAndDescription = () => {
   const { title, set_title, desc, set_desc } = useLiveSettingStore(
-    (state) => state
+    (state) => state,
   );
 
   return (
