@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
 import Wrapper from "./wrapper";
-import Toggle from "./toggle";
-import FollowingPage from "../../(home)/following/page";
 import { useRouter } from "next/navigation";
 import Following_user from "./follwing_user";
-import Recommendation from "./recommendation";
+import ToggleButton from "./toggle";
+import LoginUserIcon from "./login_user_icon";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -14,14 +13,9 @@ const Sidebar = () => {
   };
   return (
     <Wrapper>
-      <Toggle />
-      <span
-        onClick={onRouterHandler}
-        className="hover cursor-pointer border border-black"
-      >
-        <Following_user />
-      </span>
-      <Recommendation />
+      <ToggleButton />
+      <LoginUserIcon />
+      <Following_user />
     </Wrapper>
   );
 };

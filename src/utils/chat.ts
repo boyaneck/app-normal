@@ -15,7 +15,7 @@ export const max_messages = 11;
 
 // export const FIXED_HEIGHT_PX = 95; // 1.5줄 높이 (약 40px)
 export const FIXED_HEIGHT_PX = 35; // 1.5줄 높이 (약 40px)
-export const LIMIT_HEIGHT_PX = 72;
+export const LIMIT_HEIGHT_PX = 36;
 export const LINE_HEIGHT_PX = 26; // 실제 한 줄의 높이 (leading-6을 고려하여 설정)
 export const INPUT_AREA_HEIGHT_BUFFER = 40; // 입력창 영역 확보를 위한 카드 하단 여백 (px)
 export const TRANSITION_DURATION_MS = 700; // 부드러움을 위해 700ms로 설정 (Tailwind duration-700)

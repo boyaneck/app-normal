@@ -7,18 +7,12 @@ import Video from "../_components/video";
 import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
-import { getUserInfoAboutLive } from "@/api";
-import StreamerInfo from "../_components/streamer_info";
-import clsx from "clsx";
+import { getRecommendLiveList } from "@/api";
 import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar_store";
-import { useSocketStore } from "@/store/socket_store";
 import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
-import { MdOutlineFitScreen } from "react-icons/md";
-import { AiOutlineFullscreenExit } from "react-icons/ai";
-import LiveListSlide from "../_components/live_list_slide";
-import ChattingSlide from "../_components/chatting_slide";
+import LiveRecommendCard from "../_components/live-recommend-card";
 
 const LivePage = () => {
   const search_params = useSearchParams();
@@ -30,10 +24,16 @@ const LivePage = () => {
   const current_host_nickname =
     host_nickname === null ? "유저없음" : host_nickname;
   const current_host_email = host_email === null ? "유저없음" : host_email;
-  const { data: get_user_info_about_live } = useQuery({
-    queryKey: ["get_user_info_about_live"],
-    queryFn: () => getUserInfoAboutLive(current_host_id),
+  // const { data: get_user_info_about_live } = useQuery({
+  //   queryKey: ["get_user_info_about_live"],
+  //   queryFn: () => getUserInfoAboutLive(current_host_id),
+  // });
+  const { data: recommendLiveList, error } = useQuery({
+    queryKey: ["recommendLiveList", current_host_id],
+    queryFn: () => getRecommendLiveList(current_host_id),
   });
+  if (recommendLiveList) console.log("알고리즘 데이터 확인", recommendLiveList);
+
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
   const stream_nav_bar = [
     { id: "chat", icon: "💬" },
@@ -41,7 +41,7 @@ const LivePage = () => {
     { id: "settings", icon: "⚙️" },
     { id: "info", icon: "🎬" },
   ];
-  const live_information = get_user_info_about_live?.live_information[0];
+  // const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
   const { token, name, identity } = useViewerToken(current_host_id);
@@ -111,7 +111,7 @@ const LivePage = () => {
       <div className="grid grid-cols-12 h-[75vh] relative ">
         <div
           ref={videoRef}
-          className="col-start-2 col-span-7 h-3/4"
+          className="col-start-2 col-span-7 h-full"
           onMouseOver={() => {
             set_show_streamer_info_bar(true);
           }}
@@ -122,11 +122,14 @@ const LivePage = () => {
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
             className="h-full w-full "
+            // @ts-ignore
+            adaptiveStream={true}
+            dynacast={true}
+            // @ts-ignore
           >
             <Video
               host_name={current_host_nickname}
               host_identity={current_host_id}
-              token={token}
             />
           </LiveKitRoom>
 
@@ -138,11 +141,43 @@ const LivePage = () => {
         <div
           className={`col-start-9 col-span-3 
            overflow-hidden relative
-           h-3/4 ml-4 rounded-xl border border-black
+           h-full ml-4 rounded-xl border border-black
           `}
         >
-          <button onClick={SlideToggle} className="p-2 border border-black">
-            버튼
+          <button
+            onClick={SlideToggle}
+            className="
+           group relative flex items-center justify-between
+             w-28 h-10 rounded-full p-1
+             bg-white/10 backdrop-blur-md
+             border border-white/20
+             shadow-[inset_0_2px_4px_rgba(0,0,0,0.05),_0_4px_10px_rgba(0,0,0,0.05)]
+             transition-all duration-300 active:scale-95
+          
+          "
+          >
+            <div
+              className={`absolute top-1 bottom-1 rounded-full
+            bg-gradient-to-b from-white to-white/90
+            shadow-[0_2px_5px_rgba(0,0,0,0.1),_inset_0_-1px_2px_rgba(0,0,0,0.05)]
+                transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                w-[calc(50%-4px)]
+                ${slide_toggle ? "left-1" : "left-[calc(50%)]"}
+                group-active:w-[60%]`}
+            ></div>
+            <span
+              className={`relative z-10 w-1/2 text-center text-sm transition-colors duration-300
+      ${slide_toggle ? "font-bold text-gray-800" : "text-gray-500/70"}`}
+            >
+              채팅
+            </span>
+
+            <span
+              className={`relative z-10 w-1/2 text-center text-sm transition-colors duration-300
+      ${!slide_toggle ? "font-bold text-gray-800" : "text-gray-500/70"}`}
+            >
+              목록
+            </span>
           </button>
           <div
             className={`
@@ -157,20 +192,17 @@ const LivePage = () => {
               current_host_id={current_host_id}
             />
           </div>
-
           <div
             className={`
-            absolute top-10 left-0
-            w-full h-[calc(100%-2.5rem)]
-            transition-transform duration-700 z-20
-            bg-blue-600 cubic-bezier(0.25, 0.1, 0.25, 1)
-            ${
-              slide_toggle
-                ? "translate-x-full" // slide_toggle=true (Panel 1 보일 때) -> Panel 2 숨김
-                : "translate-x-0" // slide_toggle=false (Panel 2 보일 때) -> Panel 2 표시
-            }
-          `}
-          ></div>
+    absolute top-10 left-0
+    w-full h-[calc(100%-2.5rem)]
+    transition-transform duration-700 z-20
+    bg-gray-900
+    ${slide_toggle ? "translate-x-full" : "translate-x-0"}
+  `}
+          >
+            <LiveRecommendCard list={recommendLiveList || []} />
+          </div>
         </div>
         {/*채팅과 라이브목록 슬라이드 */}
       </div>

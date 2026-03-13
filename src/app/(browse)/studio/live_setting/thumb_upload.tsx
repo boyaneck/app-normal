@@ -11,34 +11,16 @@ const ThumbUpload = () => {
     getInputProps,
     isDragAccept,
     isDragActive,
-    preview,
+    thumb_url,
     isDragReject,
     thumbnailChangeForClick,
     removePreview,
-    set_preview,
+    set_thumb_url,
   } = useImage();
-  //   const onDrop = () => {};
-  //   const {
-  //     getRootProps,
-  //     getInputProps,
-  //     isDragAccept,
-  //     isDragActive,
-  //     isDragReject,
-  //   } = useDropzone({
-  //     onDrop,
-  //     accept: {
-  //       "image/jpeg": [],
-  //       "image/png": [],
-  //       "image/wbep": [],
-  //     },
-  //     maxFiles: 1,
-  //     maxSize: 5 * 1024 * 1024,
-  //     noKeyboard: true,
-  //   });
 
   const clickRemoveButton = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    set_preview(null);
+    set_thumb_url("");
   };
 
   return (
@@ -52,7 +34,7 @@ const ThumbUpload = () => {
         w-1/3 h-[200px]
      hover:cursor-pointer 
      transition-all duration-200 ease-in-out
-     ${!preview && "hover:scale-[1.01]"}
+     ${!thumb_url && "hover:scale-[1.01]"}
       ${
         isDragActive
           ? isDragReject
@@ -72,7 +54,7 @@ const ThumbUpload = () => {
         <input {...getInputProps()} className="hidden" />
         <AnimatePresence mode="wait">
           <motion.div
-            key={preview ? "uploaded" : "empty"}
+            key={thumb_url ? "uploaded" : "empty"}
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0 }}
@@ -85,13 +67,13 @@ const ThumbUpload = () => {
             ${isDragActive ? "bg-white" : "bg-gray-100"}
              `}
           >
-            {preview ? (
+            {thumb_url ? (
               <motion.div
                 className="relative w-full h-full
               "
               >
                 <img
-                  src={preview}
+                  src={thumb_url}
                   className="w-full h-full object-cover max-w-full max-h-full
                   group-hover:brightness-75 group-hover:blur-[1px]
               transition-all duration-300 ease-in-out"

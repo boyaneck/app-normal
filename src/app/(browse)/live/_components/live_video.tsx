@@ -1,36 +1,107 @@
 "use client";
-import { Participant, RemoteParticipant, Track } from "livekit-client";
-import { Video } from "lucide-react";
-import React, { useEffect, useRef } from "react";
+import { Participant, Track } from "livekit-client";
 import {
-  GridLayout,
   useConnectionState,
   useTrack,
-  useTracks,
+  VideoTrack,
 } from "@livekit/components-react";
+import { useVideoStore } from "@/store/video";
+import { useEffect, useRef } from "react";
 
 interface LiveVideoProps {
   participant: Participant;
 }
 
 const LiveVideo = ({ participant }: LiveVideoProps) => {
-  const connect = useConnectionState();
-  const video_ref = useRef<HTMLVideoElement>(null);
-  const wrapper_ref = useRef<HTMLDivElement>(null);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { isPlaying, volume, muted, togglePlayButton } = useVideoStore(
+    (state) => state,
+  );
   useEffect(() => {
-    console.log("비디오 컴포넌트의 트랙", video_ref.current);
-  }, [participant]);
-  useTracks([Track.Source.Microphone, Track.Source.Camera])
-    .filter((track) => track.participant.identity === participant.identity)
-    .forEach((track) => {
-      if (video_ref.current) track.publication.track?.attach(video_ref.current);
-    });
-  return (
-    <div>
-      <div ref={wrapper_ref} className="relative h-full flex">
-        <video ref={video_ref} width="100%" />
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    if (isPlaying) {
+      videoElement.play();
+    } else {
+      videoElement.pause();
+    }
+  }, [isPlaying]);
+
+  // 볼륨 제어
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+
+    audioElement.volume = volume / 100;
+    audioElement.muted = muted;
+  }, [volume, muted]);
+
+  const { track: video_track, publication: video_publication } = useTrack({
+    source: Track.Source.Camera,
+    participant: participant,
+  });
+  const { track: audio_track, publication: audio_publication } = useTrack({
+    source: Track.Source.Microphone,
+    participant: participant,
+  });
+  const { track: screen_share_track, publication: screen_share_publication } =
+    useTrack({ source: Track.Source.ScreenShare, participant: participant });
+
+  if (!video_publication?.isSubscribed) {
+    return (
+      <div className="h-full w-full bg-black flex items-center justify-center">
+        {/* 비디오 로딩일때의 컴포넌트 만들어야함 */}
+        <p className="text-white">📹 비디오 로딩 중...</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative h-full w-full">
+      {/* 비디오 */}
+      <VideoTrack
+        trackRef={{
+          participant: participant,
+          source: Track.Source.Camera,
+          publication: video_publication,
+        }}
+        className="h-full w-full object-contain"
+        // @ts-expect-error - VideoTrack의 내부 video 엘리먼트에 ref 전달
+        onVideoPlayingStatusChanged={(playing: boolean) => {
+          if (videoRef.current) {
+            playing ? videoRef.current.play() : videoRef.current.pause();
+          }
+        }}
+      />
+
+      {/* 오디오 */}
+      {audio_track && audio_publication?.isSubscribed && (
+        <audio
+          ref={audioRef}
+          autoPlay
+          playsInline
+          style={{ display: "none" }}
+        />
+      )}
+
+      {/* 화면공유 PIP */}
+      {screen_share_track && screen_share_publication?.isSubscribed && (
+        <div className="absolute bottom-4 right-4 w-64 h-36 rounded-lg overflow-hidden border-2 border-white/30 shadow-2xl">
+          <VideoTrack
+            trackRef={{
+              participant: participant,
+              source: Track.Source.ScreenShare,
+              publication: screen_share_publication,
+            }}
+            className="h-full w-full object-contain bg-gray-900"
+          />
+          <div className="absolute top-2 left-2 backdrop-blur-xl bg-black/50 border border-white/20 rounded px-2 py-1">
+            <span className="text-white text-xs font-medium">화면 공유</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

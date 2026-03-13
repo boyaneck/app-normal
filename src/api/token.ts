@@ -2,61 +2,57 @@
 
 import { AccessToken } from "livekit-server-sdk";
 import { v4 } from "uuid";
-import { getUserInfo, getUserInfoById } from "./user";
+import { getUserInfoById } from "./user";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 
-// 수정된 createViewerToken 함수
+/**
+ * @returns 게스트를 위한 임의의 정보
+ */
+const createGuestUser = () => {
+  const id = v4();
+  const guest_number = Math.floor(Math.random() * 1000);
+  return {
+    id,
+    user_nickname: `게스트${guest_number}`,
+    email: `guest${guest_number}@guest.com`,
+  };
+};
 
-export const createViewerToken = async (
-  current_host_id: string | undefined
-) => {
-  const cookie_store = await cookies();
-
-  const sess = cookie_store.getAll();
-  console.log("토큰 세션 정보 찾기 ", sess);
+/**
+ * @param host_id 현새 스트리머의 아이디
+ * @returns 게스트 또는 해당 유저의 정보가 들어간 토큰을 발행
+ */
+export const createViewerToken = async (host_id: string | undefined) => {
   let now_user_info;
-  //현재 유저의 로그인 유무 확인
+  console.log("호스트의 아이디 확인하기", host_id);
   try {
+    //1.로그인시 supabase로 부터 세션 정보를 받아 브라우저 쿠키에 저장
+    //2.next.js 서버에게 브라우저에서 받은 쿠키를 자동으로 넘겨줌
+    //3.서버에 도착한 쿠키들 중 supabase 관련 credit을 꺼내어 supabase에게 유효성 검사진행
     const supabase = createServerComponentClient({ cookies });
 
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser();
-    console.log("토큰이 유효한 토큰인지 확인", user);
-    if (user) {
+    if (user && !error) {
       now_user_info = {
         id: user.id,
         user_nickname: user.user_metadata.user_nickname,
         email: user.email,
       };
     } else {
-      const id = v4();
-      const guest_nickname = `게스트${Math.floor(Math.random() * 1000)}`;
-      const guest_email = `게스트${Math.floor(Math.random() * 1000)}@guest.com`;
-      now_user_info = { id, user_nickname: guest_nickname, email: guest_email };
-      console.log(
-        "로그인 유저가 없습니다. 게스트 유저를 생성합니다.",
-        now_user_info
-      );
+      now_user_info = createGuestUser();
     }
   } catch (error) {
     //에러가 발생해도 게스트로 처리
-    console.log("토큰 생성중 발생하는 error", error);
-    const id = v4();
-    const guest_nickname = `게스트${Math.floor(Math.random() * 1000)}`;
-    const guest_email = `게스트${Math.floor(Math.random() * 1000)}@guest.com`;
-    now_user_info = { id, user_nickname: guest_nickname, email: guest_email };
-    console.log(
-      "로그인 유저가 없습니다. 게스트 유저를 생성합니다.",
-      now_user_info
-    );
+    console.log("Auth 처리 중 에러발생, 게스트로 전환 ", error);
+    now_user_info = createGuestUser();
   }
 
   // 스트리머의 모든 정보 가져오기
-  const host = await getUserInfoById(current_host_id);
+  const host = await getUserInfoById(host_id);
   const is_host = now_user_info?.id === host?.id;
 
   // LiveKit 토큰 생성
@@ -68,13 +64,17 @@ export const createViewerToken = async (
       name: now_user_info.email,
     }
   );
-  console.log("토큰은 과연 누구의 것인가 ??", token);
+
   token.addGrant({
-    room: current_host_id,
+    room: host_id,
     roomJoin: true,
     canPublish: is_host,
     canPublishData: true,
   });
 
-  return token.toJwt();
+  console.log("만든 토큰 확인하기", token);
+
+  const tokenStr = token.toJwt();
+  console.log("타입은 무엇입니까 ??", typeof tokenStr);
+  return tokenStr;
 };

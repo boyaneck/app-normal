@@ -92,8 +92,13 @@ module.exports = {
           "0%": { height: "100%" },
           "100%": { height: "0" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
+        shimmer: "shimmer 2s infinite",
         "slide-in": "slide-in-left 0.3s ease-out forwards",
         "slide-out": "slide-out-right 0.3s ease-out forwards",
         "slide-out-down": "slide-out-down-animation 0.3s ease-in-out forwards",

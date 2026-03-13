@@ -1,6 +1,11 @@
 import React from "react";
 
-const MainVideo = () => {
+interface main_video_props {
+  user_id: string;
+  token: string;
+}
+
+const MainVideo = ({ user_id, token }: main_video_props) => {
   return <div>MainVideo</div>;
 };
 

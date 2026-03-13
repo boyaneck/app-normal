@@ -1,50 +1,4 @@
 import { supabase } from "../config/supabase.js";
-import {
-  IngressAudioEncodingPreset,
-  IngressInput,
-  IngressClient,
-  starttrack,
-} from "livekit-server-sdk";
-
-export const postLiveStats = async (
-  get_peak_viewer,
-  get_fund,
-  get_turn_into_chat_rate,
-  room_name
-) => {
-  try {
-    // 🔄 all_viewer가 객체 또는 배열이면 문자열로 변환
-    // const all_viewers_string = JSON.stringify(get_all_viewer);
-    // const room_name_string = room_name.join(",");
-    console.log(
-      "방송이 끝나면 반드시 여이가 떠야합니다.✅",
-      "get_peak_viewer,",
-      get_peak_viewer,
-      "get_fund,",
-      get_fund,
-      "get_turn_into_chat_rate,",
-      get_turn_into_chat_rate,
-      "room_name",
-      room_name
-    );
-    // supabase insert
-    const { data, error } = await supabase.from("post_live_stats").insert([
-      {
-        broad_num: room_name,
-        peak_viewer: get_peak_viewer, // 혹시 문자열이면 숫자로
-        fund: get_fund,
-        into_chat_rate: get_turn_into_chat_rate,
-      },
-    ]);
-    if (error) {
-      console.error("❌ supabase insert 에러:", error);
-    } else {
-      console.log("✅ postLiveStats 저장 완료:", data);
-    }
-  } catch (err) {
-    console.error("❌ postLiveStats 함수 에러:", err);
-  }
-};
 
 // export const insertTopParti = async (get_top_parti, room_name) => {
 //   console.log(" 최대 동시 시청자수,top_parto", get_top_parti, room_name);
@@ -54,16 +8,70 @@ export const postLiveStats = async (
 //   console.log(" =평균시청자수,avg", get_avg_parti, room_name);
 // };
 
+import { supabase } from "../config/supabase.js";
+
+export const postLiveStats = async ({
+  room_name,
+  peakViewers,
+  startISO,
+  totalVisitors,
+  stayedViewers,
+  retentionRate,
+  category,
+  durationMin,
+}) => {
+  try {
+    const { data, error } = await supabase.from("live_stats").insert([
+      {
+        room_name: room_name,
+        peak_viewers: peakViewers,
+        started_at: startISO,
+        total_visitors: totalVisitors,
+        stayed_viewers: stayedViewers,
+        retention_rate: parseFloat(retentionRate),
+        category: category,
+        duration_min: durationMin,
+      },
+    ]);
+
+    if (error) {
+      console.error("supabase insert error:", JSON.stringify(error, null, 2));
+      return false;
+    } else {
+      console.log("live stats saved:", data);
+      return true;
+    }
+  } catch (err) {
+    console.error("postLiveStats error:", err);
+    return false;
+  }
+};
+
+export const insertAIReports = async (roomName, report) => {
+  try {
+    const { error } = await supabase.from("ai_reports").insert({
+      room_name: roomName,
+      report,
+    });
+    if (error) throw error;
+  } catch (error) {
+    console.error(
+      "ai_reports 테이블에 데이터 insert 중 오류가 발생했습니다.",
+      error,
+    );
+    throw error;
+  }
+};
+
 export const insertAvgKeep = async () => {};
 
 export const egressWebRTC = async () => {
   //1.Egress 요청 객체 생성 및 설정
-  const request: StartTrackCompositeEgressREquest = {
-    room_name: room_id,
-
-    //오디오 트랙 설정: 방에 있는 모든 오디오 Egress에 포함
-    audio_track: {
-      source: TrackSource.ANY_PUBLISHER,
-    },
-  };
+  // const request: StartTrackCompositeEgressREquest = {
+  //   room_name: room_id,
+  //   //오디오 트랙 설정: 방에 있는 모든 오디오 Egress에 포함
+  //   audio_track: {
+  //     source: TrackSource.ANY_PUBLISHER,
+  //   },
+  // };
 };

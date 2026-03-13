@@ -18,7 +18,7 @@ const SlidingLiquidBar = () => {
       className="relative flex items-center justify-center gap-4 p-3 
                    rounded-full bg-black/20 backdrop-blur-lg"
     >
-      <div
+      {/* <div
         className="
           absolute top-3 left-3 w-20 h-20
           
@@ -38,7 +38,6 @@ const SlidingLiquidBar = () => {
           transform: `translateX(${bubbleXPosition}px)`,
         }}
       >
-        {/* 표면 광택 (하이라이트) */}
         <div className="absolute top-[10%] left-[10%] w-[50%] h-[50%] bg-gradient-to-br from-white/40 to-transparent rounded-full rotate-[-30deg]"></div>
       </div>
 
@@ -58,7 +57,7 @@ const SlidingLiquidBar = () => {
         >
           {icon}
         </button>
-      ))}
+      ))} */}
     </div>
   );
 };

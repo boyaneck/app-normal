@@ -29,7 +29,7 @@ import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
 import { createPortal } from "react-dom";
 import { AnimatePresence } from "framer-motion";
-import { CreditCardIcon } from "lucide-react";
+import { CreditCardIcon, Send } from "lucide-react";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -129,7 +129,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const heartAnimationEnd = ({ id }: heart) => {
     //여기서 하트 카운트를 세고 ,
     set_hearts(([prev_hearts]) =>
-      [prev_hearts].filter((heart) => heart?.id !== id)
+      [prev_hearts].filter((heart) => heart?.id !== id),
     );
   };
 
@@ -156,7 +156,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     //HTTP POST 로 보내기기
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string
+        process.env.NEXT_PUBLIC_SANCTION_USER_API_URL as string,
         // selected_message_for_modal()
       );
       console.log("채팅 정지 관련 post", response);
@@ -195,7 +195,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
           rounded-xl
           overflow-hidden 
           relative
-          `
+          `,
       )}
     >
       <div
@@ -243,7 +243,17 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
 
       <div className="border row-span-1  border-black grid grid-cols-[80%_10%_10%] items-center ">
         <ChatInput current_host_id={current_host_id} />
-        <div>d</div>
+        <button
+          className={`hover:cursor-pointer
+        
+          `}
+        >
+          <Send
+            className={` w-5 h-5
+              transition-colors duration-300 ease-in-out
+          `}
+          />
+        </button>
         <button className="" onClick={() => set_is_pm_modal_open(true)}>
           <CreditCardIcon />
         </button>
@@ -256,7 +266,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
               current_host_nickname={current_host_nickname}
               current_host_id={current_host_id}
             />,
-            id_target
+            id_target,
           )}
       </div>
     </div>
