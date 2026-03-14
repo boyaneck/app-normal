@@ -2,9 +2,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface LiveRecommendCardProps {
-  list: LiveItem[];
-}
 interface LiveItem {
   id: string;
   host: string;
