@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const EASE = [0.22, 1, 0.36, 1];
+
 export const StudioAIWelcome = ({
   username = "호스트 님 안녕하세요 반갑습니다  ",
 }) => {
@@ -98,11 +100,11 @@ export const StudioAIWelcome = ({
       }}
       animate={{ ...current, opacity: 1 }}
       transition={{
-        width: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-        height: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+        width: { duration: 0.6, ease: EASE },
+        height: { duration: 0.5, ease: EASE },
         borderRadius: { duration: 0.5 },
-        top: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-        y: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+        top: { duration: 0.7, ease: EASE },
+        y: { duration: 0.7, ease: EASE },
         opacity: { duration: 0.25 },
         scale: { type: "spring", stiffness: 260, damping: 22 },
       }}
@@ -113,7 +115,7 @@ export const StudioAIWelcome = ({
           left: iconCenter ? "calc(50%-14)" : 14,
           // x: iconCenter ? "-50%" : 0,
         }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.35, ease: EASE }}
       >
         <div
           className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -161,7 +163,7 @@ export const StudioAIWelcome = ({
                     y: {
                       duration: 0.25,
                       delay: i * 0.03,
-                      ease: [0.25, 0.1, 0.25, 1],
+                      ease: EASE,
                     },
                     opacity: { duration: 0.01, delay: i * 0.03 },
                   }}
