@@ -1,6 +1,6 @@
 import { useLiveSettingStore } from "@/store/live_setting_store";
 import React, { useRef, useState } from "react";
-import ThumbUpload from "./thumb_upload";
+import ThumbUpload from "./thumb-upload";
 type drage_event = (e: React.DragEvent<HTMLDivElement>) => void;
 
 const TitleAndDescription = () => {

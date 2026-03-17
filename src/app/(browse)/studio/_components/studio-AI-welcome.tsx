@@ -23,24 +23,6 @@ export const StudioAIWelcome = ({
   }, []);
 
   const boxAnimate = {
-    // square: { width: 48, height: 48, borderRadius: 12, top: "50%", y: "-50%" },
-    // expand: { width: 360, height: 52, borderRadius: 26, top: "50%", y: "-50%" },
-    // text: { width: 360, height: 52, borderRadius: 26, top: "50%", y: "-50%" },
-    // shrink: { width: 48, height: 48, borderRadius: 12, top: "50%", y: "-50%" },
-    // moveBottom: {
-    //   width: 48,
-    //   height: 48,
-    //   borderRadius: 12,
-    //   top: "calc(100vh - 72px)",
-    //   y: "0%",
-    // },
-    // input: {
-    //   width: 360,
-    //   height: 48,
-    //   borderRadius: 24,
-    //   top: "calc(100vh - 72px)",
-    //   y: "0%",
-    // },
     square: { width: 48, height: 48, borderRadius: 12, top: "50%", y: "-50%" },
     expand: { width: 360, height: 52, borderRadius: 26, top: "50%", y: "-50%" },
     text: { width: 360, height: 52, borderRadius: 26, top: "50%", y: "-50%" },
