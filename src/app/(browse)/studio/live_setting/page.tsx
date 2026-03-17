@@ -1,13 +1,12 @@
 import React from "react";
-import LiveScreen from "./live_screen";
+import LiveScreen from "./live-screen";
 import { LiveKitRoom } from "@livekit/components-react";
 import useUserStore from "@/store/user";
 import { useViewerToken } from "@/hooks/useViewerToken";
-import ThumbUpload from "./thumb_upload";
-import TitleAndDescription from "./title_and_desc";
-import LiveSetting from "../live_setting";
-import LiveSettingButton from "./live_setting_button";
-const LiveSettingPage = () => {
+import ThumbUpload from "./thumb-upload";
+import TitleAndDescription from "./title-and-desc";
+import LiveSettingButton from "./live-setting-button";
+const LiveSetting = () => {
   const { user } = useUserStore((state) => state);
   const { token, name, identity } = useViewerToken(user?.user_id);
   return (
@@ -28,4 +27,4 @@ const LiveSettingPage = () => {
   );
 };
 
-export default LiveSettingPage;
+export default LiveSetting;
