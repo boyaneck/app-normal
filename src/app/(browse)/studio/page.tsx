@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import StudioAIWelcome from "./_components/studio-AI-welcome";
-const LiveStat = dynamic(() => import("./live_stat/live_stat"));
+const LiveStat = dynamic(() => import("./live-stat/live_stat"));
 import LiveSetting from "./live_setting/page";
 import LiveSettingPage from "./live_setting/page";
 

@@ -1,7 +1,6 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
-import { post_live_stats_props } from "@/types/live";
+import { LiveStatsProps } from "@/types/live";
 import axios from "axios";
-import { randomUUID } from "crypto";
 interface live_info_insert_props {
   user_email?: string;
   thumb_url: string;
@@ -65,11 +64,11 @@ export const getHomeTrendingLiveList = async () => {
   return res.data;
 };
 
-export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
-  const { data: post_live_stats, error } = await supabaseForClient
-    .from("post_live_stats")
+export const getLiveStatsWeek = async (roomName: string | undefined) => {
+  const { data: liveStats, error } = await supabaseForClient
+    .from("live_stats")
     .select("*")
-    .eq("broad_num", room_name)
+    .eq("broad_num", roomName)
     .order("live_started_at", { ascending: false })
     .limit(7);
 
@@ -78,7 +77,7 @@ export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
     throw new Error(error.message);
   }
 
-  return post_live_stats ? post_live_stats : null;
+  return liveStats ? liveStats : null;
 };
 
 export const getWeekleyPost = async (room_name: string) => {
