@@ -32,7 +32,7 @@ interface props {
   post_live_stats: post_live_stats_props[] | null | undefined;
   stat_card_ref: React.RefObject<store>;
 }
-const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
+const WeeklyChart = ({ post_live_stats, stat_card_ref }: props) => {
   const { animateCount } = usePostLive();
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -156,4 +156,4 @@ const WeeklyTrendChart = ({ post_live_stats, stat_card_ref }: props) => {
   );
 };
 
-export default WeeklyTrendChart;
+export default WeeklyChart;
