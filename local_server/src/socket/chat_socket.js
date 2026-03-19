@@ -1,6 +1,43 @@
 import { redis_client } from "../config/redis.js";
 
 export const chatSocket = (socket, namespace_room) => {
+
+const pubClient=redis_client.duplicate()
+const subClient=redis_client.duplicate()
+
+let pubReady=false
+let subReady=false
+const initPubSub=async()=>{
+  try {
+    await pubClient.connect()
+    pubReady=true
+    console.log("Redis Pub 연결 완료")
+
+    await subClient.connect()
+    subReady=true
+    console.log("Redis Sub 연결 완료")
+  } catch (error) {
+    console.log("Redis Pub/Sub 연결 실패",error.message)
+  }
+}
+  
+initPubSub()
+
+
+const RATE_LIMIT={
+  maxMsg:3,
+  windowSec:1,
+  ttlSec:2
+}
+const checkRateLimit=async(userId)=>{
+  try {
+    const key=`rateLimit:${userId}:${Math.floor(Date.now()/1000)}`
+    const count =await redis_client.incr(key)
+    if()
+  } catch (error) {
+    
+  }
+}
   socket.on("send_message", async ({ message_info }) => {
     try {
       const chat_num = message_info?.current_chat_room_number;
@@ -14,9 +51,9 @@ export const chatSocket = (socket, namespace_room) => {
         host_id,
       };
       console.log("메세지 정보 확인하기", message_info);
+      socket.emit("receive_message", message_info);
       if (chat_num) {
         const message_data = JSON.stringify(message_info);
-        console.log("메세지 보내기", message_data);
         await redis_client.sAdd(`${host_id}:room_chat_user`, host_id);
         await redis_client.rPush(
           `${host_id}:room_chat_log`,
@@ -67,10 +104,9 @@ export const chatSocket = (socket, namespace_room) => {
         }
         // await redis_client_chat.expire(redis_chat_key,60*60*24)a
       }
-      c;
 
       console.log("메세지 정보 확인하기", message_info);
-      socket.emit("receive_message", message_info);
+      // socket.emit("receive_message", message_info);
     } catch (error) {}
   });
 };
