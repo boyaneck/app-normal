@@ -1,8 +1,32 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
-interface socket_state_props {
+import { ConnectionState } from "@livekit/components-react";
+
+type ConnectionState = "connected" | "disconnected" | "reconnecting" | "failed";
+
+interface MsgInfo {
+  msgId: string;
+  userId: string;
+  userNickname: string;
+  msg: string;
+  hostId: string;
+  chatRoomNum: string;
+}
+
+interface ReconnectInfo {
+  attempt: number;
+  max: number;
+  nextTryMs: number;
+}
+
+interface SocketState {
   socket: Socket | null;
-  // setSocket: (socket:Socket) => void
+  connectionState: ConnectionState;
+  reconnectionInfo: ReconnectInfo;
+  sendMsg: (msg: MsgInfo) => void | null;
+
+  handleError: ((error: { type: string; msg: string }) => void) | null;
+
   connect_socket: () => void;
   disconnect_socket: () => void;
 }
