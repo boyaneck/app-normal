@@ -23,37 +23,39 @@ interface SocketState {
   socket: Socket | null;
   connectionState: ConnectionState;
   reconnectionInfo: ReconnectInfo;
+  reconnectAttempt:number,
   sendMsg: (msg: MsgInfo) => void | null;
+
+
 
   handleError: ((error: { type: string; msg: string }) => void) | null;
 
-  connect_socket: () => void;
+  connectSocket: () => void;
   disconnect_socket: () => void;
 }
 
-export const useSocketStore = create<socket_state_props>((set, get) => ({
+export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
-  connect_socket: () => {
-    if (!get().socket) {
+  connectionState:"disconnected",
+  reconnectionInfo:  
+  connectSocket: () => {
+    if (get().socket?.connected) return
+    
+      const prev = get().socket;
+    if (prev) {
+      prev.removeAllListeners();
+      prev.close();
+    }
       const socket = io("http://localhost:3001/room", {
         transports: ["websocket"],
       });
-      set({ socket });
 
-      socket.on("connected", () => {
-        console.log("연결이 성공했습니다!");
-      });
+       socket.on("connect", () => {
+      console.log("[Socket] 연결 성공:", socket.id);
+      set({ ConnectionState: "connected", reconnectAttempt: 0 });
+    });
+ 
 
-      socket.on("disconnected", () => {
-        set({ socket: null });
-      });
-    }
+
+
   },
-  disconnect_socket: () => {
-    const { socket } = get();
-    if (socket) {
-      socket.disconnect();
-      set({ socket: null });
-    }
-  },
-}));
