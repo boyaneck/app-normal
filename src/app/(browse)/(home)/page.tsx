@@ -2,7 +2,7 @@
 import { createViewerToken, getLiveListNow, getLiveUser } from "@/api";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/store/bar_store";
+import { useSidebarStore } from "@/store/bar-store";
 import MainBanner from "./_components/main-banner";
 import { useMemo } from "react";
 import LiveList from "./_components/live-list";

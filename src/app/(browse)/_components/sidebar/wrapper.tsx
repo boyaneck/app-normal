@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/store/bar_store";
+import { useSidebarStore } from "@/store/bar-store";
 import { easeInOut, motion } from "framer-motion";
 import { LayoutDashboard, Settings, ShieldCheck } from "lucide-react";
 import React from "react";

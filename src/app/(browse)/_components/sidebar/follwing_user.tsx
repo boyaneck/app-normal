@@ -5,7 +5,7 @@ import { getFollowingUsers, getFollowingUsersInfo } from "@/api/follow";
 import useUserStore from "@/store/user";
 import { FaRegHeart } from "react-icons/fa6";
 import Image from "next/image";
-import useFollowingUserStore from "@/store/following_user";
+import useFollowingUserStore from "@/store/following-user";
 
 const Following_user = () => {
   const { user } = useUserStore((state) => state);

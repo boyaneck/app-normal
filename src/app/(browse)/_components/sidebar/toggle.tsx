@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useSidebarStore } from "@/store/bar_store";
+import { useSidebarStore } from "@/store/bar-store";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
