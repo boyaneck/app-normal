@@ -1,4 +1,4 @@
-import { useLiveSettingStore } from "@/store/live_setting_store";
+import { useLiveSettingStore } from "@/store/live-setting";
 import { useCallback, useRef, useState } from "react";
 import Dropzone, { useDropzone, FileRejection } from "react-dropzone";
 
@@ -12,7 +12,7 @@ export const useImage = () => {
   const compressImage = (
     file: File,
     max_width: number,
-    quality: number
+    quality: number,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!file.type.startsWith("image/")) {
@@ -66,7 +66,7 @@ export const useImage = () => {
           const compressedDataUrl = await compressImage(
             file,
             MAX_WIDTH,
-            QUALITY
+            QUALITY,
           );
 
           set_thumb_url(compressedDataUrl);
@@ -77,7 +77,7 @@ export const useImage = () => {
       }
       set_is_loading(false);
     },
-    []
+    [],
   );
   const {
     getRootProps,

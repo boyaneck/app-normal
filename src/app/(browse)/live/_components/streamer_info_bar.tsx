@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { useStreamingBarStore } from "@/store/bar_store";
+import { useStreamingBarStore } from "@/store/bar-store";
 
 interface NavItem {
   icon: React.ReactNode;

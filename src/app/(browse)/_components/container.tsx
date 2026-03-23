@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/store/bar_store";
+import { useSidebarStore } from "@/store/bar-store";
 import React from "react";
 interface ContainerProps {
   children: React.ReactNode;

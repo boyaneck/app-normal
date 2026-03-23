@@ -1,5 +1,5 @@
 import { insertAndUpdateLiveInfo } from "@/api";
-import { useLiveSettingStore } from "@/store/live_setting_store";
+import { useLiveSettingStore } from "@/store/live-setting";
 import useUserStore from "@/store/user";
 import { AnimatePresence, motion } from "framer-motion";
 import { Settings, Square } from "lucide-react";

@@ -9,7 +9,7 @@ import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
 import { getRecommendLiveList } from "@/api";
 import StreamerInfoBar from "../_components/streamer_info_bar";
-import { useStreamingBarStore } from "@/store/bar_store";
+import { useStreamingBarStore } from "@/store/bar-store";
 import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
 import LiveRecommendCard from "../_components/live-recommend-card";

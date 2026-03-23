@@ -18,7 +18,7 @@ import {
   remove_message_props,
   warning_chat,
 } from "../../../types/chat";
-import { useSocketStore } from "@/store/socket_store";
+import { useSocketStore } from "@/store/socket-store";
 import { getChatInfo } from "@/api/chat";
 import clsx from "clsx";
 import { max_messages, option_data, sanction_duration } from "@/utils/chat";
@@ -26,7 +26,7 @@ import { AnimatedHeart } from "./_components/animated_heart";
 import { AnimatedMessage } from "./_components/animated_message";
 import { ChatInput } from "./_components/chat_input";
 import ChatSanction from "./_components/chat_sanction";
-import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
+import { useSidebarStore, useStreamingBarStore } from "@/store/bar-store";
 import { createPortal } from "react-dom";
 import { AnimatePresence } from "framer-motion";
 import { CreditCardIcon, Send } from "lucide-react";

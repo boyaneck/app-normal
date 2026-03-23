@@ -1,4 +1,4 @@
-import { useSocketStore } from "@/store/socket_store";
+import { useSocketStore } from "@/store/socket-store";
 import useUserStore from "@/store/user";
 import {
   FIXED_HEIGHT_PX,
