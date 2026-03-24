@@ -40,18 +40,15 @@ const useChat = ({
     socket,
     connectionState,
     reconnectAttempt,
-    viewerCount,
     connectSocket,
     disconnectSocket,
     sendMsg,
-    setOnMessage,
+    setOnMsg,
     setOnError,
     setOnReconnect,
   } = useSocketStore();
 
-  // ----------------------------------------------------------
   // room 입장 (연결 시 + 재연결 시 둘 다 사용)
-  // ----------------------------------------------------------
   const joinRoom = useCallback(() => {
     const currentSocket = useSocketStore.getState().socket;
     if (currentSocket?.connected && hostId) {
@@ -64,14 +61,12 @@ const useChat = ({
     }
   }, [hostId, userId, userNickname, isHost]);
 
-  // ----------------------------------------------------------
   // 소켓 연결 + 콜백 등록
-  // ----------------------------------------------------------
   useEffect(() => {
     connectSocket();
 
     // 메시지 오면 → messages 배열에 추가
-    setOnMessage((msg: MsgInfo) => {
+    setOnMsg((msg: MsgInfo) => {
       setMessages((prev) => {
         // 중복 방지
         if (msg.msgId && prev.some((m) => m.msgId === msg.msgId)) {
@@ -99,18 +94,14 @@ const useChat = ({
     };
   }, []);
 
-  // ----------------------------------------------------------
   // 연결 성공 시 방 입장
-  // ----------------------------------------------------------
   useEffect(() => {
     if (connectionState === "connected") {
       joinRoom();
     }
   }, [connectionState, joinRoom]);
 
-  // ----------------------------------------------------------
   // 메시지 전송
-  // ----------------------------------------------------------
   const send = useCallback(
     (text: string) => {
       if (!text.trim()) return false;
@@ -129,9 +120,7 @@ const useChat = ({
     [userId, userNickname, avatarUrl, email, hostId, sendMsg],
   );
 
-  // ----------------------------------------------------------
   // 자동 스크롤
-  // ----------------------------------------------------------
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     setAutoScroll(el.scrollHeight - el.scrollTop - el.clientHeight < 50);
@@ -143,14 +132,11 @@ const useChat = ({
     }
   }, [messages, autoScroll]);
 
-  // ----------------------------------------------------------
   // 반환
-  // ----------------------------------------------------------
   return {
     messages,
     connectionState,
     reconnectAttempt,
-    viewerCount,
     error,
     autoScroll,
     send,
