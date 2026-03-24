@@ -1,6 +1,6 @@
 import { redis_client } from "../config/redis.js";
 
-export const chatSocket = (socket, namespace_room) => {
+export const chatSocket = (socket, namsespaceRoom) => {
 
 const pubClient=redis_client.duplicate()
 const subClient=redis_client.duplicate()
