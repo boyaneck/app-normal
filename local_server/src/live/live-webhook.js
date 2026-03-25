@@ -1,25 +1,26 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
-import { postLiveStats } from "../api/live.js";
+import { insertLiveStats } from "../api/live.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
 const receiver = new WebhookReceiver(api_key, api_secret);
 
-const getRedisKeys = (room_name) => ({
-  INFO: `live:${room_name}:info`,
-  VIEWERS: `live:${room_name}:viewers`,
-  PEAK_VIEW: `live:${room_name}:peak`,
-  AVG_RATE: `live:${room_name}:avg_rate`,
-  STAY_MINUTE: `live:${room_name}:stay`,
-  ALL_VISITORS: `live:${room_name}:all_visitors`,
-  REVISIT: `live:${room_name}:revisit`,
-  CATEGORY: `live:${room_name}:category`,
-  TIMESERIES: `live:${room_name}:timeseries`,
+export const getRedisKeys = (roomName) => ({
+  INFO: `live:${roomName}:info`,
+  VIEWERS: `live:${roomName}:viewers`,
+  PEAK_VIEW: `live:${roomName}:peak`,
+  AVG_RATE: `live:${roomName}:avg_rate`,
+  STAY_MINUTE: `live:${roomName}:stay`,
+  ALL_VISITORS: `live:${roomName}:all_visitors`,
+  REVISIT: `live:${roomName}:revisit`,
+  CATEGORY: `live:${roomName}:category`,
+  TIMESERIES: `live:${roomName}:timeseries`,
   VIEWER_RANK: `live:rank`,
+  MSG: `live:${roomName}:msg`,
 });
 
-export const liveParticipantWebhook = async (req, res) => {
+export const liveWebhook = async (req, res) => {
   let event;
   try {
     event = await receiver.receive(req.body, req.get("Authorization"));
@@ -31,16 +32,16 @@ export const liveParticipantWebhook = async (req, res) => {
 
   if (!event) return;
 
-  let room_name = event.room?.name || event.ingressInfo?.roomName;
+  let roomName = event.room?.name || event.ingressInfo?.roomName;
 
-  if (!room_name) {
-    console.log(`[Webhook] ${event.event} : room_name을 찾을 수 없음`);
+  if (!roomName) {
+    console.log(`[Webhook] ${event.event} : roomName을 찾을 수 없음`);
     return;
   }
 
   const viewer = event.participant ? event.participant.identity : null;
 
-  const keys = getRedisKeys(room_name);
+  const keys = getRedisKeys(roomName);
 
   try {
     switch (event.event) {
@@ -62,13 +63,14 @@ export const liveParticipantWebhook = async (req, res) => {
         await redis_client.hSet(keys.INFO, "today", `${date}/${day_of_week}`);
 
         // 카테고리 저장
+        //이 코드는 지금 잘못되었음
         const category = event.room?.metadata?.category || "기타";
         await redis_client.set(keys.CATEGORY, category);
 
         // 랭킹보드 초기화
         await redis_client.zAdd(keys.VIEWER_RANK, {
           score: 0,
-          value: room_name,
+          value: roomName,
         });
 
         // 시계열 초기 데이터
@@ -78,7 +80,7 @@ export const liveParticipantWebhook = async (req, res) => {
         });
 
         // 5분마다 시계열 데이터 저장
-        startTimeseriesRecording(room_name);
+        startTimeseriesRecording(roomName);
 
         break;
       }
@@ -93,7 +95,7 @@ export const liveParticipantWebhook = async (req, res) => {
           1,
         );
 
-        //처음입장인 경우
+        //처음입장인 경우(중복입장/여러 탭을 하나로 count 하기 위해 )
         if (viewerVisitCount === 1) {
           const currentViewers = await redis_client.hLen(keys.VIEWERS);
           const peakViewersStr = await redis_client.hGet(
@@ -101,7 +103,7 @@ export const liveParticipantWebhook = async (req, res) => {
             "peak_view",
           );
           //현재 방송 중인 총시청자수 순위에 해당 방송 시청자수 +1
-          await redis_client.zIncrBy(keys.VIEWER_RANK, 1, room_name);
+          await redis_client.zIncrBy(keys.VIEWER_RANK, 1, roomName);
           const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
 
           if (currentViewers > peakViewers) {
@@ -132,16 +134,17 @@ export const liveParticipantWebhook = async (req, res) => {
         const viewerLeftCount = await redis_client.hDel(keys.VIEWERS, viewer);
 
         if (viewerLeftCount > 0) {
-          await redis_client.zIncrBy(keys.VIEWER_RANK, -1, room_name);
+          await redis_client.zIncrBy(keys.VIEWER_RANK, -1, roomName);
 
+          //레이스 컨디션(동시에 여러이벤트가 처리될때 현재 방의 인원이 0명일 경우 -1 음수로 되는 것을 막기 위해 방 재설정)
           const currentScore = await redis_client.zScore(
             keys.VIEWER_RANK,
-            room_name,
+            roomName,
           );
           if (currentScore < 0) {
             await redis_client.zAdd(keys.VIEWER_RANK, {
               score: 0,
-              value: room_name,
+              value: roomName,
             });
           }
         }
@@ -163,21 +166,23 @@ export const liveParticipantWebhook = async (req, res) => {
 
       case "ingress_ended": {
         // 송출 종료 — 시계열 기록만 멈춤
-        stopTimeseriesRecording(room_name);
+        stopTimeseriesRecording(roomName);
         break;
       }
 
       case "room_finished": {
         //아주 낮은 확률로 서버가 터지거나, 유저가 해당 사인을 못받는 경우
         // ingreses_ended -> room_finished 정상적으로 이행되지 않을 수 있어서 room_finished에도 interval을 제거하는 로직을 만듬
-        console.log("room_finished 이벤트 수신:", room_name);
-        stopTimeseriesRecording(room_name);
+        console.log("room_finished 이벤트 수신:", roomName);
+        stopTimeseriesRecording(roomName);
 
         // 최대 시청자 수
         const peakViewersStr = await redis_client.hGet(
           keys.PEAK_VIEW,
           "peak_view",
         );
+
+        //최대 시청자수 자료형 변형
         const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
 
         // 방송 시작 시간
@@ -200,11 +205,9 @@ export const liveParticipantWebhook = async (req, res) => {
           ? Math.round((Date.now() - parseInt(startedAtStr, 10)) / 60000)
           : 0;
 
-        // 랭킹보드에서 제거
-
         // 통계 API 호출
-        const saveSuccess = await postLiveStats({
-          room_name,
+        const saveSuccess = await insertLiveStats({
+          roomName,
           peakViewers,
           startISO,
           totalVisitors,
@@ -216,7 +219,8 @@ export const liveParticipantWebhook = async (req, res) => {
         if (saveSuccess) {
           const exists = await redis_client.exists(keys.INFO);
           console.log("INFO 키 존재 여부:", exists);
-          await redis_client.zRem(keys.VIEWER_RANK, room_name);
+          //랭킹보드에서 해당 방송 제거
+          await redis_client.zRem(keys.VIEWER_RANK, roomName);
 
           const keysToDelete = [
             keys.VIEWERS,
@@ -252,10 +256,10 @@ export const liveParticipantWebhook = async (req, res) => {
 // 시계열 데이터 기록
 const timeseriesIntervals = new Map();
 
-const startTimeseriesRecording = (room_name) => {
-  if (timeseriesIntervals.has(room_name)) return;
-  const viewersKey = `live:${room_name}:viewers`;
-  const timeseriesKey = `live:${room_name}:timeseries`;
+const startTimeseriesRecording = (roomName) => {
+  if (timeseriesIntervals.has(roomName)) return;
+  const viewersKey = `live:${roomName}:viewers`;
+  const timeseriesKey = `live:${roomName}:timeseries`;
 
   const intervalId = setInterval(
     async () => {
@@ -272,30 +276,30 @@ const startTimeseriesRecording = (room_name) => {
         await redis_client.zRemRangeByScore(timeseriesKey, 0, tenMinutesAgo);
 
         console.log(
-          `[Timeseries] ${room_name}: ${currentViewers}명 (${new Date(timestamp).toISOString()})`,
+          `[Timeseries] ${roomName}: ${currentViewers}명 (${new Date(timestamp).toISOString()})`,
         );
       } catch (error) {
-        console.error(`[Timeseries Error] ${room_name}:`, error);
+        console.error(`[Timeseries Error] ${roomName}:`, error);
       }
     },
     5 * 60 * 1000,
   );
 
-  timeseriesIntervals.set(room_name, intervalId);
+  timeseriesIntervals.set(roomName, intervalId);
 };
 
-const stopTimeseriesRecording = (room_name) => {
-  const intervalId = timeseriesIntervals.get(room_name);
+const stopTimeseriesRecording = (roomName) => {
+  const intervalId = timeseriesIntervals.get(roomName);
   if (intervalId) {
     clearInterval(intervalId);
-    timeseriesIntervals.delete(room_name);
-    console.log(`[Timeseries] ${room_name} 기록 중지`);
+    timeseriesIntervals.delete(roomName);
+    console.log(`[Timeseries] ${roomName} 기록 중지`);
   }
 };
 
 // ViewerGrowth 계산
-export const getViewerGrowth = async (room_name) => {
-  const timeseriesKey = `live:${room_name}:timeseries`;
+export const getViewerGrowth = async (roomName) => {
+  const timeseriesKey = `live:${roomName}:timeseries`;
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;
 
@@ -329,6 +333,6 @@ export const getViewerGrowth = async (room_name) => {
 //------------단순하게 몇분 머물렀다는것이 아닌 해당 기준을 충족하면 평균 시청 지속률 SET에 저장해 놓고 함
 //시청 지속률
 // conn_keep_rate = await redis_client.scan(
-//   `${room_name}:${parti}:duration`
+//   `${roomName}:${parti}:duration`
 // );
 //가능하다면 그 값중에 평균 지속시간도 오도록
