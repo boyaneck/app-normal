@@ -1,157 +1,278 @@
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
-import { LineChart as LineChartIcon, TrendingUp } from "lucide-react"; // LineChart 이름 충돌 방지
-import React, { forwardRef, RefObject } from "react";
-import { usePostLive } from "@/hooks/usePostLive";
-import { post_live_stats_props } from "@/types/live";
+import { TrendingUp } from "lucide-react";
 
-// ----------------------------------------------------------------------
-// 1. 차트 데이터 (임시)
-// ----------------------------------------------------------------------
+interface WeeklyDataItem {
+  day_label: string;
+  avg_viewer: number;
+  peak_viewer: number;
+  all_viewer: number;
+  fund: number;
+  chat_rate: number;
+}
 
-const MOCK_DATA = [
-  { name: "화", 후원금액: 4000, 시청자: 2400 },
-  { name: "수", 후원금액: 3000, 시청자: 1398 },
-  { name: "목", 후원금액: 2000, 시청자: 9800 },
-  { name: "금", 후원금액: 2780, 시청자: 3908 },
-  { name: "토", 후원금액: 1890, 시청자: 4800 },
-  { name: "일", 후원금액: 2390, 시청자: 3800 },
-  { name: "월", 후원금액: 3490, 시청자: 4300 },
+// ===== 5개 라인 설정 =====
+const LINE_CONFIG = [
+  { key: "avg_viewer", name: "평균 시청자", color: "#3b82f6", unit: "명" },
+  { key: "peak_viewer", name: "최고 시청자", color: "#8b5cf6", unit: "명" },
+  { key: "all_viewer", name: "총 시청자", color: "#34d399", unit: "명" },
+  { key: "fund", name: "후원금액", color: "#f59e0b", unit: "원" },
+  { key: "chat_rate", name: "채팅 전환율", color: "#f87171", unit: "%" },
 ];
 
-type store = Record<string, HTMLDivElement | null>;
-interface props {
-  post_live_stats: post_live_stats_props[] | null | undefined;
-  stat_card_ref: React.RefObject<store>;
+interface WeeklyChartProps {
+  post_live_stats: WeeklyDataItem[];
+  onHoverIndex: (index: number | null) => void;
+  hoveredIndex: number | null;
+  highlightedDataKey: string | null;
 }
-const WeeklyChart = ({ post_live_stats, stat_card_ref }: props) => {
-  const { animateCount } = usePostLive();
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-gray-800/90 border border-indigo-400/70 p-3 rounded-lg shadow-xl text-white backdrop-blur-sm">
-          <p className="font-bold text-sm mb-1 text-indigo-300">
-            {label}요일 방송 통계
-          </p>
-          <div className="space-y-1">
-            {payload.map((item, index) => (
-              <p key={index} className="text-xs flex justify-between">
-                <span
-                  style={{ color: item.color }}
-                  className="font-medium mr-3"
-                >
-                  {item.name}:
+
+const WeeklyChart = ({
+  post_live_stats,
+  onHoverIndex,
+  hoveredIndex,
+  highlightedDataKey,
+}: WeeklyChartProps) => {
+  // ===== 커스텀 툴팁 =====
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+
+    return (
+      <div className="bg-[#0a0a0f]/90 backdrop-blur-2xl border border-white/[0.06] px-4 py-3 rounded-xl shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-2.5 font-medium">
+          {label}요일
+        </p>
+        <div className="space-y-1.5">
+          {payload.map((item: any, i: number) => {
+            const config = LINE_CONFIG.find((l) => l.key === item.dataKey);
+            return (
+              <div key={i} className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: item.color,
+                      boxShadow: `0 0 6px ${item.color}50`,
+                    }}
+                  />
+                  <span className="text-[11px] text-white/50">{item.name}</span>
+                </div>
+                <span className="text-[12px] font-semibold text-white/90 tabular-nums">
+                  {config?.unit === "원"
+                    ? `₩${item.value.toLocaleString()}`
+                    : config?.unit === "%"
+                      ? `${item.value}%`
+                      : item.value.toLocaleString()}
                 </span>
-                <span className="font-semibold">
-                  {item.name === "후원금액"
-                    ? `${item.value.toLocaleString()} 원`
-                    : `${item.value.toLocaleString()} 명`}
-                </span>
-              </p>
-            ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // ===== 커스텀 Dot =====
+  const ActiveDot = (props: any) => {
+    const { cx, cy, stroke } = props;
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={10} fill={stroke} opacity={0.1} />
+        <circle cx={cx} cy={cy} r={6} fill={stroke} opacity={0.2} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={3.5}
+          fill="#0a0a0f"
+          stroke={stroke}
+          strokeWidth={2}
+        />
+      </g>
+    );
+  };
+
+  // ===== 마우스 이벤트 =====
+  const handleMouseMove = (state: any) => {
+    if (state?.activeTooltipIndex !== undefined) {
+      onHoverIndex(state.activeTooltipIndex);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    onHoverIndex(null);
+  };
+
+  // ===== 라인별 스타일 계산 =====
+  const getLineStyle = (key: string) => {
+    if (!highlightedDataKey) {
+      return { strokeWidth: 2, opacity: 1 };
+    }
+    if (key === highlightedDataKey) {
+      return { strokeWidth: 3.5, opacity: 1 };
+    }
+    return { strokeWidth: 1, opacity: 0.2 };
+  };
+
+  return (
+    <div className="rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] overflow-hidden">
+      {/* ===== 헤더 ===== */}
+      <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+            <TrendingUp className="w-3.5 h-3.5 text-white/40" />
+          </div>
+          <div>
+            <h3 className="text-[13px] font-medium text-white/70 tracking-tight">
+              주간 방송 추이
+            </h3>
+            <p className="text-[10px] text-white/20 mt-0.5">최근 7일</p>
           </div>
         </div>
-      );
-    }
-    return null;
-  };
 
-  const chartMouseMove = (state: any) => {
-    if (state.activePayload && state.activePayload.length) {
-      chartMouseLeave(state.activePayload[0].payload);
-
-      const ref = stat_card_ref.current;
-      console.log("ssssssss", state.activePayload[0]);
-      const payload: post_live_stats_props = state.activePayload[0].payload;
-      const post_live_obj = { payload, ref };
-      animateCount(post_live_obj);
-    } else {
-      chartMouseLeave(null);
-    }
-  };
-  const chartMouseLeave = (val: null) => {};
-
-  // MOCK_DATA를 기본값으로 설정
-  return (
-    <div
-      className={`border border-white/20 shadow-md p-4
-        bg-white/10 transition-all duration-300 rounded-xl min-h-[450px] backdrop-blur-md
-        hover:ring-2 hover:ring-indigo-400/70 relative
-      `}
-    >
-      <div className="flex items-center text-white mb-4 text-lg font-semibold border-b border-indigo-500/30 pb-2">
-        <TrendingUp className="w-5 h-5 mr-2 text-indigo-400" />
-        주간 방송 핵심 지표 추이 (7일)
+        {/* 범례 */}
+        <div className="flex items-center gap-4 flex-wrap">
+          {LINE_CONFIG.map((line) => (
+            <div
+              key={line.key}
+              className={`flex items-center gap-1.5 transition-opacity duration-300 ${
+                highlightedDataKey && highlightedDataKey !== line.key
+                  ? "opacity-30"
+                  : "opacity-100"
+              }`}
+            >
+              <div
+                className="w-4 h-[2px] rounded-full"
+                style={{ backgroundColor: line.color }}
+              />
+              <span className="text-[10px] text-white/30">{line.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          // data={MOCK_DATA}
-          data={post_live_stats}
-          margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-          onMouseMove={chartMouseMove}
-          onMouseLeave={() => chartMouseLeave(null)}
-        >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#555"
-            strokeOpacity={0.5}
+      {/* ===== 차트 (기존의 2/3 크기) ===== */}
+      <div className="px-2 pb-3">
+        <ResponsiveContainer width="100%" height={230}>
+          <AreaChart
+            data={post_live_stats}
+            margin={{ top: 8, right: 24, left: 8, bottom: 4 }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            {/* 그라데이션 정의 */}
+            <defs>
+              {LINE_CONFIG.map((line) => (
+                <linearGradient
+                  key={line.key}
+                  id={`gradient_${line.key}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="0%"
+                    stopColor={line.color}
+                    stopOpacity={highlightedDataKey === line.key ? 0.2 : 0.08}
+                  />
+                  <stop offset="100%" stopColor={line.color} stopOpacity={0} />
+                </linearGradient>
+              ))}
+            </defs>
+
+            <CartesianGrid
+              strokeDasharray="0"
+              stroke="rgba(255,255,255,0.03)"
+              vertical={false}
+            />
+
+            <XAxis
+              dataKey="day_label"
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fontSize: 11,
+                fill: "rgba(255,255,255,0.2)",
+                fontWeight: 500,
+              }}
+              dy={6}
+            />
+
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "rgba(255,255,255,0.15)" }}
+              tickFormatter={(v) =>
+                v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
+              }
+              width={36}
+            />
+
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{
+                stroke: "rgba(255,255,255,0.06)",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
+              }}
+            />
+
+            {/* 5개 라인 */}
+            {LINE_CONFIG.map((line) => {
+              const style = getLineStyle(line.key);
+              return (
+                <Area
+                  key={line.key}
+                  type="monotone"
+                  dataKey={line.key}
+                  name={line.name}
+                  stroke={line.color}
+                  strokeWidth={style.strokeWidth}
+                  strokeOpacity={style.opacity}
+                  fill={`url(#gradient_${line.key})`}
+                  fillOpacity={
+                    highlightedDataKey
+                      ? highlightedDataKey === line.key
+                        ? 1
+                        : 0.05
+                      : 0.6
+                  }
+                  activeDot={
+                    !highlightedDataKey || highlightedDataKey === line.key ? (
+                      <ActiveDot />
+                    ) : (
+                      false
+                    )
+                  }
+                  dot={false}
+                  style={{
+                    transition: "stroke-width 0.3s ease, opacity 0.3s ease",
+                  }}
+                />
+              );
+            })}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* ===== 하단 인디케이터 ===== */}
+      <div className="px-6 pb-4 flex justify-center gap-1.5">
+        {post_live_stats.map((_, i) => (
+          <div
+            key={i}
+            className={`h-[3px] rounded-full transition-all duration-300 ${
+              hoveredIndex === i ? "w-6 bg-white/40" : "w-2 bg-white/[0.08]"
+            }`}
           />
-
-          <XAxis
-            dataKey="avg_viewer"
-            stroke="#fff"
-            padding={{ left: 10, right: 10 }}
-            className="text-xs"
-          />
-
-          <YAxis
-            stroke="#fff"
-            tickFormatter={(value) => value.toLocaleString()} // 1000 단위 콤마
-            className="text-xs"
-          />
-
-          <Tooltip content={<CustomTooltip />} />
-
-          <Legend wrapperStyle={{ paddingTop: "10px" }} />
-
-          <Line
-            type="monotone"
-            dataKey="fund"
-            stroke="#F56565" // 빨간색 (후원)
-            strokeWidth={3}
-            activeDot={{
-              r: 8,
-              fill: "#F56565",
-              stroke: "white",
-              strokeWidth: 2,
-            }}
-            dot={false}
-          />
-
-          <Line
-            type="monotone"
-            dataKey="all_viewer"
-            stroke="#48BB78" // 녹색 (시청자)
-            strokeWidth={3}
-            activeDot={{
-              r: 8,
-              fill: "#48BB78",
-              stroke: "white",
-              strokeWidth: 2,
-            }}
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+        ))}
+      </div>
     </div>
   );
 };

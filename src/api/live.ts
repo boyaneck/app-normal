@@ -65,13 +65,15 @@ export const getHomeTrendingLiveList = async () => {
 };
 
 export const getLiveStatsWeek = async (roomName: string | undefined) => {
+  console.log("제대로 된 방송 넘버 ", roomName);
   const { data: liveStats, error } = await supabaseForClient
     .from("live_stats")
     .select("*")
-    .eq("broad_num", roomName)
-    .order("live_started_at", { ascending: false })
+    .eq("room_name", roomName)
+    .order("started_at", { ascending: false })
     .limit(7);
 
+  console.log("리턴값 ", liveStats);
   if (error) {
     console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생", error.message);
     throw new Error(error.message);
