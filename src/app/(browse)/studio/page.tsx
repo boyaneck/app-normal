@@ -1,14 +1,17 @@
 "use client";
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import StudioAIWelcome from "./_components/studio-AI-welcome";
-const LiveStat = dynamic(() => import("./live-stat/live-stat"));
-import LiveSetting from "./live_setting/page";
-import LiveSettingPage from "./live_setting/page";
+import StudioAIInput from "./_components/studio-AI-input";
+import LiveStat from "./live-stat/live-stat";
+import useUserStore from "@/store/user";
+// const LiveStat = dynamic(() => import("./live-stat/live-stat"));
+const LiveSetting = dynamic(() => import("./live-setting/page"));
 
 const StudioPage = () => {
+  const { user } = useUserStore();
+  console.log("스튜디오에서 현재 호스트의 정보 가져오기 ", user?.userId);
   const TabContents: Record<string, React.ReactNode> = {
-    liveStat: <LiveStat />,
+    liveStat: <LiveStat roomName={user?.userId} />,
     liveSetting: <LiveSetting />,
   };
   const [selectTab, setSelectTab] = useState<string>("");
@@ -28,8 +31,8 @@ const StudioPage = () => {
         ))}
       </div>
       <div className="col-span-8 h-1/2 ">
-        {TabContents[selectTab] || <LiveStat />}
-        <StudioAIWelcome />
+        {TabContents[selectTab] || <LiveStat roomName={user?.userId} />}
+        <StudioAIInput />
       </div>
     </div>
   );

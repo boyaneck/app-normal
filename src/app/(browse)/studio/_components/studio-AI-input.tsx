@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-export const StudioAIWelcome = ({
+export const StudioAIInput = ({
   username = "호스트 님 안녕하세요 반갑습니다  ",
 }) => {
   const [phase, setPhase] = useState("square");
@@ -177,4 +177,4 @@ export const StudioAIWelcome = ({
   );
 };
 
-export default StudioAIWelcome;
+export default StudioAIInput;
