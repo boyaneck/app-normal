@@ -1,10 +1,15 @@
 "use client";
-
 import { useState, useMemo } from "react";
 import StatCard from "./stat-card";
 import WeeklyChart from "./weekly-chart";
+import TopSupporters from "./top-supporters";
+import RetentionRate from "./retantion-rate";
 
-// ===== 임시 데이터 (7일치) =====
+const MOCK_RETENTION_STATS = {
+  total_visitors: 2847,
+  stayed_viewers: 1962,
+  retention_rate: "0.69",
+};
 const MOCK_WEEKLY_DATA = [
   {
     day_label: "월",
@@ -64,7 +69,6 @@ const MOCK_WEEKLY_DATA = [
   },
 ];
 
-// ===== 5개 지표 - key는 차트의 dataKey와 일치해야 함 =====
 export const STAT_FIELDS = [
   { key: "avg_viewer", title: "평균 시청자", unit: "명" },
   { key: "peak_viewer", title: "최고 시청자", unit: "명" },
@@ -74,11 +78,9 @@ export const STAT_FIELDS = [
 ] as const;
 
 const LiveStats = () => {
-  // 차트 hover → 카드 데이터 변경
   const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(
     null,
   );
-  // 카드 hover → 차트 라인 강조
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
 
   const currentData = useMemo(() => {
@@ -86,7 +88,6 @@ const LiveStats = () => {
     return MOCK_WEEKLY_DATA[index];
   }, [hoveredChartIndex]);
 
-  // hoveredCardIndex → 해당 STAT_FIELDS의 key (차트 dataKey)
   const highlightedDataKey = useMemo(() => {
     if (hoveredCardIndex === null) return null;
     return STAT_FIELDS[hoveredCardIndex]?.key ?? null;
@@ -94,7 +95,7 @@ const LiveStats = () => {
 
   return (
     <div className="space-y-4 p-6">
-      {/* ===== 상단: 5개 스탯 카드 ===== */}
+      {/* 상단: 5개 스탯 카드 */}
       <div className="flex flex-row gap-3">
         {STAT_FIELDS.map((field, index) => (
           <StatCard
@@ -113,13 +114,31 @@ const LiveStats = () => {
         ))}
       </div>
 
-      {/* ===== 하단: 주간 차트 ===== */}
-      <WeeklyChart
-        post_live_stats={MOCK_WEEKLY_DATA}
-        onHoverIndex={setHoveredChartIndex}
-        hoveredIndex={hoveredChartIndex}
-        highlightedDataKey={highlightedDataKey}
-      />
+      {/* 하단: 차트 + TopSupporters 나란히 */}
+      <div className="flex flex-row gap-4 items-stretch">
+        {/* WeeklyChart: 남은 공간 채움 */}
+        <div className="flex-1 min-w-0">
+          <WeeklyChart
+            post_live_stats={MOCK_WEEKLY_DATA}
+            onHoverIndex={setHoveredChartIndex}
+            hoveredIndex={hoveredChartIndex}
+            highlightedDataKey={highlightedDataKey}
+          />
+        </div>
+
+        {/* TopSupporters: 고정 너비 */}
+        <div className="flex-shrink-0">
+          <TopSupporters />
+          <RetentionRate
+            totalVisitors={MOCK_RETENTION_STATS.total_visitors} // sCard(ALL_VISITORS)
+            stayedViewers={MOCK_RETENTION_STATS.stayed_viewers} // sCard(STAY_MINUTE)
+            retentionRate={parseFloat(MOCK_RETENTION_STATS.retention_rate)} // 0~1 소수
+            // totalVisitors={stats.total_visitors} // sCard(ALL_VISITORS)
+            // stayedViewers={stats.stayed_viewers} // sCard(STAY_MINUTE)
+            // retentionRate={parseFloat(stats.retention_rate)} // 0~1 소수
+          />
+        </div>
+      </div>
     </div>
   );
 };
