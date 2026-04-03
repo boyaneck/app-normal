@@ -59,3 +59,19 @@ export interface liveStatsCountProps {
   duration: number;
   decimal: number;
 }
+
+// Supabase live_stats 응답을 camelCase로 변환한 타입
+export interface PostLiveStats {
+  roomName?: string;
+  startedAt?: string;
+  dayLabel?: string;
+  totalVisitors: number;
+  avgViewer: string;
+  peakViewers: number;
+  fund: string;
+  intoChatRate: string;
+  retentionRate: number;
+}
+
+/** @deprecated PostLiveStats 사용 */
+export type post_live_stats_props = PostLiveStats;
