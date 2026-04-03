@@ -28,7 +28,7 @@ const TopSupporters = ({
 
   return (
     <div
-      className="w-[290px] rounded-[22px] p-5 flex flex-col h-full"
+      className="w-full rounded-[22px] p-5 flex flex-col h-full"
       style={{
         background: "rgba(255,255,255,0.72)",
         backdropFilter: "blur(28px)",

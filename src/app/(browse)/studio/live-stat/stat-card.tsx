@@ -9,6 +9,7 @@ interface StatCardProps {
   isChartHovered: boolean;
   index: number;
   onHover: (hovered: boolean) => void;
+  onClick?: () => void;
 }
 
 // ===== 카운트업 훅 =====
@@ -66,6 +67,7 @@ const StatCard = ({
   isChartHovered,
   index,
   onHover,
+  onClick,
 }: StatCardProps) => {
   const animatedValue = useCountUp(value, 500);
   const hoverColor = HOVER_COLORS[index % HOVER_COLORS.length];
@@ -74,6 +76,7 @@ const StatCard = ({
     <div
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}
+      onClick={onClick}
       className={`
         relative flex-1 min-w-[155px] rounded-2xl p-5
         bg-white/90

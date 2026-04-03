@@ -1,8 +1,7 @@
 "use client";
 interface RetentionRateProps {
   totalVisitors: number;
-  stayedViewers: number;
-  retentionRate: number;
+  retentionRate: number; // float8: 0.0 ~ 1.0
 }
 
 const getLevel = (rate: number) => {
@@ -38,14 +37,11 @@ const getLevel = (rate: number) => {
 
 const RetentionRate = ({
   totalVisitors,
-  stayedViewers,
   retentionRate,
 }: RetentionRateProps) => {
-  // retentionRate가 0~1 소수로 오면 *100, 이미 %이면 그대로
-  const ratePercent =
-    retentionRate <= 1
-      ? Math.round(retentionRate * 100)
-      : Math.round(retentionRate);
+  // retention_rate는 float8 (0.0 ~ 1.0)
+  const ratePercent = Math.round(retentionRate * 100);
+  const stayedViewers = Math.round(totalVisitors * retentionRate);
   const leftViewers = totalVisitors - stayedViewers;
   const level = getLevel(ratePercent);
 

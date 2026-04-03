@@ -1,144 +1,277 @@
 "use client";
 import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import StatCard from "./stat-card";
 import WeeklyChart from "./weekly-chart";
 import TopSupporters from "./top-supporters";
 import RetentionRate from "./retantion-rate";
+import { useQuery } from "@tanstack/react-query";
+import { getLiveStatsWeek } from "@/api/live";
+import { PostLiveStats } from "@/types/live";
 
-const MOCK_RETENTION_STATS = {
-  total_visitors: 2847,
-  stayed_viewers: 1962,
-  retention_rate: "0.69",
-};
-const MOCK_WEEKLY_DATA = [
-  {
-    day_label: "월",
-    avg_viewer: 342,
-    peak_viewer: 891,
-    all_viewer: 2450,
-    fund: 45000,
-    chat_rate: 32,
-  },
-  {
-    day_label: "화",
-    avg_viewer: 289,
-    peak_viewer: 720,
-    all_viewer: 1980,
-    fund: 32000,
-    chat_rate: 28,
-  },
-  {
-    day_label: "수",
-    avg_viewer: 512,
-    peak_viewer: 1340,
-    all_viewer: 4100,
-    fund: 87000,
-    chat_rate: 41,
-  },
-  {
-    day_label: "목",
-    avg_viewer: 198,
-    peak_viewer: 410,
-    all_viewer: 1200,
-    fund: 15000,
-    chat_rate: 19,
-  },
-  {
-    day_label: "금",
-    avg_viewer: 623,
-    peak_viewer: 1580,
-    all_viewer: 5200,
-    fund: 124000,
-    chat_rate: 45,
-  },
-  {
-    day_label: "토",
-    avg_viewer: 891,
-    peak_viewer: 2100,
-    all_viewer: 7800,
-    fund: 210000,
-    chat_rate: 52,
-  },
-  {
-    day_label: "일",
-    avg_viewer: 734,
-    peak_viewer: 1820,
-    all_viewer: 6300,
-    fund: 178000,
-    chat_rate: 48,
-  },
-];
+const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export const STAT_FIELDS = [
-  { key: "avg_viewer", title: "평균 시청자", unit: "명" },
-  { key: "peak_viewer", title: "최고 시청자", unit: "명" },
-  { key: "all_viewer", title: "총 시청자", unit: "명" },
-  { key: "fund", title: "후원 금액", unit: "원" },
-  { key: "chat_rate", title: "채팅 전환율", unit: "%" },
+  {
+    key: "avgViewer" as const,
+    title: "평균 시청자",
+    unit: "명",
+    toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
+  },
+  {
+    key: "peakViewers" as const,
+    title: "최고 시청자",
+    unit: "명",
+    toNumber: (v: string | number) => Number(v) || 0,
+  },
+  {
+    key: "totalVisitors" as const,
+    title: "총 방문자",
+    unit: "명",
+    toNumber: (v: string | number) => Number(v) || 0,
+  },
+  {
+    key: "fund" as const,
+    title: "후원 금액",
+    unit: "원",
+    toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
+  },
+  {
+    key: "intoChatRate" as const,
+    title: "채팅 전환율",
+    unit: "%",
+    toNumber: (v: string | number) => parseFloat(String(v)) || 0,
+  },
 ] as const;
 
-const LiveStats = () => {
-  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(
-    null,
-  );
+export interface MiniCardInfo {
+  index: number;
+  title: string;
+  value: number;
+  unit: string;
+}
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) {
+    if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("Failed"))
+      return { title: "네트워크 오류", desc: "인터넷 연결을 확인한 후 다시 시도해주세요." };
+    if (error.message.includes("JWT") || error.message.includes("auth"))
+      return { title: "인증 오류", desc: "세션이 만료되었습니다. 다시 로그인해주세요." };
+    return { title: "데이터 로드 실패", desc: error.message };
+  }
+  return { title: "알 수 없는 오류", desc: "잠시 후 다시 시도해주세요." };
+};
+
+const StatCardSkeleton = () => (
+  <div className="flex flex-row gap-3">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex-1 min-w-[155px] rounded-2xl p-5 bg-white/10 animate-pulse h-[110px]" />
+    ))}
+  </div>
+);
+
+interface Props {
+  roomName: string | undefined;
+  selectedCardIndex: number | null;
+  onCardSelect: (index: number | null, cards: MiniCardInfo[]) => void;
+}
+
+const LiveStats = ({ roomName, selectedCardIndex, onCardSelect }: Props) => {
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
 
-  const currentData = useMemo(() => {
-    const index = hoveredChartIndex ?? MOCK_WEEKLY_DATA.length - 1;
-    return MOCK_WEEKLY_DATA[index];
-  }, [hoveredChartIndex]);
+  const { data: rawStats, isError, error, isLoading, isFetching, refetch } =
+    useQuery<any[] | null, Error>({
+      queryKey: ["liveStatsWeek", roomName],
+      queryFn: () => getLiveStatsWeek(roomName),
+      enabled: !!roomName,
+      retry: 2,
+      retryDelay: (i) => Math.min(1000 * 2 ** i, 8000),
+      staleTime: 1000 * 60 * 5,
+    });
 
-  const highlightedDataKey = useMemo(() => {
+  const liveStatsWeek: PostLiveStats[] | null = useMemo(() => {
+    if (!rawStats) return null;
+    return rawStats.map((item) => ({
+      roomName: item.room_name,
+      startedAt: item.started_at,
+      dayLabel: item.started_at ? DAY_LABELS[new Date(item.started_at).getDay()] : "-",
+      totalVisitors: item.total_visitors,
+      avgViewer: item.avg_viewer,
+      peakViewers: item.peak_viewers,
+      fund: item.fund,
+      intoChatRate: item.into_chat_rate,
+      retentionRate: item.retention_rate,
+    }));
+  }, [rawStats]);
+
+  const currentData = useMemo(() => {
+    if (!liveStatsWeek?.length) return null;
+    return liveStatsWeek[hoveredChartIndex ?? 0] ?? liveStatsWeek[0];
+  }, [liveStatsWeek, hoveredChartIndex]);
+
+  const highlightedKey = useMemo(() => {
     if (hoveredCardIndex === null) return null;
     return STAT_FIELDS[hoveredCardIndex]?.key ?? null;
   }, [hoveredCardIndex]);
 
+  const latestData = liveStatsWeek?.[0] ?? null;
+
+  // 전체 카드 데이터 (미니 카드용)
+  const allCardsData: MiniCardInfo[] = useMemo(() =>
+    STAT_FIELDS.map((f, i) => ({
+      index: i,
+      title: f.title,
+      unit: f.unit,
+      value: currentData ? f.toNumber(currentData[f.key] as string | number) : 0,
+    })),
+    [currentData]
+  );
+
+  const handleCardClick = (index: number) => {
+    if (selectedCardIndex === index) {
+      onCardSelect(null, []);
+    } else {
+      onCardSelect(index, allCardsData);
+    }
+  };
+
+  if (!roomName) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-2 text-white/30">
+        <span className="text-sm">로그인 후 방송 통계를 확인할 수 있습니다.</span>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 p-6">
+        <StatCardSkeleton />
+        <div className="rounded-2xl bg-white/[0.05] animate-pulse h-[300px]" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    const { title, desc } = getErrorMessage(error);
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="rounded-2xl bg-red-500/10 border border-red-400/20 px-8 py-6 text-center max-w-sm">
+          <p className="text-red-400 font-semibold text-sm mb-1">{title}</p>
+          <p className="text-white/40 text-xs mb-4">{desc}</p>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="text-xs px-4 py-1.5 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+          >
+            {isFetching ? "재시도 중..." : "다시 시도"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!liveStatsWeek || liveStatsWeek.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-2 text-white/30">
+        <span className="text-sm">아직 방송 기록이 없습니다.</span>
+        <span className="text-xs">방송 종료 후 통계가 여기에 표시됩니다.</span>
+      </div>
+    );
+  }
+
+  const selectedField = selectedCardIndex !== null ? STAT_FIELDS[selectedCardIndex] : null;
+  const selectedValue = selectedField && currentData
+    ? selectedField.toNumber(currentData[selectedField.key] as string | number)
+    : 0;
+
   return (
     <div className="space-y-4 p-6">
-      {/* 상단: 5개 스탯 카드 */}
-      <div className="flex flex-row gap-3">
-        {STAT_FIELDS.map((field, index) => (
-          <StatCard
-            key={field.key}
-            title={field.title}
-            value={
-              (currentData?.[
-                field.key as keyof typeof currentData
-              ] as number) ?? 0
-            }
-            unit={field.unit}
-            isChartHovered={hoveredChartIndex !== null}
-            index={index}
-            onHover={(hovered) => setHoveredCardIndex(hovered ? index : null)}
-          />
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        {selectedCardIndex !== null ? (
+          /* ===== 확장 뷰: 선택된 카드만 전체 너비로 ===== */
+          <motion.div
+            key="expanded"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full rounded-2xl p-8 cursor-pointer"
+            style={{
+              background: "rgba(255,255,255,0.92)",
+              backdropFilter: "blur(28px)",
+              border: "0.5px solid rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+            }}
+            onClick={() => onCardSelect(null, [])}
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-black/30 font-medium mb-4">
+              {selectedField?.title}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-[64px] font-semibold text-black/85 leading-none tabular-nums tracking-tight">
+                {selectedValue.toLocaleString()}
+              </span>
+              <span className="text-[22px] text-black/25">{selectedField?.unit}</span>
+            </div>
+            <p className="mt-3 text-[11px] text-black/25">클릭하면 닫힙니다 · AI 분석 결과가 아래에 표시됩니다</p>
+          </motion.div>
+        ) : (
+          /* ===== 일반 뷰 ===== */
+          <motion.div
+            key="normal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            {/* 5개 스탯 카드 */}
+            <div className="flex flex-row gap-3">
+              {STAT_FIELDS.map((field, index) => {
+                const rawValue = currentData?.[field.key];
+                const numericValue = rawValue != null ? field.toNumber(rawValue as string | number) : 0;
+                return (
+                  <StatCard
+                    key={field.key}
+                    title={field.title}
+                    value={numericValue}
+                    unit={field.unit}
+                    isChartHovered={hoveredChartIndex !== null}
+                    index={index}
+                    onHover={(hovered) => setHoveredCardIndex(hovered ? index : null)}
+                    onClick={() => handleCardClick(index)}
+                  />
+                );
+              })}
+            </div>
 
-      {/* 하단: 차트 + TopSupporters 나란히 */}
-      <div className="flex flex-row gap-4 items-stretch">
-        {/* WeeklyChart: 남은 공간 채움 */}
-        <div className="flex-1 min-w-0">
-          <WeeklyChart
-            post_live_stats={MOCK_WEEKLY_DATA}
-            onHoverIndex={setHoveredChartIndex}
-            hoveredIndex={hoveredChartIndex}
-            highlightedDataKey={highlightedDataKey}
-          />
-        </div>
+            {/* WeeklyChart(2/3) + TopSupporters(1/3) */}
+            <div className="flex flex-row gap-4" style={{ height: 360 }}>
+              <div className="w-2/3 h-full">
+                <WeeklyChart
+                  liveStats={liveStatsWeek}
+                  onHoverIndex={setHoveredChartIndex}
+                  hoveredIndex={hoveredChartIndex}
+                  highlightedKey={highlightedKey}
+                />
+              </div>
+              <div className="w-1/3 h-full">
+                <TopSupporters />
+              </div>
+            </div>
 
-        {/* TopSupporters: 고정 너비 */}
-        <div className="flex-shrink-0">
-          <TopSupporters />
-          <RetentionRate
-            totalVisitors={MOCK_RETENTION_STATS.total_visitors} // sCard(ALL_VISITORS)
-            stayedViewers={MOCK_RETENTION_STATS.stayed_viewers} // sCard(STAY_MINUTE)
-            retentionRate={parseFloat(MOCK_RETENTION_STATS.retention_rate)} // 0~1 소수
-            // totalVisitors={stats.total_visitors} // sCard(ALL_VISITORS)
-            // stayedViewers={stats.stayed_viewers} // sCard(STAY_MINUTE)
-            // retentionRate={parseFloat(stats.retention_rate)} // 0~1 소수
-          />
-        </div>
-      </div>
+            {/* 시청자 유지율 (항상 최신 방송 기준) */}
+            {latestData && (
+              <RetentionRate
+                totalVisitors={latestData.totalVisitors}
+                retentionRate={latestData.retentionRate}
+              />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
