@@ -60,6 +60,12 @@ export interface liveStatsCountProps {
   decimal: number;
 }
 
+export interface ChatMessage {
+  id: string;
+  role: "user" | "ai";
+  content: string;
+}
+
 // Supabase live_stats 응답을 camelCase로 변환한 타입
 export interface PostLiveStats {
   roomName?: string;

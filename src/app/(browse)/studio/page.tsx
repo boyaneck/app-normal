@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import StudioAIInput from "./_components/studio-AI-input";
 import LiveStat, { MiniCardInfo } from "./live-stat/live-stat";
 import useUserStore from "@/store/user";
+import { ChatMessage } from "@/types/live";
 
 const LiveSetting = dynamic(() => import("./live-setting/page"));
 
@@ -16,24 +17,63 @@ const StudioPage = () => {
   const [selectTab, setSelectTab] = useState<string>("");
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
   const [allCards, setAllCards] = useState<MiniCardInfo[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const handleCardSelect = (index: number | null, cards: MiniCardInfo[]) => {
     setSelectedCardIndex(index);
     setAllCards(cards);
+
+    if (index !== null) {
+      const card = cards.find((c) => c.index === index);
+      if (card) {
+        setMessages([
+          {
+            id: "init",
+            role: "ai",
+            content: `**${card.title}** 데이터를 분석해드릴게요.\n이번 방송에서 **${card.value.toLocaleString()}${card.unit}**을 기록했습니다. 궁금한 점을 물어보세요!`,
+          },
+        ]);
+      }
+    } else {
+      setMessages([]);
+    }
   };
 
-  const miniCards = selectedCardIndex !== null
-    ? allCards.filter((c) => c.index !== selectedCardIndex)
-    : [];
+  const handleSendMessage = (text: string) => {
+    const userMsg: ChatMessage = {
+      id: `u_${Date.now()}`,
+      role: "user",
+      content: text,
+    };
+    setMessages((prev) => [...prev, userMsg]);
+
+    // TODO: 실제 AI API 연동 시 교체
+    setTimeout(() => {
+      const aiMsg: ChatMessage = {
+        id: `a_${Date.now()}`,
+        role: "ai",
+        content: `"${text}"에 대한 분석 결과를 준비 중입니다.`,
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+    }, 800);
+  };
+
+  const miniCards =
+    selectedCardIndex !== null
+      ? allCards.filter((c) => c.index !== selectedCardIndex)
+      : [];
+
+  const renderLiveStat = () => (
+    <LiveStat
+      roomName={user?.userId}
+      selectedCardIndex={selectedCardIndex}
+      onCardSelect={handleCardSelect}
+      messages={messages}
+    />
+  );
 
   const TabContents: Record<string, React.ReactNode> = {
-    liveStat: (
-      <LiveStat
-        roomName={user?.userId}
-        selectedCardIndex={selectedCardIndex}
-        onCardSelect={handleCardSelect}
-      />
-    ),
+    liveStat: renderLiveStat(),
     liveSetting: <LiveSetting />,
   };
 
@@ -48,14 +88,8 @@ const StudioPage = () => {
       </div>
 
       <div className="col-span-8 h-1/2">
-        {TabContents[selectTab] || (
-          <LiveStat
-            roomName={user?.userId}
-            selectedCardIndex={selectedCardIndex}
-            onCardSelect={handleCardSelect}
-          />
-        )}
-        <StudioAIInput />
+        {TabContents[selectTab] || renderLiveStat()}
+        <StudioAIInput onSend={handleSendMessage} />
       </div>
 
       {/* ===== 미니 카드 오버레이 (AI 입력창 위) ===== */}
@@ -74,12 +108,7 @@ const StudioPage = () => {
                 key={card.index}
                 initial={{ opacity: 0, y: 12, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 26,
-                  delay: i * 0.05,
-                }}
+                transition={{ type: "spring", stiffness: 400, damping: 26, delay: i * 0.05 }}
                 whileHover={{ scale: 1.06, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCardSelect(card.index, allCards)}
