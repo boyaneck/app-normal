@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StatCard from "./stat-card";
 import WeeklyChart from "./weekly-chart";
@@ -7,7 +7,7 @@ import TopSupporters from "./top-supporters";
 import RetentionRate from "./retantion-rate";
 import { useQuery } from "@tanstack/react-query";
 import { getLiveStatsWeek } from "@/api/live";
-import { PostLiveStats } from "@/types/live";
+import { PostLiveStats, ChatMessage } from "@/types/live";
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -74,11 +74,18 @@ interface Props {
   roomName: string | undefined;
   selectedCardIndex: number | null;
   onCardSelect: (index: number | null, cards: MiniCardInfo[]) => void;
+  messages: ChatMessage[];
 }
 
-const LiveStats = ({ roomName, selectedCardIndex, onCardSelect }: Props) => {
+const LiveStats = ({ roomName, selectedCardIndex, onCardSelect, messages }: Props) => {
   const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+
+  // 새 메시지 올 때 자동 스크롤 — 반드시 최상단에 선언
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const { data: rawStats, isError, error, isLoading, isFetching, refetch } =
     useQuery<any[] | null, Error>({
@@ -92,7 +99,7 @@ const LiveStats = ({ roomName, selectedCardIndex, onCardSelect }: Props) => {
 
   const liveStatsWeek: PostLiveStats[] | null = useMemo(() => {
     if (!rawStats) return null;
-    return rawStats.map((item) => ({
+    return rawStats.map((item: Record<string, any>) => ({
       roomName: item.room_name,
       startedAt: item.started_at,
       dayLabel: item.started_at ? DAY_LABELS[new Date(item.started_at).getDay()] : "-",
@@ -182,40 +189,113 @@ const LiveStats = ({ roomName, selectedCardIndex, onCardSelect }: Props) => {
   }
 
   const selectedField = selectedCardIndex !== null ? STAT_FIELDS[selectedCardIndex] : null;
-  const selectedValue = selectedField && currentData
-    ? selectedField.toNumber(currentData[selectedField.key] as string | number)
-    : 0;
+  const selectedValue =
+    selectedField && currentData
+      ? selectedField.toNumber(currentData[selectedField.key] as string | number)
+      : 0;
 
   return (
     <div className="space-y-4 p-6">
       <AnimatePresence mode="wait">
         {selectedCardIndex !== null ? (
-          /* ===== 확장 뷰: 선택된 카드만 전체 너비로 ===== */
+          /* ===== AI 채팅 뷰 ===== */
           <motion.div
-            key="expanded"
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
+            key="chat"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full rounded-2xl p-8 cursor-pointer"
+            className="flex flex-col rounded-2xl overflow-hidden"
             style={{
-              background: "rgba(255,255,255,0.92)",
-              backdropFilter: "blur(28px)",
-              border: "0.5px solid rgba(0,0,0,0.08)",
-              boxShadow: "0 4px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+              height: "calc(100vh - 220px)",
+              background: "rgba(10,10,18,0.85)",
+              backdropFilter: "blur(24px)",
+              border: "0.5px solid rgba(255,255,255,0.07)",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
             }}
-            onClick={() => onCardSelect(null, [])}
           >
-            <p className="text-[11px] uppercase tracking-[0.18em] text-black/30 font-medium mb-4">
-              {selectedField?.title}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-[64px] font-semibold text-black/85 leading-none tabular-nums tracking-tight">
-                {selectedValue.toLocaleString()}
-              </span>
-              <span className="text-[22px] text-black/25">{selectedField?.unit}</span>
+            {/* 헤더 */}
+            <div
+              className="flex-shrink-0 flex items-center gap-3 px-5 py-4"
+              style={{ borderBottom: "0.5px solid rgba(255,255,255,0.07)" }}
+            >
+              <button
+                onClick={() => onCardSelect(null, [])}
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors hover:bg-white/10"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                ←
+              </button>
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-[11px] text-white/35 tracking-wide">{selectedField?.title} 분석</p>
+                <p className="text-[15px] font-semibold text-white/90 leading-tight tabular-nums">
+                  {selectedValue.toLocaleString()}
+                  <span className="text-[11px] font-normal text-white/30 ml-1">{selectedField?.unit}</span>
+                </p>
+              </div>
             </div>
-            <p className="mt-3 text-[11px] text-black/25">클릭하면 닫힙니다 · AI 분석 결과가 아래에 표시됩니다</p>
+
+            {/* 메시지 영역 */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3" style={{ paddingBottom: "24px" }}>
+              <AnimatePresence initial={false}>
+                {messages.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                    className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                  >
+                    {/* AI 아바타 */}
+                    {msg.role === "ai" && (
+                      <div
+                        className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center mb-0.5"
+                        style={{ background: "linear-gradient(135deg, #7c6aff40, #5b4adf40)", border: "0.5px solid rgba(124,106,255,0.3)" }}
+                      >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(124,106,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                          <path d="M2 17l10 5 10-5" />
+                          <path d="M2 12l10 5 10-5" />
+                        </svg>
+                      </div>
+                    )}
+
+                    {/* 말풍선 */}
+                    <div
+                      className="max-w-[68%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
+                      style={
+                        msg.role === "user"
+                          ? {
+                              background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                              color: "rgba(255,255,255,0.95)",
+                              borderRadius: "18px 18px 4px 18px",
+                              boxShadow: "0 2px 12px rgba(92,74,223,0.35)",
+                            }
+                          : {
+                              background: "rgba(255,255,255,0.07)",
+                              color: "rgba(255,255,255,0.82)",
+                              borderRadius: "18px 18px 18px 4px",
+                              border: "0.5px solid rgba(255,255,255,0.08)",
+                            }
+                      }
+                    >
+                      {msg.content}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              <div ref={messagesEndRef} />
+            </div>
           </motion.div>
         ) : (
           /* ===== 일반 뷰 ===== */
