@@ -15,7 +15,9 @@ const StudioPage = () => {
   const { user } = useUserStore();
 
   const [selectTab, setSelectTab] = useState<string>("");
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
+    null,
+  );
   const [allCards, setAllCards] = useState<MiniCardInfo[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
@@ -79,7 +81,7 @@ const StudioPage = () => {
 
   return (
     <div className="border border-red-500 grid grid-cols-10 h-1/2">
-      <div className="col-span-2">
+      <div className="col-span-1">
         {Object.keys(TabContents).map((key) => (
           <div key={key} onClick={() => setSelectTab(key)}>
             {key}
@@ -108,7 +110,12 @@ const StudioPage = () => {
                 key={card.index}
                 initial={{ opacity: 0, y: 12, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 26, delay: i * 0.05 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 26,
+                  delay: i * 0.05,
+                }}
                 whileHover={{ scale: 1.06, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCardSelect(card.index, allCards)}
@@ -118,7 +125,8 @@ const StudioPage = () => {
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
                   border: "0.5px solid rgba(0,0,0,0.08)",
-                  boxShadow: "0 2px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  boxShadow:
+                    "0 2px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
                 }}
               >
                 <span className="text-[9px] uppercase tracking-[0.12em] text-black/30 mb-0.5">
@@ -127,7 +135,9 @@ const StudioPage = () => {
                 <span className="text-[15px] font-semibold text-black/80 tabular-nums leading-none">
                   {card.value.toLocaleString()}
                 </span>
-                <span className="text-[9px] text-black/25 mt-0.5">{card.unit}</span>
+                <span className="text-[9px] text-black/25 mt-0.5">
+                  {card.unit}
+                </span>
               </motion.button>
             ))}
           </motion.div>
