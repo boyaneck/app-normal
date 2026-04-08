@@ -6,6 +6,7 @@ interface StatCardProps {
   title: string;
   value: number;
   unit: string;
+  delta?: number; // 어제 대비 증감 (없으면 미표시)
   isChartHovered: boolean;
   index: number;
   onHover: (hovered: boolean) => void;
@@ -64,6 +65,7 @@ const StatCard = ({
   title,
   value,
   unit,
+  delta,
   isChartHovered,
   index,
   onHover,
@@ -71,6 +73,9 @@ const StatCard = ({
 }: StatCardProps) => {
   const animatedValue = useCountUp(value, 500);
   const hoverColor = HOVER_COLORS[index % HOVER_COLORS.length];
+
+  const showDelta = delta !== undefined && delta !== 0;
+  const isPositive = delta !== undefined && delta > 0;
 
   return (
     <div
@@ -97,8 +102,18 @@ const StatCard = ({
         {title}
       </h3>
 
-      <div className="text-[28px] font-semibold text-black/85 tracking-tight leading-none mb-2 tabular-nums">
-        {animatedValue.toLocaleString()}
+      <div className="flex items-baseline gap-2 mb-2">
+        <div className="text-[28px] font-semibold text-black/85 tracking-tight leading-none tabular-nums">
+          {animatedValue.toLocaleString()}
+        </div>
+        {showDelta && (
+          <span
+            className="text-[11px] font-medium tabular-nums"
+            style={{ color: isPositive ? "#16a34a" : "#dc2626" }}
+          >
+            {isPositive ? "▲" : "▼"} {Math.abs(delta!).toLocaleString()}
+          </span>
+        )}
       </div>
 
       <span className="text-[11px] text-black/25 font-medium">{unit}</span>
