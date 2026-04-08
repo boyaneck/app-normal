@@ -151,6 +151,7 @@ const LiveStats = ({
   }, [hoveredCardIndex]);
 
   const latestData = liveStatsWeek?.[0] ?? null;
+  const prevData = liveStatsWeek?.[1] ?? null;
 
   // 전체 카드 데이터 (미니 카드용)
   const allCardsData: MiniCardInfo[] = useMemo(
@@ -400,12 +401,23 @@ const LiveStats = ({
                   rawValue != null
                     ? field.toNumber(rawValue as string | number)
                     : 0;
+                const todayVal = latestData
+                  ? field.toNumber(latestData[field.key] as string | number)
+                  : null;
+                const prevVal = prevData
+                  ? field.toNumber(prevData[field.key] as string | number)
+                  : null;
+                const delta =
+                  todayVal !== null && prevVal !== null
+                    ? todayVal - prevVal
+                    : undefined;
                 return (
                   <StatCard
                     key={field.key}
                     title={field.title}
                     value={numericValue}
                     unit={field.unit}
+                    delta={delta}
                     isChartHovered={hoveredChartIndex !== null}
                     index={index}
                     onHover={(hovered) =>
@@ -432,12 +444,14 @@ const LiveStats = ({
               </div>
             </div>
 
-            {/* 시청자 유지율 (항상 최신 방송 기준) */}
+            {/* 시청자 유지율 (항상 최신 방송 기준, 2/3 너비) */}
             {latestData && (
-              <RetentionRate
-                totalVisitors={latestData.totalVisitors}
-                retentionRate={latestData.retentionRate}
-              />
+              <div className="w-2/3">
+                <RetentionRate
+                  totalVisitors={latestData.totalVisitors}
+                  retentionRate={latestData.retentionRate}
+                />
+              </div>
             )}
           </motion.div>
         )}
