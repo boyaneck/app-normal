@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getLiveStatsWeek } from "@/api/live";
 import { PostLiveStats, ChatMessage } from "@/types/live";
 import ClipPanel from "./live-highlight-clip";
+import AICard from "../_components/AI-card";
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -238,7 +239,7 @@ const LiveStats = ({
     <div className="space-y-4 p-6">
       <AnimatePresence mode="wait">
         {selectedCardIndex !== null ? (
-          /* ===== AI 채팅 뷰 (2분할) ===== */
+          /* ===== AI 채팅 뷰 (2분할: 클립 40% / 채팅 60%) ===== */
           <motion.div
             key="chat"
             initial={{ opacity: 0, y: 12 }}
@@ -248,30 +249,32 @@ const LiveStats = ({
             className="flex flex-row gap-3"
             style={{ height: "calc(100vh - 220px)" }}
           >
-            {/* ===== 왼쪽: 클립 패널 (1/2) ===== */}
-            <div className="w-1/2 h-full">
+            {/* ===== 왼쪽: 클립 패널 (40%) ===== */}
+            <div className="w-2/5 h-full">
               <ClipPanel cardTitle={selectedField?.title} />
             </div>
 
-            {/* ===== 오른쪽: AI 채팅 (1/2) ===== */}
+            {/* ===== 오른쪽: AI 채팅 (60%) ===== */}
             <div
-              className="w-1/2 h-full flex flex-col rounded-2xl overflow-hidden"
+              className="w-3/5 h-full flex flex-col rounded-2xl overflow-hidden"
               style={{
-                background: "rgba(10,10,18,0.85)",
-                backdropFilter: "blur(24px)",
-                border: "0.5px solid rgba(255,255,255,0.07)",
-                boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
+                background: "rgba(255,255,255,0.65)",
+                backdropFilter: "blur(32px)",
+                WebkitBackdropFilter: "blur(32px)",
+                border: "0.5px solid rgba(255,255,255,0.8)",
+                boxShadow:
+                  "0 8px 40px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.95)",
               }}
             >
               {/* 헤더 */}
               <div
                 className="flex-shrink-0 flex items-center gap-3 px-5 py-4"
-                style={{ borderBottom: "0.5px solid rgba(255,255,255,0.07)" }}
+                style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}
               >
                 <button
                   onClick={() => onCardSelect(null, [])}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors hover:bg-white/10"
-                  style={{ color: "rgba(255,255,255,0.4)" }}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors hover:bg-black/5"
+                  style={{ color: "rgba(0,0,0,0.3)" }}
                 >
                   ←
                 </button>
@@ -297,22 +300,98 @@ const LiveStats = ({
                   </svg>
                 </div>
                 <div>
-                  <p className="text-[11px] text-white/35 tracking-wide">
+                  <p className="text-[11px] text-black/35 tracking-wide">
                     {selectedField?.title} 분석
                   </p>
-                  <p className="text-[15px] font-semibold text-white/90 leading-tight tabular-nums">
+                  <p className="text-[15px] font-semibold text-black/80 leading-tight tabular-nums">
                     {selectedValue.toLocaleString()}
-                    <span className="text-[11px] font-normal text-white/30 ml-1">
+                    <span className="text-[11px] font-normal text-black/30 ml-1">
                       {selectedField?.unit}
                     </span>
                   </p>
                 </div>
               </div>
 
+              {/* AI 요약 분석 박스 */}
+              <div className="flex-shrink-0 px-4 pt-3 pb-1">
+                <div
+                  className="rounded-xl px-4 py-3"
+                  style={{
+                    background: "rgba(124,106,255,0.07)",
+                    border: "0.5px solid rgba(124,106,255,0.18)",
+                    backdropFilter: "blur(12px)",
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-md flex items-center justify-center"
+                      style={{
+                        background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                      }}
+                    >
+                      <svg
+                        width="8"
+                        height="8"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                      </svg>
+                    </div>
+                    <span
+                      className="text-[10px] font-semibold tracking-wide"
+                      style={{ color: "rgba(92,74,223,0.8)" }}
+                    >
+                      AI 분석 요약
+                    </span>
+                  </div>
+                  <ul className="space-y-1">
+                    {[
+                      `이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`,
+                      prevData
+                        ? (() => {
+                            const prev = selectedField
+                              ? selectedField.toNumber(
+                                  prevData[selectedField.key] as
+                                    | string
+                                    | number,
+                                )
+                              : 0;
+                            const diff = selectedValue - prev;
+                            return diff >= 0
+                              ? `전 방송 대비 ${diff.toLocaleString()}${selectedField?.unit} 증가했습니다.`
+                              : `전 방송 대비 ${Math.abs(diff).toLocaleString()}${selectedField?.unit} 감소했습니다.`;
+                          })()
+                        : "전 방송 데이터가 없어 비교가 불가합니다.",
+                      "아래 채팅창에서 더 자세한 분석을 요청할 수 있습니다.",
+                    ].map((text, i) => (
+                      <li key={i} className="flex items-start gap-1.5">
+                        <span
+                          className="mt-[3px] w-1 h-1 rounded-full flex-shrink-0"
+                          style={{ background: "rgba(124,106,255,0.5)" }}
+                        />
+                        <span
+                          className="text-[11px] leading-relaxed"
+                          style={{ color: "rgba(0,0,0,0.55)" }}
+                        >
+                          {text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
               {/* 메시지 영역 */}
               <div
-                className="flex-1 overflow-y-auto px-5 py-4 space-y-3"
-                style={{ paddingBottom: "24px" }}
+                className="flex-1 overflow-y-auto px-5 py-3 space-y-3"
+                style={{ paddingBottom: "20px" }}
               >
                 <AnimatePresence initial={false}>
                   {messages.map((msg) => (
@@ -332,9 +411,9 @@ const LiveStats = ({
                         <div
                           className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center mb-0.5"
                           style={{
-                            background:
-                              "linear-gradient(135deg, #7c6aff40, #5b4adf40)",
-                            border: "0.5px solid rgba(124,106,255,0.3)",
+                            background: "rgba(255,255,255,0.8)",
+                            border: "0.5px solid rgba(124,106,255,0.2)",
+                            boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
                           }}
                         >
                           <svg
@@ -342,7 +421,7 @@ const LiveStats = ({
                             height="11"
                             viewBox="0 0 24 24"
                             fill="none"
-                            stroke="rgba(124,106,255,0.9)"
+                            stroke="rgba(124,106,255,0.8)"
                             strokeWidth="2.5"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -364,13 +443,14 @@ const LiveStats = ({
                                   "linear-gradient(135deg, #7c6aff, #5b4adf)",
                                 color: "rgba(255,255,255,0.95)",
                                 borderRadius: "18px 18px 4px 18px",
-                                boxShadow: "0 2px 12px rgba(92,74,223,0.35)",
+                                boxShadow: "0 2px 12px rgba(92,74,223,0.25)",
                               }
                             : {
-                                background: "rgba(255,255,255,0.07)",
-                                color: "rgba(255,255,255,0.82)",
+                                background: "rgba(255,255,255,0.75)",
+                                color: "rgba(0,0,0,0.72)",
                                 borderRadius: "18px 18px 18px 4px",
-                                border: "0.5px solid rgba(255,255,255,0.08)",
+                                border: "0.5px solid rgba(0,0,0,0.06)",
+                                boxShadow: "0 1px 8px rgba(0,0,0,0.05)",
                               }
                         }
                       >
@@ -453,6 +533,7 @@ const LiveStats = ({
                 />
               </div>
             )}
+            <AICard />
           </motion.div>
         )}
       </AnimatePresence>
