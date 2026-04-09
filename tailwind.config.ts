@@ -8,12 +8,40 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        toss: {
+          blue: "#1b64da", // 메인 텍스트, 노드
+          light: "#5b9eff", // 서브 텍스트, 연결선
+          pale: "#90bbff", // 연한 엘립스, 외곽 노드
+          bg: "#f0f5ff", // 카드 배경
+          border: "#bdd0ff", // 카드 테두리
+        },
         main_color: "#69E2FF", // 커스텀 색상을 main_color로 지정
       },
       smoothTransitionForBar: {
         transitionBar: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
       },
       keyframes: {
+        borderGlow: {
+          "0%, 100%": {
+            boxShadow: "0 0 0px 0px rgba(55,138,221,0)",
+            borderColor: "#bdd0ff",
+          },
+          "50%": {
+            boxShadow: "0 0 22px 6px rgba(55,138,221,0.22)",
+            borderColor: "#5b9eff",
+          },
+        },
+        sweep: {
+          "0%": { left: "-130%", opacity: "0" },
+          "10%": { opacity: "1" },
+          "50%": { left: "160%", opacity: "1" },
+          "51%": { opacity: "0" },
+          "100%": { left: "160%", opacity: "0" },
+        },
+        iconFloat: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-4px)" },
+        },
         "slide-animation-down": {
           "0%": { transform: "translateY(0)", oopacity: "1" },
           "100%": { transform: "translateY(100%)", opacity: "0" },
@@ -98,6 +126,9 @@ module.exports = {
         },
       },
       animation: {
+        "border-glow": "borderGlow 3s ease-in-out infinite",
+        sweep: "sweep 3s ease-in-out infinite",
+        "icon-float": "iconFloat 3s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
         "slide-in": "slide-in-left 0.3s ease-out forwards",
         "slide-out": "slide-out-right 0.3s ease-out forwards",
