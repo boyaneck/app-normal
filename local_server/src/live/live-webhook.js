@@ -16,6 +16,7 @@ export const getRedisKeys = (roomName) => ({
   REVISIT: `live:${roomName}:revisit`,
   CATEGORY: `live:${roomName}:category`,
   TIMESERIES: `live:${roomName}:timeseries`,
+  HIGHLIGHTS: `live:${roomName}:highlights`,
   VIEWER_RANK: `live:rank`,
   MSG: `live:${roomName}:msg`,
 });
