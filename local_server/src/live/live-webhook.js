@@ -1,6 +1,7 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
 import { insertLiveStats } from "../api/live.js";
+import { detectViewerSpike } from "./viewer-spike-detector.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
@@ -273,8 +274,10 @@ const startTimeseriesRecording = (roomName) => {
           value: currentViewers.toString(),
         });
 
-        const tenMinutesAgo = timestamp - 10 * 60 * 1000;
-        await redis_client.zRemRangeByScore(timeseriesKey, 0, tenMinutesAgo);
+        // 평균 계산을 위해 전체 시계열 보존 (삭제 안 함)
+
+        // 시청자 스파이크 감지
+        await detectViewerSpike(roomName, currentViewers);
 
         console.log(
           `[Timeseries] ${roomName}: ${currentViewers}명 (${new Date(timestamp).toISOString()})`,
