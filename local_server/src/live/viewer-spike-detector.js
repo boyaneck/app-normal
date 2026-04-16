@@ -1,5 +1,5 @@
 import { redis_client } from "../config/redis.js";
-import { getRedisKeys } from "./live-webhook.js";
+import { getRedisKeys } from "./redis-keys.js";
 
 const SPIKE_THRESHOLD = 0.3;              // 30% 변화율 기준
 const MIN_DATA_POINTS = 2;               // 최소 2포인트(=10분) 이후 감지 시작

@@ -2,25 +2,15 @@ import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
 import { insertLiveStats } from "../api/live.js";
 import { detectViewerSpike } from "./viewer-spike-detector.js";
+import { startRecording, stopRecording, waitForEgressComplete } from "./egress-manager.js";
+import { runClipPipeline } from "./clip-pipeline.js";
+import { getRedisKeys } from "./redis-keys.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
 const receiver = new WebhookReceiver(api_key, api_secret);
 
-export const getRedisKeys = (roomName) => ({
-  INFO: `live:${roomName}:info`,
-  VIEWERS: `live:${roomName}:viewers`,
-  PEAK_VIEW: `live:${roomName}:peak`,
-  AVG_RATE: `live:${roomName}:avg_rate`,
-  STAY_MINUTE: `live:${roomName}:stay`,
-  ALL_VISITORS: `live:${roomName}:all_visitors`,
-  REVISIT: `live:${roomName}:revisit`,
-  CATEGORY: `live:${roomName}:category`,
-  TIMESERIES: `live:${roomName}:timeseries`,
-  HIGHLIGHTS: `live:${roomName}:highlights`,
-  VIEWER_RANK: `live:rank`,
-  MSG: `live:${roomName}:msg`,
-});
+export { getRedisKeys } from "./redis-keys.js";
 
 export const liveWebhook = async (req, res) => {
   let event;
@@ -65,7 +55,6 @@ export const liveWebhook = async (req, res) => {
         await redis_client.hSet(keys.INFO, "today", `${date}/${day_of_week}`);
 
         // 카테고리 저장
-        //이 코드는 지금 잘못되었음
         const category = event.room?.metadata?.category || "기타";
         await redis_client.set(keys.CATEGORY, category);
 
@@ -84,27 +73,35 @@ export const liveWebhook = async (req, res) => {
         // 5분마다 시계열 데이터 저장
         startTimeseriesRecording(roomName);
 
+        // Egress 녹화 시작 (실패해도 방송 진행)
+        try {
+          const { egressId, filePath } = await startRecording(roomName);
+          await redis_client.hSet(keys.EGRESS, {
+            egressId,
+            filePath,
+          });
+        } catch (egressErr) {
+          console.error("[Egress] 녹화 시작 실패 (방송은 정상 진행):", egressErr.message);
+        }
+
         break;
       }
 
       case "participant_joined": {
         if (!viewer) break;
 
-        //유저의 해당 방송 접속에 대한 중복 체크, 및 멀티탭 중복 체크
         const viewerVisitCount = await redis_client.hIncrBy(
           keys.VIEWERS,
           viewer,
           1,
         );
 
-        //처음입장인 경우(중복입장/여러 탭을 하나로 count 하기 위해 )
         if (viewerVisitCount === 1) {
           const currentViewers = await redis_client.hLen(keys.VIEWERS);
           const peakViewersStr = await redis_client.hGet(
             keys.PEAK_VIEW,
             "peak_view",
           );
-          //현재 방송 중인 총시청자수 순위에 해당 방송 시청자수 +1
           await redis_client.zIncrBy(keys.VIEWER_RANK, 1, roomName);
           const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
 
@@ -116,12 +113,7 @@ export const liveWebhook = async (req, res) => {
             );
           }
 
-          //누적방문자수 (해당 방에 처음으로 접속할 때만 해당 로직을 실행)
           await redis_client.sAdd(keys.ALL_VISITORS, viewer);
-        }
-        //두번째 입장 혹은 같은 페이지의 탭이 2개이상 켜져 있는경우
-        else if (viewerVisitCount >= 2) {
-          //재방문 관련 로직은 아직 붎필요함으로 pass
         }
 
         // 시청 시작 시간 기록
@@ -138,7 +130,6 @@ export const liveWebhook = async (req, res) => {
         if (viewerLeftCount > 0) {
           await redis_client.zIncrBy(keys.VIEWER_RANK, -1, roomName);
 
-          //레이스 컨디션(동시에 여러이벤트가 처리될때 현재 방의 인원이 0명일 경우 -1 음수로 되는 것을 막기 위해 방 재설정)
           const currentScore = await redis_client.zScore(
             keys.VIEWER_RANK,
             roomName,
@@ -151,7 +142,6 @@ export const liveWebhook = async (req, res) => {
           }
         }
 
-        // 시청 지속 시간 체크
         const joinTimeStr = await redis_client.hGet(keys.AVG_RATE, viewer);
         if (joinTimeStr) {
           const durationSec = Math.round(
@@ -167,31 +157,44 @@ export const liveWebhook = async (req, res) => {
       }
 
       case "ingress_ended": {
-        // 송출 종료 — 시계열 기록만 멈춤
         stopTimeseriesRecording(roomName);
+
+        // Egress 중지 요청 (파일 최종화 시작)
+        const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
+        if (egressId) {
+          stopRecording(egressId).catch((err) =>
+            console.error("[Egress] 중지 실패:", err.message),
+          );
+        }
+
         break;
       }
 
       case "room_finished": {
-        //아주 낮은 확률로 서버가 터지거나, 유저가 해당 사인을 못받는 경우
-        // ingreses_ended -> room_finished 정상적으로 이행되지 않을 수 있어서 room_finished에도 interval을 제거하는 로직을 만듬
         console.log("room_finished 이벤트 수신:", roomName);
         stopTimeseriesRecording(roomName);
+
+        // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
+        const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
+        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "filePath");
+        const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
+
+        if (egressId) {
+          await stopRecording(egressId);
+        }
 
         // 최대 시청자 수
         const peakViewersStr = await redis_client.hGet(
           keys.PEAK_VIEW,
           "peak_view",
         );
-
-        //최대 시청자수 자료형 변형
         const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
 
         // 방송 시작 시간
-        const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
         const startISO = startedAtStr
           ? new Date(parseInt(startedAtStr, 10)).toISOString()
           : new Date().toISOString();
+        const broadcastStartedAt = startedAtStr ? parseInt(startedAtStr, 10) : Date.now();
 
         // 누적 방문자 수
         const totalVisitors = await redis_client.sCard(keys.ALL_VISITORS);
@@ -201,13 +204,22 @@ export const liveWebhook = async (req, res) => {
         const retentionRate =
           totalVisitors > 0 ? (stayedViewers / totalVisitors).toFixed(2) : "0";
 
+        // 채팅 전환율 = 1분이상 머문 사람 중 채팅을 친 사람 비율
+        const chattersWhoStayed = await redis_client.sInter([
+          keys.CHAT_UNIQUE_USERS,
+          keys.STAY_MINUTE,
+        ]);
+        const intoChatRate =
+          stayedViewers > 0
+            ? (chattersWhoStayed.length / stayedViewers).toFixed(2)
+            : "0";
+
         const category = await redis_client.get(keys.CATEGORY);
-        const dateInfo = await redis_client.hGet(keys.INFO, "today");
         const durationMin = startedAtStr
           ? Math.round((Date.now() - parseInt(startedAtStr, 10)) / 60000)
           : 0;
 
-        // 통계 API 호출
+        // 통계 저장
         const saveSuccess = await insertLiveStats({
           roomName,
           peakViewers,
@@ -215,13 +227,12 @@ export const liveWebhook = async (req, res) => {
           totalVisitors,
           stayedViewers,
           retentionRate,
+          intoChatRate,
           category,
           durationMin,
         });
+
         if (saveSuccess) {
-          const exists = await redis_client.exists(keys.INFO);
-          console.log("INFO 키 존재 여부:", exists);
-          //랭킹보드에서 해당 방송 제거
           await redis_client.zRem(keys.VIEWER_RANK, roomName);
 
           const keysToDelete = [
@@ -233,19 +244,28 @@ export const liveWebhook = async (req, res) => {
             keys.ALL_VISITORS,
             keys.CATEGORY,
             keys.TIMESERIES,
+            keys.DONATION,
+            keys.DONATION_TOTAL_AMOUNT,
+            keys.DONATION_COUNT,
+            keys.DONATION_TIMESERIES,
+            keys.CHAT_UNIQUE_USERS,
+            keys.CHAT_TIMESERIES,
+            keys.EGRESS,
+            // keys.HIGHLIGHTS — 클립 파이프라인에서 읽고 나서 삭제
           ];
 
           for (const key of keysToDelete) {
-            const result = await redis_client.del(key);
-            console.log(`${key} 삭제: ${result}`);
+            await redis_client.del(key);
           }
         } else {
-          // 실패하면 Redis 데이터 유지 + 나중에 재시도할 수 있도록 표시
           await redis_client.hSet(keys.INFO, "save_failed", "true");
           console.error("Supabase 저장 실패 — Redis 데이터 유지");
         }
 
-        // 리소스 정리
+        // 클립 파이프라인 — Egress 완전 업로드 후 비동기 실행
+        if (egressId && recordingFilePath) {
+          scheduleClipPipeline(roomName, egressId, recordingFilePath, broadcastStartedAt, keys);
+        }
 
         break;
       }
@@ -253,6 +273,31 @@ export const liveWebhook = async (req, res) => {
   } catch (error) {
     console.error("Webhook processing error:", error);
   }
+};
+
+/**
+ * Egress 업로드 완료를 기다린 후 클립 파이프라인 실행
+ * room_finished 이벤트 처리를 블로킹하지 않도록 완전히 비동기 분리
+ */
+const scheduleClipPipeline = (roomName, egressId, recordingFilePath, broadcastStartedAt, keys) => {
+  (async () => {
+    try {
+      console.log(`[ClipPipeline] Egress 업로드 대기 중: ${egressId}`);
+      const completed = await waitForEgressComplete(egressId);
+
+      if (!completed) {
+        console.warn(`[ClipPipeline] Egress 미완료 — 클립 파이프라인 스킵: ${roomName}`);
+        return;
+      }
+
+      await runClipPipeline(roomName, recordingFilePath, broadcastStartedAt);
+
+      // 파이프라인 완료 후 HIGHLIGHTS 삭제
+      await redis_client.del(keys.HIGHLIGHTS);
+    } catch (err) {
+      console.error(`[ClipPipeline] 비동기 실행 오류: ${err.message}`);
+    }
+  })();
 };
 
 // 시계열 데이터 기록
@@ -274,9 +319,6 @@ const startTimeseriesRecording = (roomName) => {
           value: currentViewers.toString(),
         });
 
-        // 평균 계산을 위해 전체 시계열 보존 (삭제 안 함)
-
-        // 시청자 스파이크 감지
         await detectViewerSpike(roomName, currentViewers);
 
         console.log(
@@ -327,16 +369,3 @@ export const getViewerGrowth = async (roomName) => {
   const growth = (newestViewers - oldestViewers) / oldestViewers;
   return Math.max(0, Math.min(1, growth));
 };
-
-//현재 방의 방송시작 시간 저장------
-//평균 시청 지속률
-//나중에 같은 유저가 여러번 같은방송에 들어왔을때, 해당 값을 어떻게 처리할지에 대해 생각하기
-//어떤때는 그냥 들어와서 보기만하는데 ,어떤때는 들어왔는데, 더 짧은시간이지만,채팅,후원을 할 수 있기에에
-
-// 이제 여기서 1분이상 머문사람을 set 에 넣어놓았으니까, 그거를 1분이상 머문사람/총 왔다갔다 한사람
-//------------단순하게 몇분 머물렀다는것이 아닌 해당 기준을 충족하면 평균 시청 지속률 SET에 저장해 놓고 함
-//시청 지속률
-// conn_keep_rate = await redis_client.scan(
-//   `${roomName}:${parti}:duration`
-// );
-//가능하다면 그 값중에 평균 지속시간도 오도록
