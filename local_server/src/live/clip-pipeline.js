@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { redis_client } from "../config/redis.js";
 import { getRedisKeys } from "./redis-keys.js";
 import { unlinkSync, mkdirSync, existsSync } from "fs";
@@ -7,7 +7,7 @@ import { join } from "path";
 import ffmpeg from "fluent-ffmpeg";
 
 // 서비스 키가 필요한 스토리지 작업용 (Storage RLS 우회)
-const supabaseAdmin = createClient(
+const SupabaseClient = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
@@ -15,7 +15,7 @@ const supabaseAdmin = createClient(
 const BUCKET = process.env.SUPABASE_S3_BUCKET || "recordings";
 const CLIP_BUCKET = "clips";
 const CLIP_BEFORE_SEC = 30; // 하이라이트 기준 앞 30초
-const CLIP_AFTER_SEC = 30;  // 하이라이트 기준 뒤 30초
+const CLIP_AFTER_SEC = 30; // 하이라이트 기준 뒤 30초
 const CLIP_DURATION = CLIP_BEFORE_SEC + CLIP_AFTER_SEC; // 60초
 
 /**
@@ -24,13 +24,15 @@ const CLIP_DURATION = CLIP_BEFORE_SEC + CLIP_AFTER_SEC; // 60초
  * @param {string} filePath  Supabase Storage 내 경로 (e.g. recordings/room/ts.mp4)
  * @returns {string} 로컬 임시 파일 경로
  */
-const downloadRecording = async (filePath) => {
-  const { data, error } = await supabaseAdmin.storage
+const downloadLive = async (filePath) => {
+  const { data, error } = await SupabaseClient.storage
     .from(BUCKET)
     .download(filePath);
 
-  if (error) throw new Error(`[ClipPipeline] 녹화 다운로드 실패: ${error.message}`);
+  if (error)
+    throw new Error(`[ClipPipeline] 녹화 다운로드 실패: ${error.message}`);
 
+  //OS가 만들어 놓은 기존의 임시파일에 붙히기
   const tmpDir = join(tmpdir(), "clips");
   if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
 
@@ -40,7 +42,9 @@ const downloadRecording = async (filePath) => {
   const { writeFileSync } = await import("fs");
   writeFileSync(localPath, buf);
 
-  console.log(`[ClipPipeline] 다운로드 완료: ${localPath} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`);
+  console.log(
+    `[ClipPipeline] 다운로드 완료: ${localPath} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`,
+  );
   return localPath;
 };
 
@@ -58,11 +62,13 @@ const extractClip = (inputPath, startSec, outputPath) => {
     ffmpeg(inputPath)
       .setStartTime(Math.max(0, startSec))
       .setDuration(CLIP_DURATION)
-      .outputOptions("-c copy")           // 재인코딩 없이 스트림 복사 (빠름)
+      .outputOptions("-c copy") // 재인코딩 없이 스트림 복사 (빠름)
       .outputOptions("-avoid_negative_ts make_zero")
       .output(outputPath)
       .on("end", () => resolve())
-      .on("error", (err) => reject(new Error(`[FFmpeg] 추출 실패: ${err.message}`)))
+      .on("error", (err) =>
+        reject(new Error(`[FFmpeg] 추출 실패: ${err.message}`)),
+      )
       .run();
   });
 };
@@ -78,16 +84,19 @@ const uploadClip = async (localPath, storagePath) => {
   const { readFileSync } = await import("fs");
   const fileBuffer = readFileSync(localPath);
 
-  const { error } = await supabaseAdmin.storage
+  const { error } = await SupabaseClient.storage
     .from(CLIP_BUCKET)
     .upload(storagePath, fileBuffer, {
       contentType: "video/mp4",
       upsert: false,
     });
 
-  if (error) throw new Error(`[ClipPipeline] 클립 업로드 실패: ${error.message}`);
+  if (error)
+    throw new Error(`[ClipPipeline] 클립 업로드 실패: ${error.message}`);
 
-  const { data } = supabaseAdmin.storage.from(CLIP_BUCKET).getPublicUrl(storagePath);
+  const { data } = SupabaseClient.storage
+    .from(CLIP_BUCKET)
+    .getPublicUrl(storagePath);
   return data.publicUrl;
 };
 
@@ -95,7 +104,7 @@ const uploadClip = async (localPath, storagePath) => {
  * 클립 메타데이터를 Supabase DB clips 테이블에 저장
  */
 const saveClipToDB = async (roomName, clipRecord) => {
-  const { error } = await supabaseAdmin.from("clips").insert({
+  const { error } = await SupabaseClient.from("clips").insert({
     room_name: roomName,
     type: clipRecord.type,
     public_url: clipRecord.publicUrl,
@@ -120,35 +129,45 @@ const saveClipToDB = async (roomName, clipRecord) => {
  *
  * @param {string} roomName
  * @param {string} recordingFilePath  Supabase Storage 내 녹화 파일 경로
- * @param {number} broadcastStartedAt  방송 시작 timestamp (ms)
+ * @param {number} liveStartedAt  방송 시작 timestamp (ms)
  */
-export const runClipPipeline = async (roomName, recordingFilePath, broadcastStartedAt) => {
+export const runClipPipeline = async (
+  roomName,
+  recordingFilePath,
+  liveStartedAt,
+) => {
   console.log(`[ClipPipeline] 시작: ${roomName}`);
 
   const keys = getRedisKeys(roomName);
   const tempFiles = [];
 
   try {
-    // 1. 하이라이트 목록 읽기
-    const rawHighlights = await redis_client.zRangeWithScores(keys.HIGHLIGHTS, 0, -1);
+    // 1. 하이라이트 목록 읽기-Redis로 부터
+    const getHighlights = await redis_client.zRangeWithScores(
+      keys.HIGHLIGHTS,
+      0,
+      -1,
+    );
 
-    if (!rawHighlights || rawHighlights.length === 0) {
-      console.log(`[ClipPipeline] 하이라이트 없음: ${roomName}`);
+    if (!getHighlights || getHighlights.length === 0) {
+      console.log(` ${roomName} 방의 하이라이트가 없음!`);
       return;
     }
 
-    const highlights = rawHighlights.map(({ value, score }) => {
-      try {
-        return { ...JSON.parse(value), timestamp: score };
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    const highlights = getHighlights
+      .map(({ value, score }) => {
+        try {
+          return { ...JSON.parse(value), timestamp: score };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
-    console.log(`[ClipPipeline] 하이라이트 ${highlights.length}개 발견`);
+    console.log(`${roomName} 하이라이트 ${highlights.length}개 발견`);
 
     // 2. 녹화 파일 다운로드
-    const localRecording = await downloadRecording(recordingFilePath);
+    const localRecording = await downloadLive(recordingFilePath);
     tempFiles.push(localRecording);
 
     // 3. 각 하이라이트 → 클립 추출 + 업로드
@@ -157,7 +176,7 @@ export const runClipPipeline = async (roomName, recordingFilePath, broadcastStar
     for (const highlight of highlights) {
       try {
         // 하이라이트 시각을 방송 시작 기준 상대 시간(초)으로 변환
-        const offsetMs = highlight.timestamp - broadcastStartedAt;
+        const offsetMs = highlight.timestamp - liveStartedAt;
         const offsetSec = Math.max(0, Math.floor(offsetMs / 1000));
         const clipStartSec = Math.max(0, offsetSec - CLIP_BEFORE_SEC);
 
@@ -183,24 +202,26 @@ export const runClipPipeline = async (roomName, recordingFilePath, broadcastStar
         });
 
         savedClips.push({ type: highlight.type, url: publicUrl });
-        console.log(`[ClipPipeline] 클립 완료: ${highlight.type} @ ${offsetSec}s → ${publicUrl}`);
+        console.log(
+          ` 클립 완료: ${highlight.type} @ ${offsetSec}s → ${publicUrl}`,
+        );
       } catch (clipErr) {
-        console.error(`[ClipPipeline] 개별 클립 실패 (${highlight.type}):`, clipErr.message);
+        console.error(` 개별 클립 실패 (${highlight.type}):`, clipErr.message);
         // 하나 실패해도 나머지 계속 처리
       }
     }
 
-    console.log(`[ClipPipeline] 완료: ${savedClips.length}/${highlights.length}개 클립 저장`);
+    console.log(` 완료: ${savedClips.length}/${highlights.length}개 클립 저장`);
 
     // 4. 원본 녹화 삭제 (Storage 용량 절약)
-    const { error: delErr } = await supabaseAdmin.storage
+    const { error: delErr } = await SupabaseClient.storage
       .from(BUCKET)
       .remove([recordingFilePath]);
 
     if (delErr) {
-      console.warn(`[ClipPipeline] 원본 녹화 삭제 실패: ${delErr.message}`);
+      console.warn(` 원본 녹화 삭제 실패: ${delErr.message}`);
     } else {
-      console.log(`[ClipPipeline] 원본 녹화 삭제 완료: ${recordingFilePath}`);
+      console.log(` 원본 녹화 삭제 완료: ${recordingFilePath}`);
     }
   } finally {
     // 5. 로컬 임시 파일 정리
@@ -209,6 +230,6 @@ export const runClipPipeline = async (roomName, recordingFilePath, broadcastStar
         if (existsSync(f)) unlinkSync(f);
       } catch {}
     }
-    console.log(`[ClipPipeline] 임시 파일 ${tempFiles.length}개 정리 완료`);
+    console.log(` 임시 파일 ${tempFiles.length}개 정리 완료`);
   }
 };
