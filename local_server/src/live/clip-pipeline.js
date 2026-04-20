@@ -30,7 +30,7 @@ const downloadLive = async (filePath) => {
     .download(filePath);
 
   if (error)
-    throw new Error(`[ClipPipeline] 녹화 다운로드 실패: ${error.message}`);
+    throw new Error(`HighlightClip 추출 녹화 다운로드 실패: ${error.message}`);
 
   //OS가 만들어 놓은 기존의 임시파일에 붙히기
   const tmpDir = join(tmpdir(), "clips");
@@ -43,7 +43,7 @@ const downloadLive = async (filePath) => {
   writeFileSync(localPath, buf);
 
   console.log(
-    `[ClipPipeline] 다운로드 완료: ${localPath} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`,
+    `HighlightClip 추출 다운로드 완료: ${localPath} (${(buf.length / 1024 / 1024).toFixed(1)} MB)`,
   );
   return localPath;
 };
@@ -80,6 +80,13 @@ const extractClip = (inputPath, startSec, outputPath) => {
  * @param {string} storagePath  Storage 내 경로
  * @returns {string} 공개 URL
  */
+
+const upload = async (ss) => {
+  const { readFileSync } = await import("fs");
+  const buffer = readFileSync(ss);
+};
+
+//로컬에서 하이라이트 부분만 추출한 클립 다시 supabase에 올리기
 const uploadClip = async (localPath, storagePath) => {
   const { readFileSync } = await import("fs");
   const fileBuffer = readFileSync(localPath);
@@ -92,7 +99,7 @@ const uploadClip = async (localPath, storagePath) => {
     });
 
   if (error)
-    throw new Error(`[ClipPipeline] 클립 업로드 실패: ${error.message}`);
+    throw new Error(`HighlightClip 추출 클립 업로드 실패: ${error.message}`);
 
   const { data } = SupabaseClient.storage
     .from(CLIP_BUCKET)
@@ -103,19 +110,20 @@ const uploadClip = async (localPath, storagePath) => {
 /**
  * 클립 메타데이터를 Supabase DB clips 테이블에 저장
  */
-const saveClipToDB = async (roomName, clipRecord) => {
+const saveClipToDB = async (roomName, clip) => {
   const { error } = await SupabaseClient.from("clips").insert({
     room_name: roomName,
-    type: clipRecord.type,
-    public_url: clipRecord.publicUrl,
-    storage_path: clipRecord.storagePath,
-    start_offset_sec: clipRecord.startOffsetSec,
+    type: clip.type,
+    public_url: clip.publicUrl,
+    storage_path: clip.storagePath,
+    start_offset_sec: clip.startOffsetSec,
     duration_sec: CLIP_DURATION,
-    highlight_ts: new Date(clipRecord.highlightTimestamp).toISOString(),
+    highlight_ts: new Date(clip.highlightTimestamp).toISOString(),
     created_at: new Date().toISOString(),
   });
 
-  if (error) throw new Error(`[ClipPipeline] DB 저장 실패: ${error.message}`);
+  if (error)
+    throw new Error(`HighlightClip 추출 DB 저장 실패: ${error.message}`);
 };
 
 /**
@@ -128,15 +136,15 @@ const saveClipToDB = async (roomName, clipRecord) => {
  * 6. 임시 파일 정리, 원본 녹화 삭제
  *
  * @param {string} roomName
- * @param {string} recordingFilePath  Supabase Storage 내 녹화 파일 경로
- * @param {number} liveStartedAt  방송 시작 timestamp (ms)
+ * @param {string} highlightClipPath  Supabase Storage 내 녹화 파일 경로
+ * @param {number} liveStartedDate  방송 시작한 날짜
  */
-export const runClipPipeline = async (
+export const runExtractClips = async (
   roomName,
-  recordingFilePath,
-  liveStartedAt,
+  highlightClipPath,
+  liveStartedDate,
 ) => {
-  console.log(`[ClipPipeline] 시작: ${roomName}`);
+  console.log(`HighlightClip 추출 시작: ${roomName}`);
 
   const keys = getRedisKeys(roomName);
   const tempFiles = [];
@@ -166,17 +174,17 @@ export const runClipPipeline = async (
 
     console.log(`${roomName} 하이라이트 ${highlights.length}개 발견`);
 
-    // 2. 녹화 파일 다운로드
-    const localRecording = await downloadLive(recordingFilePath);
-    tempFiles.push(localRecording);
+    // 2. 녹화 파일 다운로드(Storage)
+    const localLiveFile = await downloadLive(highlightClipPath);
+    tempFiles.push(localLiveFile);
 
     // 3. 각 하이라이트 → 클립 추출 + 업로드
-    const savedClips = [];
+    const extractedClips = [];
 
     for (const highlight of highlights) {
       try {
         // 하이라이트 시각을 방송 시작 기준 상대 시간(초)으로 변환
-        const offsetMs = highlight.timestamp - liveStartedAt;
+        const offsetMs = highlight.timestamp - liveStartedDate;
         const offsetSec = Math.max(0, Math.floor(offsetMs / 1000));
         const clipStartSec = Math.max(0, offsetSec - CLIP_BEFORE_SEC);
 
@@ -186,7 +194,7 @@ export const runClipPipeline = async (
         tempFiles.push(localClipPath);
 
         // FFmpeg 추출
-        await extractClip(localRecording, clipStartSec, localClipPath);
+        await extractClip(localLiveFile, clipStartSec, localClipPath);
 
         // 업로드
         const storagePath = `${roomName}/${clipFilename}`;
@@ -201,7 +209,7 @@ export const runClipPipeline = async (
           highlightTimestamp: highlight.timestamp,
         });
 
-        savedClips.push({ type: highlight.type, url: publicUrl });
+        extractedClips.push({ type: highlight.type, url: publicUrl });
         console.log(
           ` 클립 완료: ${highlight.type} @ ${offsetSec}s → ${publicUrl}`,
         );
@@ -211,17 +219,19 @@ export const runClipPipeline = async (
       }
     }
 
-    console.log(` 완료: ${savedClips.length}/${highlights.length}개 클립 저장`);
+    console.log(
+      ` 완료: ${extractedClips.length}/${highlights.length}개 클립 저장`,
+    );
 
     // 4. 원본 녹화 삭제 (Storage 용량 절약)
     const { error: delErr } = await SupabaseClient.storage
       .from(BUCKET)
-      .remove([recordingFilePath]);
+      .remove([highlightClipPath]);
 
     if (delErr) {
       console.warn(` 원본 녹화 삭제 실패: ${delErr.message}`);
     } else {
-      console.log(` 원본 녹화 삭제 완료: ${recordingFilePath}`);
+      console.log(` 원본 녹화 삭제 완료: ${highlightClipPath}`);
     }
   } finally {
     // 5. 로컬 임시 파일 정리
