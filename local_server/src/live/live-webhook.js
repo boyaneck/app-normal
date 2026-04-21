@@ -75,10 +75,10 @@ export const liveWebhook = async (req, res) => {
 
         // Egress 녹화 시작 (실패해도 방송 진행)
         try {
-          const { egressId, filePath } = await startRecording(roomName);
+          const { egressId, fileName } = await startRecording(roomName);
           await redis_client.hSet(keys.EGRESS, {
             egressId,
-            filePath,
+            fileName,
           });
         } catch (egressErr) {
           console.error("[Egress] 녹화 시작 실패 (방송은 정상 진행):", egressErr.message);
@@ -176,7 +176,7 @@ export const liveWebhook = async (req, res) => {
 
         // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
         const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
-        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "filePath");
+        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "fileName");
         const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
 
         if (egressId) {

@@ -111,15 +111,12 @@ const uploadClip = async (localPath, storagePath) => {
  * 클립 메타데이터를 Supabase DB clips 테이블에 저장
  */
 const saveClipToDB = async (roomName, clip) => {
-  const { error } = await SupabaseClient.from("clips").insert({
+  const { error } = await SupabaseClient.from("highlights").insert({
     room_name: roomName,
     type: clip.type,
     public_url: clip.publicUrl,
     storage_path: clip.storagePath,
-    start_offset_sec: clip.startOffsetSec,
-    duration_sec: CLIP_DURATION,
-    highlight_ts: new Date(clip.highlightTimestamp).toISOString(),
-    created_at: new Date().toISOString(),
+    highlight_started_at: clip.highlightTimestamp,
   });
 
   if (error)

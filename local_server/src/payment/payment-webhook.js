@@ -14,10 +14,7 @@ const verifyWebhookSignature = (body, signature) => {
     .digest("hex");
 
   // timingSafeEqual: 타이밍 어택 방지
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expected),
-  );
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 };
 
 // PortOne → 서버 웹훅 핸들러
