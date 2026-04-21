@@ -4,29 +4,29 @@ import {
   EncodingOptionsPreset,
 } from "livekit-server-sdk";
 
-const api_key = process.env.LIVEKIT_API_KEY;
-const api_secret = process.env.LIVEKIT_API_SECRET;
-const livekit_url = process.env.LIVEKIT_URL;
+const apiKey = process.env.LIVEKIT_API_KEY;
+const apiSecret = process.env.LIVEKIT_API_SECRET;
+const livekitUrl = process.env.LIVEKIT_URL;
 
-const egressClient = new EgressClient(livekit_url, api_key, api_secret);
+const egressClient = new EgressClient(livekitUrl, apiKey, apiSecret);
 
 /**
  * 방송 시작 시 LiveKit Egress 녹화 시작
  * → Supabase Storage (S3 호환)에 MP4로 저장
  *
  * @param {string} roomName
- * @returns {{ egressId: string, filePath: string }}
+ * @returns {{ egressId: string, fileName: string }}
  */
 export const startRecording = async (roomName) => {
   const timestamp = Date.now();
-  const filePath = `recordings/${roomName}/${timestamp}.mp4`;
+  const fileName = `recordings/${roomName}/${timestamp}.mp4`;
 
   const egressInfo = await egressClient.startRoomCompositeEgress(
     roomName,
     {
       file: {
         fileType: EncodedFileType.MP4,
-        filepath: filePath,
+        fileName: fileName,
         s3: {
           accessKey: process.env.SUPABASE_S3_ACCESS_KEY,
           secret: process.env.SUPABASE_S3_SECRET_KEY,
@@ -42,11 +42,13 @@ export const startRecording = async (roomName) => {
     },
   );
 
-  console.log(`[Egress] 녹화 시작: ${roomName} → ${filePath} (${egressInfo.egressId})`);
+  console.log(
+    `🎥녹화 시작: ${roomName} → ${fileName} (egressId:${egressInfo.egressId})`,
+  );
 
   return {
     egressId: egressInfo.egressId,
-    filePath,
+    fileName,
   };
 };
 
@@ -61,10 +63,10 @@ export const stopRecording = async (egressId) => {
 
   try {
     await egressClient.stopEgress(egressId);
-    console.log(`[Egress] 녹화 중지: ${egressId}`);
+    console.log(`녹화 중지: ${egressId}`);
   } catch (err) {
     // 이미 종료된 경우 무시
-    console.warn(`[Egress] stopEgress 실패 (이미 종료됐을 수 있음): ${err.message}`);
+    console.warn(`stopEgress 실패 (이미 종료됐을 수 있음): ${err.message}`);
   }
 };
 
@@ -76,7 +78,10 @@ export const stopRecording = async (egressId) => {
  * @param {number} maxWaitMs   기본 5분
  * @returns {boolean} 완료 여부
  */
-export const waitForEgressComplete = async (egressId, maxWaitMs = 5 * 60 * 1000) => {
+export const waitForEgressComplete = async (
+  egressId,
+  maxWaitMs = 5 * 60 * 1000,
+) => {
   const POLL_INTERVAL = 5000;
   const deadline = Date.now() + maxWaitMs;
 
@@ -85,20 +90,20 @@ export const waitForEgressComplete = async (egressId, maxWaitMs = 5 * 60 * 1000)
       const [info] = await egressClient.listEgress({ egressId });
       // status: 0=EGRESS_STARTING, 1=EGRESS_ACTIVE, 2=EGRESS_ENDING, 3=EGRESS_COMPLETE, 4=EGRESS_FAILED
       if (info?.status === 3) {
-        console.log(`[Egress] 업로드 완료: ${egressId}`);
+        console.log(`업로드 완료: ${egressId}`);
         return true;
       }
       if (info?.status === 4) {
-        console.error(`[Egress] 실패 상태: ${egressId}`);
+        console.error(`실패 상태: ${egressId}`);
         return false;
       }
     } catch (err) {
-      console.warn(`[Egress] 상태 조회 실패: ${err.message}`);
+      console.warn(`상태 조회 실패: ${err.message}`);
     }
 
     await new Promise((r) => setTimeout(r, POLL_INTERVAL));
   }
 
-  console.warn(`[Egress] 대기 시간 초과: ${egressId}`);
+  console.warn(`대기 시간 초과: ${egressId}`);
   return false;
 };
