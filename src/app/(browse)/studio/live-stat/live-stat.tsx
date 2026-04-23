@@ -247,7 +247,7 @@ const LiveStats = ({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-row gap-3"
-            style={{ height: "calc(100vh - 220px)" }}
+            style={{ height: "calc(100vh - 310px)" }}
           >
             {/* ===== 왼쪽: 클립 패널 (40%) ===== */}
             <div className="w-2/5 h-full">

@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { redis_client } from "../config/redis.js";
 import { getRedisKeys } from "./redis-keys.js";
 import { unlinkSync, mkdirSync, existsSync } from "fs";
@@ -7,7 +7,7 @@ import { join } from "path";
 import ffmpeg from "fluent-ffmpeg";
 
 // 서비스 키가 필요한 스토리지 작업용 (Storage RLS 우회)
-const SupabaseClient = createClient(
+const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
@@ -25,7 +25,7 @@ const CLIP_DURATION = CLIP_BEFORE_SEC + CLIP_AFTER_SEC; // 60초
  * @returns {string} 로컬 임시 파일 경로
  */
 const downloadLive = async (filePath) => {
-  const { data, error } = await SupabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(BUCKET)
     .download(filePath);
 
@@ -73,25 +73,11 @@ const extractClip = (inputPath, startSec, outputPath) => {
   });
 };
 
-/**
- * 로컬 클립 파일을 Supabase Storage clips 버킷에 업로드
- *
- * @param {string} localPath    로컬 파일 경로
- * @param {string} storagePath  Storage 내 경로
- * @returns {string} 공개 URL
- */
-
-const upload = async (ss) => {
-  const { readFileSync } = await import("fs");
-  const buffer = readFileSync(ss);
-};
-
-//로컬에서 하이라이트 부분만 추출한 클립 다시 supabase에 올리기
 const uploadClip = async (localPath, storagePath) => {
   const { readFileSync } = await import("fs");
   const fileBuffer = readFileSync(localPath);
 
-  const { error } = await SupabaseClient.storage
+  const { error } = await supabase.storage
     .from(CLIP_BUCKET)
     .upload(storagePath, fileBuffer, {
       contentType: "video/mp4",
@@ -101,7 +87,7 @@ const uploadClip = async (localPath, storagePath) => {
   if (error)
     throw new Error(`HighlightClip 추출 클립 업로드 실패: ${error.message}`);
 
-  const { data } = SupabaseClient.storage
+  const { data } = supabase.storage
     .from(CLIP_BUCKET)
     .getPublicUrl(storagePath);
   return data.publicUrl;
@@ -111,7 +97,7 @@ const uploadClip = async (localPath, storagePath) => {
  * 클립 메타데이터를 Supabase DB clips 테이블에 저장
  */
 const saveClipToDB = async (roomName, clip) => {
-  const { error } = await SupabaseClient.from("highlights").insert({
+  const { error } = await supabase.from("highlights").insert({
     room_name: roomName,
     type: clip.type,
     public_url: clip.publicUrl,
@@ -136,7 +122,7 @@ const saveClipToDB = async (roomName, clip) => {
  * @param {string} highlightClipPath  Supabase Storage 내 녹화 파일 경로
  * @param {number} liveStartedDate  방송 시작한 날짜
  */
-export const runExtractClips = async (
+export const runClipPipeline = async (
   roomName,
   highlightClipPath,
   liveStartedDate,
@@ -221,7 +207,7 @@ export const runExtractClips = async (
     );
 
     // 4. 원본 녹화 삭제 (Storage 용량 절약)
-    const { error: delErr } = await SupabaseClient.storage
+    const { error: delErr } = await supabase.storage
       .from(BUCKET)
       .remove([highlightClipPath]);
 

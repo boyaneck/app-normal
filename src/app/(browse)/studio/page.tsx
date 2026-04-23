@@ -80,7 +80,7 @@ const StudioPage = () => {
   };
 
   return (
-    <div className="border border-red-500 grid grid-cols-10 h-1/2">
+    <div className="grid grid-cols-10 h-full">
       <div className="col-span-1">
         {Object.keys(TabContents).map((key) => (
           <div key={key} onClick={() => setSelectTab(key)}>
@@ -89,7 +89,7 @@ const StudioPage = () => {
         ))}
       </div>
 
-      <div className="col-span-8 h-1/2">
+      <div className="col-span-8 h-full overflow-y-auto pb-[160px]">
         {TabContents[selectTab] || renderLiveStat()}
         <StudioAIInput onSend={handleSendMessage} />
       </div>
