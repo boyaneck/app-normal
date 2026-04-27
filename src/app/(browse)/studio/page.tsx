@@ -32,7 +32,7 @@ const StudioPage = () => {
           {
             id: "init",
             role: "ai",
-            content: `**${card.title}** 데이터를 분석해드릴게요.\n이번 방송에서 **${card.value.toLocaleString()}${card.unit}**을 기록했습니다. 궁금한 점을 물어보세요!`,
+            content: "궁금한 거 물어보세요",
           },
         ]);
       }
@@ -71,6 +71,7 @@ const StudioPage = () => {
       selectedCardIndex={selectedCardIndex}
       onCardSelect={handleCardSelect}
       messages={messages}
+      onSend={handleSendMessage}
     />
   );
 
@@ -91,7 +92,9 @@ const StudioPage = () => {
 
       <div className="col-span-8 h-full overflow-y-auto pb-[160px]">
         {TabContents[selectTab] || renderLiveStat()}
-        <StudioAIInput onSend={handleSendMessage} />
+        {selectedCardIndex === null && (
+          <StudioAIInput onSend={handleSendMessage} />
+        )}
       </div>
 
       {/* ===== 미니 카드 오버레이 (AI 입력창 위) ===== */}
