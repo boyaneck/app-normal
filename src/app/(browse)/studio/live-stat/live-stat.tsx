@@ -89,18 +89,22 @@ const StatCardSkeleton = () => (
 
 interface Props {
   roomName: string | undefined;
+  selectedCardIndex?: number | null;
+  onCardSelect?: (index: number | null, cards: MiniCardInfo[]) => void;
+  messages?: ChatMessage[];
+  onSend?: (text: string) => void;
 }
 
 const LiveStats = ({
   roomName,
   selectedCardIndex,
   onCardSelect,
-  messages,
+  messages = [],
+  onSend,
 }: Props) => {
-  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(
-    null,
-  );
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
+  const [chatInput, setChatInput] = useState("");
 
   // 새 메시지 올 때 자동 스크롤 — 반드시 최상단에 선언
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -278,26 +282,12 @@ const LiveStats = ({
                 >
                   ←
                 </button>
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
-                  }}
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                    <path d="M2 17l10 5 10-5" />
-                    <path d="M2 12l10 5 10-5" />
-                  </svg>
+                <div className="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden">
+                  <img
+                    src="/images/AI_assistant.jpg"
+                    alt="AI"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
                   <p className="text-[11px] text-black/35 tracking-wide">
@@ -315,76 +305,37 @@ const LiveStats = ({
               {/* AI 요약 분석 박스 */}
               <div className="flex-shrink-0 px-4 pt-3 pb-1">
                 <div
-                  className="rounded-xl px-4 py-3"
+                  className="rounded-xl px-4 py-3 text-center"
                   style={{
-                    background: "rgba(124,106,255,0.07)",
-                    border: "0.5px solid rgba(124,106,255,0.18)",
-                    backdropFilter: "blur(12px)",
+                    background: "rgba(255,255,255,0.55)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "0.5px solid rgba(135,206,250,0.4)",
+                    boxShadow: "0 2px 16px rgba(100,180,255,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
                   }}
                 >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <div
-                      className="w-4 h-4 rounded-md flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
-                      }}
-                    >
-                      <svg
-                        width="8"
-                        height="8"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                        <path d="M2 17l10 5 10-5" />
-                        <path d="M2 12l10 5 10-5" />
-                      </svg>
-                    </div>
-                    <span
-                      className="text-[10px] font-semibold tracking-wide"
-                      style={{ color: "rgba(92,74,223,0.8)" }}
-                    >
-                      AI 분석 요약
-                    </span>
-                  </div>
-                  <ul className="space-y-1">
-                    {[
-                      `이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`,
-                      prevData
-                        ? (() => {
-                            const prev = selectedField
-                              ? selectedField.toNumber(
-                                  prevData[selectedField.key] as
-                                    | string
-                                    | number,
-                                )
-                              : 0;
-                            const diff = selectedValue - prev;
-                            return diff >= 0
-                              ? `전 방송 대비 ${diff.toLocaleString()}${selectedField?.unit} 증가했습니다.`
-                              : `전 방송 대비 ${Math.abs(diff).toLocaleString()}${selectedField?.unit} 감소했습니다.`;
-                          })()
-                        : "전 방송 데이터가 없어 비교가 불가합니다.",
-                      "아래 채팅창에서 더 자세한 분석을 요청할 수 있습니다.",
-                    ].map((text, i) => (
-                      <li key={i} className="flex items-start gap-1.5">
-                        <span
-                          className="mt-[3px] w-1 h-1 rounded-full flex-shrink-0"
-                          style={{ background: "rgba(124,106,255,0.5)" }}
-                        />
-                        <span
-                          className="text-[11px] leading-relaxed"
-                          style={{ color: "rgba(0,0,0,0.55)" }}
-                        >
-                          {text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <span
+                    className="text-[10px] font-semibold tracking-wide block mb-1.5"
+                    style={{ color: "rgba(80,160,220,0.8)" }}
+                  >
+                    AI 분석 요약
+                  </span>
+                  <p className="text-[11px] leading-relaxed" style={{ color: "rgba(0,0,0,0.55)" }}>
+                    {`이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`}
+                  </p>
+                  {prevData && (() => {
+                    const prev = selectedField
+                      ? selectedField.toNumber(prevData[selectedField.key] as string | number)
+                      : 0;
+                    const diff = selectedValue - prev;
+                    return (
+                      <p className="text-[11px] leading-relaxed mt-0.5" style={{ color: "rgba(0,0,0,0.55)" }}>
+                        {diff >= 0
+                          ? `전 방송 대비 ${diff.toLocaleString()}${selectedField?.unit} 증가했습니다.`
+                          : `전 방송 대비 ${Math.abs(diff).toLocaleString()}${selectedField?.unit} 감소했습니다.`}
+                      </p>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -399,48 +350,22 @@ const LiveStats = ({
                       key={msg.id}
                       initial={{ opacity: 0, y: 10, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 28,
-                      }}
+                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
                       className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                     >
                       {/* AI 아바타 */}
                       {msg.role === "ai" && (
-                        <div
-                          className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center mb-0.5"
-                          style={{
-                            background: "rgba(255,255,255,0.8)",
-                            border: "0.5px solid rgba(124,106,255,0.2)",
-                            boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
-                          }}
-                        >
-                          <svg
-                            width="11"
-                            height="11"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="rgba(124,106,255,0.8)"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                            <path d="M2 17l10 5 10-5" />
-                            <path d="M2 12l10 5 10-5" />
-                          </svg>
+                        <div className="w-7 h-7 rounded-lg flex-shrink-0 overflow-hidden mb-0.5">
+                          <img src="/images/AI_assistant.jpg" alt="AI" className="w-full h-full object-cover" />
                         </div>
                       )}
-
                       {/* 말풍선 */}
                       <div
                         className="max-w-[75%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
                         style={
                           msg.role === "user"
                             ? {
-                                background:
-                                  "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                                background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
                                 color: "rgba(255,255,255,0.95)",
                                 borderRadius: "18px 18px 4px 18px",
                                 boxShadow: "0 2px 12px rgba(92,74,223,0.25)",
@@ -460,6 +385,61 @@ const LiveStats = ({
                   ))}
                 </AnimatePresence>
                 <div ref={messagesEndRef} />
+              </div>
+
+              {/* 채팅 입력창 */}
+              <div
+                className="flex-shrink-0 px-4 py-3"
+                style={{ borderTop: "0.5px solid rgba(0,0,0,0.06)" }}
+              >
+                <div
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                  style={{
+                    background: "rgba(255,255,255,0.7)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    border: "0.5px solid rgba(135,206,250,0.35)",
+                    boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey && chatInput.trim()) {
+                        e.preventDefault();
+                        onSend?.(chatInput.trim());
+                        setChatInput("");
+                      }
+                    }}
+                    placeholder="궁금한 거 물어보세요..."
+                    className="flex-1 text-sm outline-none bg-transparent"
+                    style={{ color: "#1a1a2e" }}
+                  />
+                  <AnimatePresence>
+                    {chatInput.trim() && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.7 }}
+                        onClick={() => {
+                          if (chatInput.trim()) {
+                            onSend?.(chatInput.trim());
+                            setChatInput("");
+                          }
+                        }}
+                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="22" y1="2" x2="11" y2="13" />
+                          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -13,7 +13,7 @@ const supabase = createClient(
 );
 
 const BUCKET = process.env.SUPABASE_S3_BUCKET || "recordings";
-const CLIP_BUCKET = "clips";
+const CLIP_BUCKET = "highlight_clips";
 const CLIP_BEFORE_SEC = 30; // 하이라이트 기준 앞 30초
 const CLIP_AFTER_SEC = 30; // 하이라이트 기준 뒤 30초
 const CLIP_DURATION = CLIP_BEFORE_SEC + CLIP_AFTER_SEC; // 60초
