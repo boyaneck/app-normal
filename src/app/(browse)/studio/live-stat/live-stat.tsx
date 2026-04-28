@@ -50,6 +50,7 @@ export interface MiniCardInfo {
   index: number;
   title: string;
   value: number;
+  prevValue: number | null;
   unit: string;
 }
 
@@ -92,7 +93,8 @@ interface Props {
   selectedCardIndex?: number | null;
   onCardSelect?: (index: number | null, cards: MiniCardInfo[]) => void;
   messages?: ChatMessage[];
-  onSend?: (text: string) => void;
+  onChatAISendMsg?: (text: string) => void;
+  isAiTyping?: boolean;
 }
 
 const LiveStats = ({
@@ -100,7 +102,8 @@ const LiveStats = ({
   selectedCardIndex,
   onCardSelect,
   messages = [],
-  onSend,
+  onChatAISendMsg,
+  isAiTyping = false,
 }: Props) => {
   const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
@@ -165,11 +168,10 @@ const LiveStats = ({
         index: i,
         title: f.title,
         unit: f.unit,
-        value: currentData
-          ? f.toNumber(currentData[f.key] as string | number)
-          : 0,
+        value: currentData ? f.toNumber(currentData[f.key] as string | number) : 0,
+        prevValue: prevData ? f.toNumber(prevData[f.key] as string | number) : null,
       })),
-    [currentData],
+    [currentData, prevData],
   );
 
   const handleCardClick = (index: number) => {
@@ -384,6 +386,38 @@ const LiveStats = ({
                     </motion.div>
                   ))}
                 </AnimatePresence>
+                {/* AI 타이핑 인디케이터 */}
+                <AnimatePresence>
+                  {isAiTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      className="flex items-end gap-2"
+                    >
+                      <div className="w-7 h-7 rounded-lg flex-shrink-0 overflow-hidden mb-0.5">
+                        <img src="/images/AI_assistant.jpg" alt="AI" className="w-full h-full object-cover" />
+                      </div>
+                      <div
+                        className="px-4 py-2.5 flex gap-1 items-center"
+                        style={{
+                          background: "rgba(255,255,255,0.75)",
+                          borderRadius: "18px 18px 18px 4px",
+                          border: "0.5px solid rgba(0,0,0,0.06)",
+                        }}
+                      >
+                        {[0, 1, 2].map((i) => (
+                          <motion.span
+                            key={i}
+                            className="w-1.5 h-1.5 rounded-full bg-black/25 block"
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <div ref={messagesEndRef} />
               </div>
 
@@ -407,25 +441,26 @@ const LiveStats = ({
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey && chatInput.trim()) {
+                      if (e.key === "Enter" && !e.shiftKey && chatInput.trim() && !isAiTyping) {
                         e.preventDefault();
-                        onSend?.(chatInput.trim());
+                        onChatAISendMsg?.(chatInput.trim());
                         setChatInput("");
                       }
                     }}
                     placeholder="궁금한 거 물어보세요..."
-                    className="flex-1 text-sm outline-none bg-transparent"
+                    disabled={isAiTyping}
+                    className="flex-1 text-sm outline-none bg-transparent disabled:opacity-50"
                     style={{ color: "#1a1a2e" }}
                   />
                   <AnimatePresence>
-                    {chatInput.trim() && (
+                    {chatInput.trim() && !isAiTyping && (
                       <motion.button
                         initial={{ opacity: 0, scale: 0.7 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.7 }}
                         onClick={() => {
                           if (chatInput.trim()) {
-                            onSend?.(chatInput.trim());
+                            onChatAISendMsg?.(chatInput.trim());
                             setChatInput("");
                           }
                         }}
