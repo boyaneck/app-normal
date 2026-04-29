@@ -1,8 +1,8 @@
 import { redis_client } from "../config/redis.js";
 import { getRedisKeys } from "./redis-keys.js";
 
-const SPIKE_THRESHOLD = 0.3;              // 30% 변화율 기준
-const MIN_DATA_POINTS = 2;               // 최소 2포인트(=10분) 이후 감지 시작
+const SPIKE_THRESHOLD = 0.3; // 30% 변화율 기준
+const MIN_DATA_POINTS = 2; // 최소 2포인트(=10분) 이후 감지 시작
 const SPIKE_COOLDOWN_MS = 5 * 60 * 1000; // 동일 타입 스파이크 5분 내 중복 방지
 
 /**
@@ -24,16 +24,12 @@ export const detectViewerSpike = async (roomName, currentViewers) => {
 
   // 2. 워밍업 체크 — 데이터 포인트가 부족하면 감지 안 함
   if (timeseriesData.length < MIN_DATA_POINTS) {
-    console.log(
-      `[SpikeDetector] ${roomName}: 워밍업 중 (${timeseriesData.length}/${MIN_DATA_POINTS})`,
-    );
+    console.log(`ViewrSpike ${roomName}: 워밍업 중, 수집 데이터 부족)`);
     return;
   }
 
   // 3. 전체 구간 평균 시청자 계산
-  const viewerCounts = timeseriesData.map((entry) =>
-    parseInt(entry.value, 10),
-  );
+  const viewerCounts = timeseriesData.map((entry) => parseInt(entry.value, 10));
   const avgViewers =
     viewerCounts.reduce((sum, v) => sum + v, 0) / viewerCounts.length;
 
@@ -52,7 +48,12 @@ export const detectViewerSpike = async (roomName, currentViewers) => {
   const now = Date.now();
 
   // 6. 쿨다운 체크 — 5분 내 동일 타입 스파이크가 이미 있으면 스킵
-  const recentRaw = await redis_client.zRange(keys.HIGHLIGHTS, now - SPIKE_COOLDOWN_MS, now, { BY: "SCORE" });
+  const recentRaw = await redis_client.zRange(
+    keys.HIGHLIGHTS,
+    now - SPIKE_COOLDOWN_MS,
+    now,
+    { BY: "SCORE" },
+  );
 
   const hasDuplicate = recentRaw.some((raw) => {
     try {
