@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import StudioAIInput from "./_components/studio-AI-input";
+import { StudioAIInput } from "./_components/AI-input";
 import LiveStat, { MiniCardInfo } from "./live-stat/live-stat";
 import useUserStore from "@/store/user";
 import { ChatMessage } from "@/types/live";
@@ -26,47 +26,59 @@ const StudioPage = () => {
     setSelectedCardIndex(index);
     setAllCards(cards);
     if (index !== null) {
-      setMessages([{ id: "init", role: "ai", content: "궁금한 거 물어보세요" }]);
+      setMessages([
+        { id: "init", role: "ai", content: "궁금한 거 물어보세요" },
+      ]);
     } else {
       setMessages([]);
     }
   };
 
   const onChatAISendMsg = async (text: string) => {
-    const userMsg: ChatMessage = { id: `u_${Date.now()}`, role: "user", content: text };
+    const userMsg: ChatMessage = {
+      id: `u_${Date.now()}`,
+      role: "user",
+      content: text,
+    };
     const updatedMessages = [...messages, userMsg];
     setMessages(updatedMessages);
     setIsAiTyping(true);
 
     try {
-      const selectedCard = selectedCardIndex !== null
-        ? allCards.find((c) => c.index === selectedCardIndex)
-        : null;
+      const selectedCard =
+        selectedCardIndex !== null
+          ? allCards.find((c) => c.index === selectedCardIndex)
+          : null;
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            cardTitle: selectedCard?.title ?? "",
-            currentValue: selectedCard?.value ?? 0,
-            prevValue: selectedCard?.prevValue ?? null,
-            unit: selectedCard?.unit ?? "",
-            messages: updatedMessages.slice(-6),
-          }),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cardTitle: selectedCard?.title ?? "",
+          currentValue: selectedCard?.value ?? 0,
+          prevValue: selectedCard?.prevValue ?? null,
+          unit: selectedCard?.unit ?? "",
+          messages: updatedMessages.slice(-6),
+        }),
+      });
 
       const data = await res.json();
       setMessages((prev) => [
         ...prev,
-        { id: `a_${Date.now()}`, role: "ai", content: data.answer ?? "응답을 받지 못했습니다." },
+        {
+          id: `a_${Date.now()}`,
+          role: "ai",
+          content: data.answer ?? "응답을 받지 못했습니다.",
+        },
       ]);
     } catch {
       setMessages((prev) => [
         ...prev,
-        { id: `a_${Date.now()}`, role: "ai", content: "AI 연결에 실패했습니다. 잠시 후 다시 시도해주세요." },
+        {
+          id: `a_${Date.now()}`,
+          role: "ai",
+          content: "AI 연결에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        },
       ]);
     } finally {
       setIsAiTyping(false);
