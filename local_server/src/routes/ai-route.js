@@ -5,8 +5,13 @@ import { AILiveReportPrompt } from "../prompt/AI-live-report-prompt.js";
 
 const router = express.Router();
 
-const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GOOGLE_AI_API_KEY}`;
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+
+const groqHeaders = () => ({
+  Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+  "Content-Type": "application/json",
+});
 
 /**
  * POST /ai/chat
@@ -27,26 +32,28 @@ router.post("/chat", async (req, res) => {
       messages = [],
     } = req.body;
 
-    //이전의 값과 현재 값 비교, 질문에 필요한 최소한의 모델링(질문)이 된
-    const queryPrompt = AIChatPrompt(cardTitle, currentValue, prevValue, unit);
+    const systemPrompt = AIChatPrompt(cardTitle, currentValue, prevValue, unit);
 
     // 최근 6개만 슬라이딩 윈도우
-    const recentMessages = messages.slice(-6);
-
-    const chatSession = recentMessages.map((msg) => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
+    const recentMessages = messages.slice(-6).map((msg) => ({
+      role: msg.role === "user" ? "user" : "assistant",
+      content: msg.content,
     }));
 
-    const { data } = await axios.post(GEMINI_URL, {
-      system_instruction: { parts: [{ text: queryPrompt }] },
-      contents: chatSession,
-    });
+    const { data } = await axios.post(
+      GROQ_URL,
+      {
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...recentMessages,
+        ],
+      },
+      { headers: groqHeaders() },
+    );
 
-    console.log("[AI Chat] Gemini 응답:", JSON.stringify(data, null, 2));
     const answer =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ??
-      "답변을 가져오지 못했습니다.";
+      data.choices?.[0]?.message?.content ?? "답변을 가져오지 못했습니다.";
     res.json({ answer });
   } catch (err) {
     console.error("[AI Chat]", err.response?.data ?? err.message);
@@ -66,13 +73,17 @@ router.post("/analyze", async (req, res) => {
 
     const prompt = AILiveReportPrompt(current, prev);
 
-    const { data } = await axios.post(GEMINI_URL, {
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-    });
+    const { data } = await axios.post(
+      GROQ_URL,
+      {
+        model: GROQ_MODEL,
+        messages: [{ role: "user", content: prompt }],
+      },
+      { headers: groqHeaders() },
+    );
 
     const answer =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ??
-      "분석 결과를 가져오지 못했습니다.";
+      data.choices?.[0]?.message?.content ?? "분석 결과를 가져오지 못했습니다.";
     res.json({ answer });
   } catch (err) {
     console.error("[AI Analyze]", err.response?.data ?? err.message);
