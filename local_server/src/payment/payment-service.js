@@ -64,6 +64,9 @@ export const saveDonation = async (hostId, paymentInfo) => {
   await redis_client.incrBy(keys.DONATION_TOTAL_AMOUNT, paymentInfo.amount);
   await redis_client.incr(keys.DONATION_COUNT);
 
+  // 고유 후원자 (buyerName 기준 중복 제거)
+  await redis_client.sAdd(keys.DONATION_UNIQUE_USERS, paymentInfo.buyerName ?? "anonymous");
+
   // 스파이크 감지용 시계열 (score = timestamp, value = JSON)
   await redis_client.zAdd(keys.DONATION_TIMESERIES, {
     score: now,
@@ -76,6 +79,7 @@ export const saveDonation = async (hostId, paymentInfo) => {
   await redis_client.expire(keys.DONATION_TOTAL_AMOUNT, TTL);
   await redis_client.expire(keys.DONATION_COUNT, TTL);
   await redis_client.expire(keys.DONATION_TIMESERIES, TTL);
+  await redis_client.expire(keys.DONATION_UNIQUE_USERS, TTL);
 
   // 스파이크 감지
   await detectDonationSpike(hostId, paymentInfo.amount);

@@ -1,16 +1,17 @@
 "use client";
 import React from "react";
 import Wrapper from "./wrapper";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Following_user from "./follwing_user";
 import ToggleButton from "./toggle";
 import LoginUserIcon from "./login_user_icon";
 
 const Sidebar = () => {
   const router = useRouter();
-  const onRouterHandler = () => {
-    router.push("following");
-  };
+  const pathname = usePathname();
+
+  if (pathname === "/studio") return null;
+
   return (
     <Wrapper>
       <ToggleButton />

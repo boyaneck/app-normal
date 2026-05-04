@@ -111,9 +111,29 @@ const LiveStats = ({
 
   // 새 메시지 올 때 자동 스크롤 — 반드시 최상단에 선언
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleChatInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatInput(e.target.value);
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    }
+  };
+
+  const handleChatSend = () => {
+    if (!chatInput.trim() || isAiTyping) return;
+    onChatAISendMsg?.(chatInput.trim());
+    setChatInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
+  };
 
   const {
     data: rawStats,
@@ -245,24 +265,24 @@ const LiveStats = ({
     <div className="space-y-4 p-6">
       <AnimatePresence mode="wait">
         {selectedCardIndex !== null ? (
-          /* ===== AI 채팅 뷰 (2분할: 클립 40% / 채팅 60%) ===== */
+          /* ===== AI 채팅 뷰 (클립 30% / 채팅 flex-1) ===== */
           <motion.div
             key="chat"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-row gap-3"
-            style={{ height: "calc(100vh - 310px)" }}
+            className="flex flex-row gap-2"
+            style={{ height: "calc(100vh - 310px)", marginLeft: 150 }}
           >
-            {/* ===== 왼쪽: 클립 패널 (40%) ===== */}
-            <div className="w-2/5 h-full">
+            {/* ===== 왼쪽: 클립 패널 (35%) ===== */}
+            <div className="h-full flex-shrink-0" style={{ width: "35%" }}>
               <ClipPanel cardTitle={selectedField?.title} />
             </div>
 
-            {/* ===== 오른쪽: AI 채팅 (60%) ===== */}
+            {/* ===== 오른쪽: AI 채팅 (나머지 전부) ===== */}
             <div
-              className="w-3/5 h-full flex flex-col rounded-2xl overflow-hidden"
+              className="h-full flex flex-col rounded-2xl overflow-hidden flex-1"
               style={{
                 background: "rgba(255,255,255,0.65)",
                 backdropFilter: "blur(32px)",
@@ -436,21 +456,21 @@ const LiveStats = ({
                     boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
                   }}
                 >
-                  <input
-                    type="text"
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
                     value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
+                    onChange={handleChatInputChange}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey && chatInput.trim() && !isAiTyping) {
+                      if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        onChatAISendMsg?.(chatInput.trim());
-                        setChatInput("");
+                        handleChatSend();
                       }
                     }}
                     placeholder="궁금한 거 물어보세요..."
                     disabled={isAiTyping}
-                    className="flex-1 text-sm outline-none bg-transparent disabled:opacity-50"
-                    style={{ color: "#1a1a2e" }}
+                    className="flex-1 text-sm outline-none bg-transparent disabled:opacity-50 resize-none leading-relaxed"
+                    style={{ color: "#1a1a2e", maxHeight: "120px", overflowY: "auto" }}
                   />
                   <AnimatePresence>
                     {chatInput.trim() && !isAiTyping && (
@@ -458,12 +478,7 @@ const LiveStats = ({
                         initial={{ opacity: 0, scale: 0.7 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.7 }}
-                        onClick={() => {
-                          if (chatInput.trim()) {
-                            onChatAISendMsg?.(chatInput.trim());
-                            setChatInput("");
-                          }
-                        }}
+                        onClick={handleChatSend}
                         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                         style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
                       >

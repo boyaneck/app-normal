@@ -219,6 +219,22 @@ export const liveWebhook = async (req, res) => {
           ? Math.round((Date.now() - parseInt(startedAtStr, 10)) / 60000)
           : 0;
 
+        // 후원 통계
+        const fundStr = await redis_client.get(keys.DONATION_TOTAL_AMOUNT);
+        const donationCountStr = await redis_client.get(keys.DONATION_COUNT);
+        const donationUniqueUsers = await redis_client.sCard(keys.DONATION_UNIQUE_USERS);
+        const fund = fundStr ? parseInt(fundStr, 10) : 0;
+        const donationCount = donationCountStr ? parseInt(donationCountStr, 10) : 0;
+
+        // 시계열 데이터 (Supabase 저장용)
+        const viewerTimeseries = await redis_client.zRangeWithScores(keys.TIMESERIES, 0, -1);
+        const donationTimeseries = await redis_client.zRangeWithScores(keys.DONATION_TIMESERIES, 0, -1);
+
+        // avg_viewer 계산 (시계열 평균)
+        const avgViewer = viewerTimeseries.length > 0
+          ? Math.round(viewerTimeseries.reduce((sum, e) => sum + parseInt(e.value, 10), 0) / viewerTimeseries.length)
+          : 0;
+
         // 통계 저장
         const saveSuccess = await insertLiveStats({
           roomName,
@@ -230,6 +246,12 @@ export const liveWebhook = async (req, res) => {
           intoChatRate,
           category,
           durationMin,
+          fund,
+          donationCount,
+          donationUniqueUsers,
+          avgViewer,
+          viewerTimeseries,
+          donationTimeseries,
         });
 
         if (saveSuccess) {
@@ -248,6 +270,7 @@ export const liveWebhook = async (req, res) => {
             keys.DONATION_TOTAL_AMOUNT,
             keys.DONATION_COUNT,
             keys.DONATION_TIMESERIES,
+            keys.DONATION_UNIQUE_USERS,
             keys.CHAT_UNIQUE_USERS,
             keys.CHAT_TIMESERIES,
             keys.EGRESS,
