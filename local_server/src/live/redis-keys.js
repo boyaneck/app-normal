@@ -13,6 +13,7 @@ export const getRedisKeys = (roomName) => ({
   DONATION_TOTAL_AMOUNT: `live:${roomName}:donation:total`,
   DONATION_COUNT: `live:${roomName}:donation:count`,
   DONATION_TIMESERIES: `live:${roomName}:donation:timeseries`,
+  DONATION_UNIQUE_USERS: `live:${roomName}:donation:users`,
   CHAT_UNIQUE_USERS: `live:${roomName}:chat:users`,
   CHAT_TIMESERIES: `live:${roomName}:chat:timeseries`,
   VIEWER_RANK: `live:rank`,

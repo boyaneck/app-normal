@@ -18,292 +18,161 @@ const MOCK_CLIPS: Clip[] = [
   { id: "4", label: "하이라이트 4", timestamp: "1:02:44", duration: "1:00" },
 ];
 
-const toSeconds = (ts: string): number => {
-  const parts = ts.split(":").map(Number);
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  return parts[0] * 60 + parts[1];
-};
-
 interface Props {
   cardTitle?: string;
   clips?: Clip[];
 }
 
 export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
-  const [activeClip, setActiveClip] = useState<Clip>(clips[0]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [activeClip, setActiveClip] = useState<Clip | null>(null);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragScrollLeft = useRef(0);
 
-  const totalSec =
-    clips.length > 0 ? toSeconds(clips[clips.length - 1].timestamp) * 1.2 : 3600;
+  const onDragStart = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    dragStartX.current = e.pageX - (carouselRef.current?.offsetLeft ?? 0);
+    dragScrollLeft.current = carouselRef.current?.scrollLeft ?? 0;
+    if (carouselRef.current) carouselRef.current.style.cursor = "grabbing";
+  };
 
-  const getPos = (ts: string) =>
-    Math.min((toSeconds(ts) / totalSec) * 100, 93);
+  const onDragMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !carouselRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - carouselRef.current.offsetLeft;
+    const walk = (x - dragStartX.current) * 1.5;
+    carouselRef.current.scrollLeft = dragScrollLeft.current - walk;
+  };
+
+  const onDragEnd = () => {
+    isDragging.current = false;
+    if (carouselRef.current) carouselRef.current.style.cursor = "grab";
+  };
 
   const handleSelect = (clip: Clip) => {
-    setActiveClip(clip);
+    setActiveClip((prev) => (prev?.id === clip.id ? null : clip));
     if (mainVideoRef.current && clip.src) {
       mainVideoRef.current.src = clip.src;
       mainVideoRef.current.play().catch(() => {});
     }
   };
 
-  const getPopupAlign = (pos: number) => {
-    if (pos < 18) return { left: 0, transform: "none" };
-    if (pos > 80) return { right: 0, left: "auto" as const, transform: "none" };
-    return { left: "50%", transform: "translateX(-50%)" };
-  };
+  const displayed = activeClip ?? clips[0];
 
   return (
-    // h-full 추가 — AI 채팅 패널과 높이 맞춤
-    <div
-      className="flex flex-col rounded-2xl w-full h-full"
-      style={{
-        background: "rgba(255,255,255,0.05)",
-        backdropFilter: "blur(32px)",
-        WebkitBackdropFilter: "blur(32px)",
-        border: "0.5px solid rgba(255,255,255,0.1)",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)",
-      }}
-    >
-      {/* 헤더 */}
-      <div
-        className="flex-shrink-0 flex items-center gap-2 px-5 py-4"
-        style={{ borderBottom: "0.5px solid rgba(255,255,255,0.07)" }}
-      >
-        <div
-          className="w-1.5 h-1.5 rounded-full"
-          style={{ background: "rgba(239,68,68,0.9)", boxShadow: "0 0 6px rgba(239,68,68,0.5)" }}
-        />
-        <span className="text-[11px] text-white/45 tracking-wide">
-          {cardTitle ? `${cardTitle} ` : ""}하이라이트 클립
-        </span>
-        <span
-          className="ml-auto text-[9px] px-2 py-0.5 rounded-full"
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            color: "rgba(255,255,255,0.25)",
-            border: "0.5px solid rgba(255,255,255,0.08)",
-          }}
-        >
-          {clips.length}개
-        </span>
-      </div>
-
-      {/* 메인 플레이어 — flex-1로 남은 공간 채움 */}
-      <div className="flex-1 min-h-0 px-4 pt-4 pb-3">
-        <div
-          className="relative w-full h-full rounded-2xl overflow-hidden"
-          style={{
-            background: "rgba(0,0,0,0.35)",
-            border: "0.5px solid rgba(255,255,255,0.08)",
-          }}
+    <div className="flex flex-col w-full h-full">
+      {/* 메인 플레이어 */}
+      <div className="flex-1 min-h-0">
+        <div className="relative w-full h-full rounded-2xl overflow-hidden"
+          style={{ background: "rgba(0,0,0,0.28)", border: "0.5px solid rgba(255,255,255,0.07)" }}
         >
           <AnimatePresence mode="wait">
-            {activeClip.src ? (
+            {displayed.src ? (
               <motion.video
-                key={activeClip.id}
+                key={displayed.id}
                 ref={mainVideoRef}
-                src={activeClip.src}
+                src={displayed.src}
                 className="w-full h-full object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.25 }}
                 loop muted playsInline autoPlay
               />
             ) : (
               <motion.div
-                key={`ph-${activeClip.id}`}
-                className="w-full h-full flex flex-col items-center justify-center gap-3"
+                key={`ph-${displayed.id}`}
+                className="w-full h-full flex flex-col items-center justify-center gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                  style={{
-                    background: "rgba(255,255,255,0.07)",
-                    border: "0.5px solid rgba(255,255,255,0.13)",
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)" stroke="none">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                </div>
-                <p className="text-[11px] text-white/35">{activeClip.label}</p>
-                <p className="text-[10px] text-white/20 tabular-nums">{activeClip.timestamp}</p>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.25)" stroke="none">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                <p className="text-[9px] text-white/25 tabular-nums">{displayed.timestamp}</p>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* 라벨 오버레이 */}
+          <div className="absolute bottom-0 left-0 right-0 px-3 py-2"
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}
+          >
+            <p className="text-[10px] text-white/70 truncate">{displayed.label}</p>
+            <p className="text-[9px] text-white/35 tabular-nums">{displayed.timestamp}</p>
+          </div>
         </div>
       </div>
 
-      {/* 타임라인 섹션 */}
-      <div className="flex-shrink-0 px-5 pb-6">
-        <p className="text-[9px] text-white/45 mb-4 tracking-widest uppercase font-medium">
-          Timeline
-        </p>
-
-        {/* 라인 + 점 — overflow visible 유지 (팝업이 위로 뜨도록) */}
-        <div
-          className="relative w-full"
-          style={{ height: 20, overflow: "visible" }}
-        >
-          {/* ── 베이스 라인 ── */}
+      {/* 하단 썸네일 캐러셀 */}
+      <div className="flex-shrink-0 pt-2 relative">
+        {/* 오른쪽 더 있음 힌트 */}
+        {clips.length > 4 && (
           <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: 0,
-              right: 0,
-              height: 2,
-              marginTop: -1,
-              borderRadius: 999,
-              background: "rgba(255,255,255,0.22)",
-            }}
-          />
-
-          {/* ── 활성 구간 (보라) ── */}
-          <motion.div
-            animate={{ width: `${getPos(activeClip.timestamp)}%` }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: 0,
-              height: 2,
-              marginTop: -1,
-              borderRadius: 999,
-              background: "linear-gradient(to right, #7c6aff, #a78bfa)",
-            }}
-          />
-
-          {/* ── 마커 점 + 팝업 ── */}
+            className="absolute right-0 top-2 bottom-1 w-8 pointer-events-none z-10"
+            style={{ background: "linear-gradient(to right, transparent, rgba(0,0,0,0.7))" }}
+          >
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+              <div className="w-0.5 h-0.5 rounded-full bg-white/40" />
+              <div className="w-0.5 h-0.5 rounded-full bg-white/30" />
+              <div className="w-0.5 h-0.5 rounded-full bg-white/20" />
+            </div>
+          </div>
+        )}
+        <div
+          ref={carouselRef}
+          className="flex gap-1.5 overflow-x-auto pb-1 select-none"
+          style={{ scrollbarWidth: "none", cursor: "grab" }}
+          onMouseDown={onDragStart}
+          onMouseMove={onDragMove}
+          onMouseUp={onDragEnd}
+          onMouseLeave={onDragEnd}
+        >
           {clips.map((clip) => {
-            const pos = getPos(clip.timestamp);
-            const isActive = activeClip.id === clip.id;
-            const isHovered = hoveredId === clip.id;
-            const popupAlign = getPopupAlign(pos);
-
+            const isActive = activeClip?.id === clip.id;
             return (
-              <div
+              <motion.button
                 key={clip.id}
-                style={{
-                  position: "absolute",
-                  left: `${pos}%`,
-                  top: "50%",
-                  width: 28,
-                  height: 28,
-                  transform: "translate(-50%, -50%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  zIndex: isHovered ? 30 : 10,
-                }}
-                onMouseEnter={() => setHoveredId(clip.id)}
-                onMouseLeave={() => setHoveredId(null)}
                 onClick={() => handleSelect(clip)}
+                whileTap={{ scale: 0.95 }}
+                className="relative overflow-hidden flex-shrink-0"
+                style={{
+                  width: "calc(25% - 5px)",
+                  minWidth: "calc(25% - 5px)",
+                  aspectRatio: "16/10",
+                  borderRadius: 8,
+                  border: isActive
+                    ? "1.5px solid rgba(167,139,250,0.9)"
+                    : "0.5px solid rgba(255,255,255,0.12)",
+                  background: "rgba(0,0,0,0.3)",
+                  boxShadow: isActive ? "0 0 8px rgba(124,106,255,0.4)" : "none",
+                }}
               >
-                {/* 팝업 미리보기 — 점 위로 직접 떠오름 */}
-                <AnimatePresence>
-                  {isHovered && (
-                    <motion.div
-                      style={{
-                        position: "absolute",
-                        bottom: "calc(100% + 10px)",
-                        width: 140,
-                        zIndex: 50,
-                        ...popupAlign,
-                      }}
-                      initial={{ opacity: 0, y: 8, scale: 0.92 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 6, scale: 0.92 }}
-                      transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                {clip.thumbnail ? (
+                  <img src={clip.thumbnail} className="w-full h-full object-cover" alt="" />
+                ) : clip.src ? (
+                  <video src={clip.src} className="w-full h-full object-cover" muted playsInline />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <svg width="10" height="10" viewBox="0 0 24 24"
+                      fill={isActive ? "rgba(167,139,250,0.9)" : "rgba(255,255,255,0.2)"}
+                      stroke="none"
                     >
-                      <div
-                        className="rounded-xl overflow-hidden"
-                        style={{
-                          background: "rgba(10,10,22,0.94)",
-                          border: "0.5px solid rgba(255,255,255,0.18)",
-                          boxShadow: "0 10px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
-                        }}
-                      >
-                        {/* 영상/썸네일 */}
-                        <div style={{ aspectRatio: "16/9", overflow: "hidden", background: "rgba(30,30,50,0.8)" }}>
-                          {clip.src ? (
-                            <video src={clip.src} className="w-full h-full object-cover" muted playsInline autoPlay loop />
-                          ) : clip.thumbnail ? (
-                            <img src={clip.thumbnail} className="w-full h-full object-cover" alt="" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)" stroke="none">
-                                <polygon points="5 3 19 12 5 21 5 3" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        {/* 정보 */}
-                        <div
-                          className="flex items-center justify-between gap-2 px-2.5 py-2"
-                          style={{ borderTop: "0.5px solid rgba(255,255,255,0.07)" }}
-                        >
-                          <span className="text-[9px] font-semibold text-white/85 tabular-nums">
-                            {clip.timestamp}
-                          </span>
-                          <span className="text-[8px] text-white/35 truncate max-w-[72px]">
-                            {clip.label}
-                          </span>
-                        </div>
-                      </div>
-                      {/* 화살표 */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: -5,
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          width: 0, height: 0,
-                          borderLeft: "5px solid transparent",
-                          borderRight: "5px solid transparent",
-                          borderTop: "5px solid rgba(10,10,22,0.94)",
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* 점 */}
-                <motion.div
-                  animate={{
-                    width: isActive ? 13 : isHovered ? 11 : 8,
-                    height: isActive ? 13 : isHovered ? 11 : 8,
-                    background: isActive
-                      ? "#a78bfa"
-                      : isHovered
-                        ? "#fff"
-                        : "rgba(255,255,255,0.55)",
-                    boxShadow: isActive
-                      ? "0 0 0 3px rgba(167,139,250,0.3), 0 0 14px rgba(124,106,255,0.6)"
-                      : isHovered
-                        ? "0 0 0 2px rgba(255,255,255,0.2)"
-                        : "none",
-                  }}
-                  transition={{ duration: 0.15 }}
-                  style={{ borderRadius: 999 }}
-                />
-              </div>
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                  </div>
+                )}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5"
+                    style={{ background: "linear-gradient(to right, #7c6aff, #a78bfa)" }}
+                  />
+                )}
+              </motion.button>
             );
           })}
-        </div>
-
-        {/* 시작 / 끝 라벨 */}
-        <div className="flex justify-between mt-3">
-          <span className="text-[9px] text-white/30 tabular-nums">0:00</span>
-          <span className="text-[9px] text-white/30 tabular-nums">
-            {clips[clips.length - 1]?.timestamp}
-          </span>
         </div>
       </div>
     </div>

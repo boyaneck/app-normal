@@ -10,6 +10,12 @@ export const insertLiveStats = async ({
   intoChatRate,
   category,
   durationMin,
+  fund = 0,
+  donationCount = 0,
+  donationUniqueUsers = 0,
+  avgViewer = 0,
+  viewerTimeseries = [],
+  donationTimeseries = [],
 }) => {
   try {
     const { data, error } = await supabase.from("live_stats").insert([
@@ -23,6 +29,12 @@ export const insertLiveStats = async ({
         into_chat_rate: parseFloat(intoChatRate ?? 0),
         category: category,
         duration_min: durationMin,
+        fund,
+        avg_viewer: avgViewer,
+        donation_count: donationCount,
+        donation_unique_users: donationUniqueUsers,
+        viewer_timeseries: viewerTimeseries,
+        donation_timeseries: donationTimeseries,
       },
     ]);
 
