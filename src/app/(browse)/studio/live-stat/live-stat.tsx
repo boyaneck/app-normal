@@ -277,7 +277,7 @@ const LiveStats = ({
           >
             {/* ===== 왼쪽: 클립 패널 (35%) ===== */}
             <div className="h-full flex-shrink-0" style={{ width: "35%" }}>
-              <ClipPanel cardTitle={selectedField?.title} />
+              <ClipPanel cardTitle={selectedField?.title} roomName={roomName} />
             </div>
 
             {/* ===== 오른쪽: AI 채팅 (나머지 전부) ===== */}

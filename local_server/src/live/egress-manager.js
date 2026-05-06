@@ -21,13 +21,24 @@ export const startRecording = async (roomName) => {
   const timestamp = Date.now();
   const fileName = `recordings/${roomName}/${timestamp}.mp4`;
 
+  console.log("[Egress] EncodedFileType.MP4:", EncodedFileType.MP4);
+  console.log("[Egress] EncodingOptionsPreset:", EncodingOptionsPreset.H264_720P_30);
+  console.log("[Egress] S3 config:", {
+    accessKey: process.env.SUPABASE_S3_ACCESS_KEY ? "SET" : "MISSING",
+    secret: process.env.SUPABASE_S3_SECRET_KEY ? "SET" : "MISSING",
+    region: process.env.SUPABASE_S3_REGION,
+    endpoint: process.env.SUPABASE_S3_ENDPOINT,
+    bucket: process.env.SUPABASE_S3_BUCKET,
+  });
+
   const egressInfo = await egressClient.startRoomCompositeEgress(
     roomName,
     {
-      file: {
-        fileType: EncodedFileType.MP4,
-        fileName: fileName,
-        s3: {
+      fileType: EncodedFileType.MP4,
+      filepath: fileName,
+      output: {
+        case: "s3",
+        value: {
           accessKey: process.env.SUPABASE_S3_ACCESS_KEY,
           secret: process.env.SUPABASE_S3_SECRET_KEY,
           region: process.env.SUPABASE_S3_REGION || "ap-southeast-1",
@@ -38,13 +49,11 @@ export const startRecording = async (roomName) => {
       },
     },
     {
-      preset: EncodingOptionsPreset.H264_720P_30,
+      encodingOptions: EncodingOptionsPreset.H264_720P_30,
     },
   );
 
-  console.log(
-    `🎥녹화 시작: ${roomName} → ${fileName} (egressId:${egressInfo.egressId})`,
-  );
+  console.log(`[Egress] 녹화 시작: ${roomName} → ${fileName} (${egressInfo.egressId})`);
 
   return {
     egressId: egressInfo.egressId,

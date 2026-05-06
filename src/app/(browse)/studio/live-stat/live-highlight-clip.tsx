@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { getHighlights } from "@/api/live";
 
 export interface Clip {
   id: string;
@@ -11,25 +13,25 @@ export interface Clip {
   thumbnail?: string;
 }
 
-const MOCK_CLIPS: Clip[] = [
-  { id: "1", label: "하이라이트 1", timestamp: "14:32", duration: "1:00" },
-  { id: "2", label: "하이라이트 2", timestamp: "28:15", duration: "1:00" },
-  { id: "3", label: "하이라이트 3", timestamp: "45:08", duration: "1:00" },
-  { id: "4", label: "하이라이트 4", timestamp: "1:02:44", duration: "1:00" },
-];
-
 interface Props {
   cardTitle?: string;
-  clips?: Clip[];
+  roomName?: string;
 }
 
-export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
-  const [activeClip, setActiveClip] = useState<Clip | null>(null);
+export const LiveHighlightClip = ({ cardTitle, roomName }: Props) => {
+  const [activeClip, setActiveClip] = useState<any | null>(null);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const dragScrollLeft = useRef(0);
+
+  const { data: highlights = [], isLoading } = useQuery({
+    queryKey: ["highlights", roomName],
+    queryFn: () => getHighlights(roomName),
+    enabled: !!roomName,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const onDragStart = (e: React.MouseEvent) => {
     isDragging.current = true;
@@ -51,15 +53,46 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
     if (carouselRef.current) carouselRef.current.style.cursor = "grab";
   };
 
-  const handleSelect = (clip: Clip) => {
-    setActiveClip((prev) => (prev?.id === clip.id ? null : clip));
-    if (mainVideoRef.current && clip.src) {
-      mainVideoRef.current.src = clip.src;
+  const handleSelect = (clip: any) => {
+    setActiveClip((prev: any) => (prev?.id === clip.id ? null : clip));
+    if (mainVideoRef.current && clip.public_url) {
+      mainVideoRef.current.src = clip.public_url;
       mainVideoRef.current.play().catch(() => {});
     }
   };
 
-  const displayed = activeClip ?? clips[0];
+  const displayed = activeClip ?? highlights[0];
+
+  const formatTimestamp = (ts: string) => {
+    if (!ts) return "";
+    const date = new Date(ts);
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col w-full h-full items-center justify-center">
+        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+      </div>
+    );
+  }
+
+  if (highlights.length === 0) {
+    return (
+      <div
+        className="flex flex-col w-full h-full items-center justify-center gap-2 rounded-2xl"
+        style={{
+          background: "rgba(0,0,0,0.25)",
+          border: "0.5px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5">
+          <polygon points="5 3 19 12 5 21 5 3" />
+        </svg>
+        <p className="text-[10px] text-white/50">방송 종료 후 하이라이트가 생성됩니다</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -69,11 +102,11 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
           style={{ background: "rgba(0,0,0,0.28)", border: "0.5px solid rgba(255,255,255,0.07)" }}
         >
           <AnimatePresence mode="wait">
-            {displayed.src ? (
+            {displayed?.public_url ? (
               <motion.video
                 key={displayed.id}
                 ref={mainVideoRef}
-                src={displayed.src}
+                src={displayed.public_url}
                 className="w-full h-full object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -83,7 +116,7 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
               />
             ) : (
               <motion.div
-                key={`ph-${displayed.id}`}
+                key={`ph-${displayed?.id}`}
                 className="w-full h-full flex flex-col items-center justify-center gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -92,25 +125,30 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.25)" stroke="none">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
-                <p className="text-[9px] text-white/25 tabular-nums">{displayed.timestamp}</p>
+                <p className="text-[9px] text-white/25 tabular-nums">
+                  {formatTimestamp(displayed?.highlight_started_at)}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* 라벨 오버레이 */}
-          <div className="absolute bottom-0 left-0 right-0 px-3 py-2"
-            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}
-          >
-            <p className="text-[10px] text-white/70 truncate">{displayed.label}</p>
-            <p className="text-[9px] text-white/35 tabular-nums">{displayed.timestamp}</p>
-          </div>
+          {displayed && (
+            <div className="absolute bottom-0 left-0 right-0 px-3 py-2"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }}
+            >
+              <p className="text-[10px] text-white/70 truncate">{displayed.type}</p>
+              <p className="text-[9px] text-white/35 tabular-nums">
+                {formatTimestamp(displayed.highlight_started_at)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 하단 썸네일 캐러셀 */}
       <div className="flex-shrink-0 pt-2 relative">
-        {/* 오른쪽 더 있음 힌트 */}
-        {clips.length > 4 && (
+        {highlights.length > 4 && (
           <div
             className="absolute right-0 top-2 bottom-1 w-8 pointer-events-none z-10"
             style={{ background: "linear-gradient(to right, transparent, rgba(0,0,0,0.7))" }}
@@ -131,7 +169,7 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
           onMouseUp={onDragEnd}
           onMouseLeave={onDragEnd}
         >
-          {clips.map((clip) => {
+          {highlights.map((clip: any) => {
             const isActive = activeClip?.id === clip.id;
             return (
               <motion.button
@@ -151,10 +189,8 @@ export const LiveHighlightClip = ({ cardTitle, clips = MOCK_CLIPS }: Props) => {
                   boxShadow: isActive ? "0 0 8px rgba(124,106,255,0.4)" : "none",
                 }}
               >
-                {clip.thumbnail ? (
-                  <img src={clip.thumbnail} className="w-full h-full object-cover" alt="" />
-                ) : clip.src ? (
-                  <video src={clip.src} className="w-full h-full object-cover" muted playsInline />
+                {clip.public_url ? (
+                  <video src={clip.public_url} className="w-full h-full object-cover" muted playsInline />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <svg width="10" height="10" viewBox="0 0 24 24"

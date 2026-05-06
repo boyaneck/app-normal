@@ -1,8 +1,8 @@
 import { redis_client } from "../config/redis.js";
 import { getRedisKeys } from "./redis-keys.js";
 
-const SPIKE_THRESHOLD = 0.3; // 30% 변화율 기준
-const MIN_DATA_POINTS = 2; // 최소 2포인트(=10분) 이후 감지 시작
+const SPIKE_THRESHOLD = 0.3; // 30% 변화율 임계값
+const MIN_DATA_POINTS = 2; // 최소 2개 데이터 포인트 필요 (10분 이상 방송)
 const SPIKE_COOLDOWN_MS = 5 * 60 * 1000; // 동일 타입 스파이크 5분 내 중복 방지
 
 /**

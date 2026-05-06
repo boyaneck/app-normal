@@ -5,11 +5,14 @@ import { unlinkSync, mkdirSync, existsSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import ffmpeg from "fluent-ffmpeg";
+import ffmpegStatic from "ffmpeg-static";
 
-// 서비스 키가 필요한 스토리지 작업용 (Storage RLS 우회)
-const supabase = createClient(
+ffmpeg.setFfmpegPath(ffmpegStatic);
+
+// 모듈 로드 시점이 아닌 함수 호출 시점에 생성 → env 로드 보장
+const getSupabaseAdmin = () => createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  process.env.SUPABASE_ANON_KEY,
 );
 
 const BUCKET = process.env.SUPABASE_S3_BUCKET || "recordings";
@@ -25,7 +28,7 @@ const CLIP_DURATION = CLIP_BEFORE_SEC + CLIP_AFTER_SEC; // 60초
  * @returns {string} 로컬 임시 파일 경로
  */
 const downloadLive = async (filePath) => {
-  const { data, error } = await supabase.storage
+  const { data, error } = await getSupabaseAdmin().storage
     .from(BUCKET)
     .download(filePath);
 
@@ -77,7 +80,7 @@ const uploadClip = async (localPath, storagePath) => {
   const { readFileSync } = await import("fs");
   const fileBuffer = readFileSync(localPath);
 
-  const { error } = await supabase.storage
+  const { error } = await getSupabaseAdmin().storage
     .from(CLIP_BUCKET)
     .upload(storagePath, fileBuffer, {
       contentType: "video/mp4",
@@ -87,7 +90,7 @@ const uploadClip = async (localPath, storagePath) => {
   if (error)
     throw new Error(`HighlightClip 추출 클립 업로드 실패: ${error.message}`);
 
-  const { data } = supabase.storage
+  const { data } = getSupabaseAdmin().storage
     .from(CLIP_BUCKET)
     .getPublicUrl(storagePath);
   return data.publicUrl;
@@ -97,7 +100,7 @@ const uploadClip = async (localPath, storagePath) => {
  * 클립 메타데이터를 Supabase DB clips 테이블에 저장
  */
 const saveClipToDB = async (roomName, clip) => {
-  const { error } = await supabase.from("highlights").insert({
+  const { error } = await getSupabaseAdmin().from("highlights").insert({
     room_name: roomName,
     type: clip.type,
     public_url: clip.publicUrl,
@@ -207,7 +210,7 @@ export const runClipPipeline = async (
     );
 
     // 4. 원본 녹화 삭제 (Storage 용량 절약)
-    const { error: delErr } = await supabase.storage
+    const { error: delErr } = await getSupabaseAdmin().storage
       .from(BUCKET)
       .remove([highlightClipPath]);
 
