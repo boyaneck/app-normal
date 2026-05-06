@@ -132,6 +132,21 @@ export const insertAndUpdateLiveInfo = async ({
   }
 };
 
+export const getHighlights = async (roomName: string | undefined) => {
+  if (!roomName) return [];
+  const { data, error } = await supabaseForClient
+    .from("highlights")
+    .select("id, type, public_url, highlight_started_at")
+    .eq("room_name", roomName)
+    .order("highlight_started_at", { ascending: true });
+
+  if (error) {
+    console.error("하이라이트 로드 오류:", error.message);
+    return [];
+  }
+  return data ?? [];
+};
+
 export const getLiveListNow = async () => {
   try {
     const viewers_top7 = await axios.get(

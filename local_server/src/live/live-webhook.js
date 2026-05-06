@@ -73,15 +73,17 @@ export const liveWebhook = async (req, res) => {
         // 5분마다 시계열 데이터 저장
         startTimeseriesRecording(roomName);
 
-        // Egress 녹화 시작 (실패해도 방송 진행)
+        // Egress 녹화 시작 — 방이 완전히 준비될 때까지 3초 대기
+        await new Promise((r) => setTimeout(r, 3000));
         try {
-          const { egressId, fileName } = await startRecording(roomName);
+          const { egressId, filePath } = await startRecording(roomName);
           await redis_client.hSet(keys.EGRESS, {
             egressId,
-            fileName,
+            filePath,
           });
         } catch (egressErr) {
           console.error("[Egress] 녹화 시작 실패 (방송은 정상 진행):", egressErr.message);
+          console.error("[Egress] 에러 상세:", JSON.stringify(egressErr, null, 2));
         }
 
         break;
@@ -176,7 +178,7 @@ export const liveWebhook = async (req, res) => {
 
         // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
         const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
-        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "fileName");
+        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "filePath");
         const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
 
         if (egressId) {
