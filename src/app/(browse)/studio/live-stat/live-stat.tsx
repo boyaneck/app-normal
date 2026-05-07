@@ -265,7 +265,7 @@ const LiveStats = ({
     <div className="space-y-4 p-6">
       <AnimatePresence mode="wait">
         {selectedCardIndex !== null ? (
-          /* ===== AI 채팅 뷰 (클립 30% / 채팅 flex-1) ===== */
+          /* ===== AI 채팅 뷰 (클립 35% / 채팅 flex-1) ===== */
           <motion.div
             key="chat"
             initial={{ opacity: 0, y: 12 }}
@@ -273,7 +273,7 @@ const LiveStats = ({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-row gap-2"
-            style={{ height: "calc(100vh - 310px)", marginLeft: 150 }}
+            style={{ height: "calc(100vh - 310px)", marginLeft: 80 }}
           >
             {/* ===== 왼쪽: 클립 패널 (35%) ===== */}
             <div className="h-full flex-shrink-0" style={{ width: "35%" }}>
@@ -292,42 +292,13 @@ const LiveStats = ({
                   "0 8px 40px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.95)",
               }}
             >
-              {/* 헤더 */}
+              {/* 상단: AI 분석 요약 (헤더 대체) */}
               <div
-                className="flex-shrink-0 flex items-center gap-3 px-5 py-4"
+                className="flex-shrink-0 px-4 pt-4 pb-3"
                 style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}
               >
-                <button
-                  onClick={() => onCardSelect(null, [])}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors hover:bg-black/5"
-                  style={{ color: "rgba(0,0,0,0.3)" }}
-                >
-                  ←
-                </button>
-                <div className="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden">
-                  <img
-                    src="/images/AI_assistant.jpg"
-                    alt="AI"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-[11px] text-black/35 tracking-wide">
-                    {selectedField?.title} 분석
-                  </p>
-                  <p className="text-[15px] font-semibold text-black/80 leading-tight tabular-nums">
-                    {selectedValue.toLocaleString()}
-                    <span className="text-[11px] font-normal text-black/30 ml-1">
-                      {selectedField?.unit}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              {/* AI 요약 분석 박스 */}
-              <div className="flex-shrink-0 px-4 pt-3 pb-1">
                 <div
-                  className="rounded-xl px-4 py-3 text-center"
+                  className="rounded-xl px-4 py-3"
                   style={{
                     background: "rgba(255,255,255,0.55)",
                     backdropFilter: "blur(20px)",
@@ -340,7 +311,7 @@ const LiveStats = ({
                     className="text-[10px] font-semibold tracking-wide block mb-1.5"
                     style={{ color: "rgba(80,160,220,0.8)" }}
                   >
-                    AI 분석 요약
+                    AI 분석 요약 · {selectedField?.title}
                   </span>
                   <p className="text-[11px] leading-relaxed" style={{ color: "rgba(0,0,0,0.55)" }}>
                     {`이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`}
@@ -375,10 +346,15 @@ const LiveStats = ({
                       transition={{ type: "spring", stiffness: 380, damping: 28 }}
                       className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                     >
-                      {/* AI 아바타 */}
+                      {/* AI 아바타 — Gemini 아이콘 */}
                       {msg.role === "ai" && (
-                        <div className="w-7 h-7 rounded-lg flex-shrink-0 overflow-hidden mb-0.5">
-                          <img src="/images/AI_assistant.jpg" alt="AI" className="w-full h-full object-cover" />
+                        <div
+                          className="w-7 h-7 rounded-lg flex-shrink-0 mb-0.5 flex items-center justify-center"
+                          style={{ background: "linear-gradient(135deg, #4285F4, #1a56c4)" }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="white"/>
+                          </svg>
                         </div>
                       )}
                       {/* 말풍선 */}
@@ -415,8 +391,13 @@ const LiveStats = ({
                       exit={{ opacity: 0, y: 4 }}
                       className="flex items-end gap-2"
                     >
-                      <div className="w-7 h-7 rounded-lg flex-shrink-0 overflow-hidden mb-0.5">
-                        <img src="/images/AI_assistant.jpg" alt="AI" className="w-full h-full object-cover" />
+                      <div
+                        className="w-7 h-7 rounded-lg flex-shrink-0 mb-0.5 flex items-center justify-center"
+                        style={{ background: "linear-gradient(135deg, #4285F4, #1a56c4)" }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="white"/>
+                        </svg>
                       </div>
                       <div
                         className="px-4 py-2.5 flex gap-1 items-center"
@@ -507,20 +488,10 @@ const LiveStats = ({
             <div className="flex flex-row gap-3">
               {STAT_FIELDS.map((field, index) => {
                 const rawValue = currentData?.[field.key];
-                const numericValue =
-                  rawValue != null
-                    ? field.toNumber(rawValue as string | number)
-                    : 0;
-                const todayVal = latestData
-                  ? field.toNumber(latestData[field.key] as string | number)
-                  : null;
-                const prevVal = prevData
-                  ? field.toNumber(prevData[field.key] as string | number)
-                  : null;
-                const delta =
-                  todayVal !== null && prevVal !== null
-                    ? todayVal - prevVal
-                    : undefined;
+                const numericValue = rawValue != null ? field.toNumber(rawValue as string | number) : 0;
+                const todayVal = latestData ? field.toNumber(latestData[field.key] as string | number) : null;
+                const prevVal = prevData ? field.toNumber(prevData[field.key] as string | number) : null;
+                const delta = todayVal !== null && prevVal !== null ? todayVal - prevVal : undefined;
                 return (
                   <StatCard
                     key={field.key}
@@ -530,9 +501,7 @@ const LiveStats = ({
                     delta={delta}
                     isChartHovered={hoveredChartIndex !== null}
                     index={index}
-                    onHover={(hovered) =>
-                      setHoveredCardIndex(hovered ? index : null)
-                    }
+                    onHover={(hovered) => setHoveredCardIndex(hovered ? index : null)}
                     onClick={() => handleCardClick(index)}
                   />
                 );

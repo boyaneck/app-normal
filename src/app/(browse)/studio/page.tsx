@@ -136,20 +136,34 @@ const StudioPage = () => {
     <div className="flex h-full">
       {/* ===== 스튜디오 탭 사이드바 ===== */}
       <div
-        className="flex-shrink-0 flex flex-col"
-        style={{ width: 100, paddingTop: 80, marginLeft: 60 }}
+        className="flex-shrink-0 flex flex-col items-center"
+        style={{
+          width: 100,
+          paddingTop: selectedCardIndex !== null ? 24 : 80,
+          marginLeft: 60,
+        }}
       >
-        {/* 아이콘 묶음 — 타원형 컨테이너 */}
+        {/* AI 채팅 모드: 뒤로가기 버튼 — 패널 상단과 동일 높이 */}
+        {selectedCardIndex !== null && (
+          <button
+            onClick={() => handleCardSelect(null, [])}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 flex-shrink-0"
+            style={{
+              background: "rgba(255,255,255,0.85)",
+              border: "1.5px solid rgba(255,255,255,0.9)",
+              color: "rgba(0,0,0,0.6)",
+              fontSize: 18,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+            }}
+          >
+            ←
+          </button>
+        )}
+
+        {/* 탭 아이콘들 — AI 모드: 뒤로가기 버튼으로부터 150px 아래 */}
         <div
-          className="flex flex-col items-center gap-5 px-3 py-6"
-          style={{
-            borderRadius: 60,
-            background: "rgba(255,255,255,0.07)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)",
-          }}
+          className="flex flex-col items-center gap-5"
+          style={{ marginTop: selectedCardIndex !== null ? 150 : 0 }}
         >
           {TABS.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -169,10 +183,10 @@ const StudioPage = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: isActive ? "rgba(124,106,255,0.3)" : "rgba(255,255,255,0.12)",
-                    border: isActive ? "1.5px solid rgba(124,106,255,0.7)" : "1.5px solid rgba(255,255,255,0.4)",
-                    boxShadow: isActive ? "0 0 20px rgba(124,106,255,0.35)" : "none",
-                    color: isActive ? "#a78bfa" : "#ffffff",
+                    background: isActive ? "rgba(124,106,255,0.3)" : "rgba(255,255,255,0.18)",
+                    border: isActive ? "1.5px solid rgba(124,106,255,0.7)" : "1.5px solid rgba(255,255,255,0.55)",
+                    boxShadow: isActive ? "0 0 20px rgba(124,106,255,0.35)" : "0 2px 8px rgba(0,0,0,0.12)",
+                    color: isActive ? "#a78bfa" : "rgba(255,255,255,0.9)",
                     transition: "all 0.2s",
                   }}
                 >
@@ -181,7 +195,7 @@ const StudioPage = () => {
                 <span style={{
                   fontSize: 10,
                   fontWeight: 500,
-                  color: isActive ? "#a78bfa" : "rgba(255,255,255,0.7)",
+                  color: isActive ? "#a78bfa" : "rgba(255,255,255,0.75)",
                   letterSpacing: "0.04em",
                 }}>
                   {tab.label}
@@ -203,8 +217,8 @@ const StudioPage = () => {
       <AnimatePresence>
         {miniCards.length > 0 && (
           <motion.div
-            className="fixed bottom-[84px] left-1/2 flex gap-2 z-40"
-            style={{ x: "-50%" }}
+            className="fixed bottom-[84px] flex gap-2 z-40"
+            style={{ x: "-50%", left: "calc(50% + 92px)" }}
             initial={{ opacity: 0, y: 16, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
