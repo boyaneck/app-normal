@@ -15,19 +15,19 @@ const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const STAT_FIELDS = [
   {
-    key: "avg_viewer" as const,
+    key: "avgViewer" as const,
     title: "평균 시청자",
     unit: "명",
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "peak_viewers" as const,
+    key: "peakViewers" as const,
     title: "최고 시청자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
   },
   {
-    key: "total_visitors" as const,
+    key: "totalVisitors" as const,
     title: "총 방문자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
@@ -39,7 +39,7 @@ const STAT_FIELDS = [
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "into_chat_rate" as const,
+    key: "intoChatRate" as const,
     title: "채팅 전환율",
     unit: "%",
     toNumber: (v: string | number) => parseFloat(String(v)) || 0,
@@ -153,24 +153,33 @@ const LiveStats = ({
 
   const liveStatsWeek: PostLiveStats[] | null = useMemo(() => {
     if (!rawStats) return null;
-    return rawStats.map((item: Record<string, any>) => ({
+    const mapped = rawStats.map((item: Record<string, any>) => ({
       roomName: item.room_name,
-      startedAt: item.started_at,
+      startedAt: item.started_at ?? null,
       dayLabel: item.started_at
         ? DAY_LABELS[new Date(item.started_at).getDay()]
         : "-",
-      totalVisitors: item.total_visitors,
-      avgViewer: item.avg_viewer,
-      peakViewers: item.peak_viewers,
-      fund: item.fund,
-      intoChatRate: item.into_chat_rate,
-      retentionRate: item.retention_rate,
+      totalVisitors: Number(item.total_visitors) || 0,
+      avgViewer: Number(item.avg_viewer) || 0,
+      peakViewers: Number(item.peak_viewers) || 0,
+      fund: Number(item.fund) || 0,
+      intoChatRate: parseFloat(item.into_chat_rate) || 0,
+      retentionRate: Number(item.retention_rate) || 0,
     }));
+    // 최신 날짜가 index 0 이 되도록 보장 (API 정렬이 신뢰되지 않을 때 방어)
+    mapped.sort((a, b) => {
+      if (!a.startedAt || !b.startedAt) return 0;
+      return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
+    });
+    return mapped;
   }, [rawStats]);
 
   const currentData = useMemo(() => {
     if (!liveStatsWeek?.length) return null;
-    return liveStatsWeek[hoveredChartIndex ?? 0] ?? liveStatsWeek[0];
+    if (hoveredChartIndex === null) return liveStatsWeek[0];
+    // WeeklyChart는 reversed(오래된→최신 순)이므로 인덱스를 역변환
+    const reversedIndex = liveStatsWeek.length - 1 - hoveredChartIndex;
+    return liveStatsWeek[reversedIndex] ?? liveStatsWeek[0];
   }, [liveStatsWeek, hoveredChartIndex]);
 
   const highlightedKey = useMemo(() => {
@@ -350,10 +359,17 @@ const LiveStats = ({
                       {msg.role === "ai" && (
                         <div
                           className="w-7 h-7 rounded-lg flex-shrink-0 mb-0.5 flex items-center justify-center"
-                          style={{ background: "linear-gradient(135deg, #4285F4, #1a56c4)" }}
+                          style={{
+                            background: "white",
+                            boxShadow: "0 1px 6px rgba(14,165,233,0.2)",
+                            border: "0.5px solid rgba(56,189,248,0.2)",
+                          }}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="white"/>
+                            {/* AI 스파클 (4포인트) */}
+                            <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="#38bdf8"/>
+                            {/* LIVE 도트 */}
+                            <circle cx="19.5" cy="4.5" r="2.2" fill="#0ea5e9"/>
                           </svg>
                         </div>
                       )}
@@ -523,13 +539,16 @@ const LiveStats = ({
               </div>
             </div>
 
-            {/* 시청자 유지율 (항상 최신 방송 기준, 2/3 너비) */}
+            {/* 시청자 유지율 — WeeklyChart와 동일한 flex 구조로 width 일치 */}
             {latestData && (
-              <div className="w-2/3">
-                <RetentionRate
-                  totalVisitors={latestData.totalVisitors}
-                  retentionRate={latestData.retentionRate}
-                />
+              <div className="flex flex-row gap-4">
+                <div className="w-2/3">
+                  <RetentionRate
+                    totalVisitors={latestData.totalVisitors}
+                    retentionRate={latestData.retentionRate}
+                  />
+                </div>
+                <div className="w-1/3" />
               </div>
             )}
             <AICard />

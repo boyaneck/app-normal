@@ -132,6 +132,29 @@ export const insertAndUpdateLiveInfo = async ({
   }
 };
 
+export const getTopSupporters = async () => {
+  const { data, error } = await supabaseForClient
+    .from("payments")
+    .select("user_nickname, amount");
+
+  if (error) throw new Error(error.message);
+  if (!data || data.length === 0) return [];
+
+  // amount가 text 타입이라 직접 집계
+  const map = new Map<string, { amount: number; count: number }>();
+  for (const row of data) {
+    const amt = parseInt(row.amount ?? "0", 10) || 0;
+    const nick = row.user_nickname ?? "익명";
+    const prev = map.get(nick) ?? { amount: 0, count: 0 };
+    map.set(nick, { amount: prev.amount + amt, count: prev.count + 1 });
+  }
+
+  return Array.from(map.entries())
+    .map(([nickname, { amount, count }]) => ({ nickname, amount, count }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+};
+
 export const getHighlights = async (roomName: string | undefined) => {
   if (!roomName) return [];
   const { data, error } = await supabaseForClient
