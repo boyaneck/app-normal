@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getTopSupporters } from "@/api/live";
 
 interface Supporter {
   nickname: string;
@@ -20,160 +22,143 @@ const MOCK_SUPPORTERS: Supporter[] = [
   { nickname: "게임마스터99", amount: 8000, count: 2 },
 ];
 
+// 1등: 골드, 2~5등: 스카이블루
+const getColor = (i: number) => {
+  if (i === 0) return {
+    bg: "linear-gradient(135deg, rgba(255,179,0,0.12) 0%, rgba(255,120,60,0.08) 100%)",
+    border: "0.5px solid rgba(255,160,40,0.28)",
+    dot: "linear-gradient(135deg, #FFB300, #FF5722)",
+    dotGlow: "0 0 6px rgba(255,160,40,0.5)",
+    bar: "linear-gradient(90deg, #FFB300, #FF7043)",
+    badge: { bg: "rgba(255,150,30,0.12)", color: "rgba(200,100,10,0.8)", text: "1st" },
+  };
+  return {
+    bg: "rgba(56,189,248,0.07)",
+    border: "0.5px solid rgba(56,189,248,0.22)",
+    dot: "linear-gradient(135deg, #38bdf8, #0ea5e9)",
+    dotGlow: "0 0 6px rgba(56,189,248,0.45)",
+    bar: "linear-gradient(90deg, #38bdf8, #0ea5e9)",
+    badge: null,
+  };
+};
+
+const RANKS = ["1st", "2nd", "3rd", "4th", "5th"];
+
 const TopSupporters = ({
-  supporters = MOCK_SUPPORTERS,
+  supporters: propSupporters,
 }: TopSupportersProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const { data: fetchedSupporters } = useQuery({
+    queryKey: ["topSupporters"],
+    queryFn: getTopSupporters,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const supporters = fetchedSupporters?.length
+    ? fetchedSupporters
+    : propSupporters ?? MOCK_SUPPORTERS;
+
   const maxAmount = supporters[0]?.amount ?? 1;
 
   return (
     <div
-      className="w-full rounded-[22px] p-5 flex flex-col h-full"
+      className="w-full rounded-[22px] px-4 py-4 flex flex-col h-full overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.72)",
         backdropFilter: "blur(28px)",
         WebkitBackdropFilter: "blur(28px)",
         border: "0.5px solid rgba(0,0,0,0.08)",
-        boxShadow:
-          "0 2px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
+        boxShadow: "0 2px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
       }}
     >
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <h3
-          className="text-[13px] font-medium tracking-tight"
-          style={{ color: "rgba(0,0,0,0.82)" }}
-        >
+      <div className="flex items-center justify-between mb-3 flex-shrink-0">
+        <h3 className="text-[13px] font-medium tracking-tight" style={{ color: "rgba(0,0,0,0.82)" }}>
           Top Supporters
         </h3>
         <span
           className="text-[10px] rounded-full px-2.5 py-0.5"
-          style={{
-            color: "rgba(0,0,0,0.3)",
-            background: "rgba(0,0,0,0.04)",
-            border: "0.5px solid rgba(0,0,0,0.07)",
-          }}
+          style={{ color: "rgba(0,0,0,0.3)", background: "rgba(0,0,0,0.04)", border: "0.5px solid rgba(0,0,0,0.07)" }}
         >
           이번 방송
         </span>
       </div>
 
-      {/* 리스트 — flex-1로 남은 높이 전부 채움 */}
-      <div className="flex flex-col flex-1 gap-0.5">
+      {/* 리스트 */}
+      <div className="flex flex-col flex-1 gap-1 min-h-0">
         {supporters.map((s, i) => {
           const pct = Math.round((s.amount / maxAmount) * 100);
-          const isTop = i === 0;
-          const isTopHovered = isTop && hoveredIndex === i;
+          const isHovered = hoveredIndex === i;
+          const c = getColor(i);
 
           return (
             <div
               key={s.nickname}
-              className="flex items-center gap-2.5 cursor-default transition-all duration-200 flex-1"
-              style={
-                isTopHovered
-                  ? {
-                      padding: "10px 11px",
-                      borderRadius: "14px",
-                      background:
-                        "linear-gradient(135deg, rgba(255,179,0,0.13) 0%, rgba(255,120,60,0.09) 100%)",
-                      border: "0.5px solid rgba(255,160,40,0.3)",
-                      boxShadow: "inset 0 1px 0 rgba(255,220,120,0.3)",
-                    }
-                  : {
-                      padding: "8px 11px",
-                      borderRadius: "12px",
-                      border: "0.5px solid transparent",
-                    }
-              }
+              className="flex items-center gap-2 cursor-default transition-all duration-200 flex-1 min-h-0 overflow-hidden"
+              style={{
+                padding: "6px 8px",
+                borderRadius: 12,
+                background: isHovered ? c.bg : "transparent",
+                border: isHovered ? c.border : "0.5px solid transparent",
+              }}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* 도트 */}
+              {/* 순위 도트 */}
               <div
                 className="shrink-0 transition-all duration-200"
                 style={{
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  background: isTopHovered
-                    ? "linear-gradient(135deg, #FFB300, #FF5722)"
-                    : "rgba(0,0,0,0.15)",
-                  boxShadow: isTopHovered
-                    ? "0 0 6px rgba(255,160,40,0.5)"
-                    : "none",
+                  background: isHovered ? c.dot : "rgba(0,0,0,0.15)",
+                  boxShadow: isHovered ? c.dotGlow : "none",
                 }}
               />
 
               {/* 콘텐츠 */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 {/* 닉네임 + 금액 */}
-                <div className="flex items-baseline justify-between mb-1.5">
+                <div className="flex items-baseline justify-between gap-1 mb-1">
                   <span
-                    className="truncate max-w-[140px] transition-all duration-200"
-                    style={{
-                      fontSize: 13,
-                      fontWeight: isTopHovered ? 500 : 400,
-                      color: "rgba(0,0,0,0.82)",
-                    }}
+                    className="truncate text-[12px] transition-all duration-200 min-w-0"
+                    style={{ fontWeight: isHovered ? 500 : 400, color: "rgba(0,0,0,0.82)" }}
                   >
                     {s.nickname}
                   </span>
                   <span
-                    className="shrink-0 ml-2 tabular-nums transition-all duration-200"
-                    style={{
-                      fontSize: 13,
-                      fontWeight: isTopHovered ? 500 : 400,
-                      color: "rgba(0,0,0,0.82)",
-                      letterSpacing: "-0.01em",
-                    }}
+                    className="shrink-0 tabular-nums text-[12px] transition-all duration-200"
+                    style={{ fontWeight: isHovered ? 500 : 400, color: "rgba(0,0,0,0.75)", letterSpacing: "-0.01em" }}
                   >
                     {s.amount.toLocaleString()}
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 400,
-                        color: "rgba(0,0,0,0.25)",
-                        marginLeft: 1,
-                      }}
-                    >
-                      원
-                    </span>
+                    <span style={{ fontSize: 9, fontWeight: 400, color: "rgba(0,0,0,0.25)", marginLeft: 1 }}>원</span>
                   </span>
                 </div>
 
                 {/* 프로그레스 바 */}
-                <div
-                  className="rounded-full"
-                  style={{ height: 2, background: "rgba(0,0,0,0.05)" }}
-                >
+                <div className="rounded-full mb-1" style={{ height: 2, background: "rgba(0,0,0,0.05)" }}>
                   <div
-                    className="h-full rounded-full transition-all duration-200"
-                    style={{
-                      width: `${pct}%`,
-                      background: isTopHovered
-                        ? "linear-gradient(90deg, #FFB300, #FF7043)"
-                        : "rgba(0,0,0,0.12)",
-                    }}
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{ width: `${pct}%`, background: isHovered ? c.bar : "rgba(0,0,0,0.1)" }}
                   />
                 </div>
 
-                {/* 후원 횟수 + 1st 배지 */}
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span style={{ fontSize: 10, color: "rgba(0,0,0,0.25)" }}>
-                    {s.count}회 후원
-                  </span>
-                  {isTopHovered && (
+                {/* 후원 횟수 + 배지 */}
+                <div className="flex items-center gap-1.5">
+                  <span style={{ fontSize: 10, color: "rgba(0,0,0,0.25)" }}>{s.count}회 후원</span>
+                  {isHovered && (
                     <span
                       className="rounded"
                       style={{
                         fontSize: 9,
-                        background: "rgba(255,150,30,0.12)",
-                        color: "rgba(200,100,10,0.8)",
+                        background: i === 0 ? "rgba(255,150,30,0.12)" : "rgba(56,189,248,0.12)",
+                        color: i === 0 ? "rgba(200,100,10,0.8)" : "rgba(14,165,233,0.9)",
                         padding: "1px 5px",
                         letterSpacing: "0.02em",
                       }}
                     >
-                      1st
+                      {RANKS[i]}
                     </span>
                   )}
                 </div>

@@ -72,10 +72,10 @@ export interface PostLiveStats {
   startedAt?: string;
   dayLabel?: string;
   totalVisitors: number;
-  avgViewer: string;
+  avgViewer: number;
   peakViewers: number;
-  fund: string;
-  intoChatRate: string;
+  fund: number;
+  intoChatRate: number;
   retentionRate: number;
 }
 
