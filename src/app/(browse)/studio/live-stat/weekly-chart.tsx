@@ -1,26 +1,23 @@
 "use client";
 import { useMemo } from "react";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  ComposedChart, Bar, Area, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LabelList, Cell,
 } from "recharts";
-import { TrendingUp } from "lucide-react";
 import { PostLiveStats } from "@/types/live";
 
-const LINE_CONFIG = [
-  { key: "avgViewer",     name: "평균 시청자", color: "#3b82f6", unit: "명" },
-  { key: "peakViewers",   name: "최고 시청자", color: "#8b5cf6", unit: "명" },
-  { key: "totalVisitors", name: "총 방문자",   color: "#34d399", unit: "명" },
-  { key: "fund",          name: "후원금액",    color: "#f59e0b", unit: "원" },
-  { key: "intoChatRate",  name: "채팅 전환율", color: "#f87171", unit: "%" },
-];
+type MetricKey = "avgViewer" | "peakViewers" | "totalVisitors" | "fund" | "intoChatRate";
 
-const METRIC_KEYS = LINE_CONFIG.map((l) => l.key);
+const METRIC: Record<MetricKey, { name: string; color: string; unit: string; axis: "viewers" | "fund" | "pct" }> = {
+  avgViewer:     { name: "평균 시청자", color: "#0ea5e9", unit: "명", axis: "viewers" },
+  peakViewers:   { name: "최고 시청자", color: "#818cf8", unit: "명", axis: "viewers" },
+  totalVisitors: { name: "총 방문자",   color: "#10b981", unit: "명", axis: "viewers" },
+  fund:          { name: "후원금액",    color: "#f59e0b", unit: "원", axis: "fund"    },
+  intoChatRate:  { name: "채팅 전환율", color: "#f43f5e", unit: "%",  axis: "pct"     },
+};
+
+const ALL_KEYS = Object.keys(METRIC) as MetricKey[];
 
 interface WeeklyChartProps {
   liveStats: PostLiveStats[];
@@ -29,215 +26,311 @@ interface WeeklyChartProps {
   highlightedKey: string | null;
 }
 
-const WeeklyChart = ({
-  liveStats,
-  onHoverIndex,
-  hoveredIndex,
-  highlightedKey,
-}: WeeklyChartProps) => {
-  // 오래된 날짜가 왼쪽, 최신이 오른쪽 (시간 순)
-  const chronoStats = useMemo(() => [...liveStats].reverse(), [liveStats]);
+/* ─── 라벨 포맷 ────────────────────────────────── */
+const labelFmt = (v: number, unit: string) => {
+  if (unit === "원") return v >= 10000 ? `${(v / 10000).toFixed(0)}만` : `${v}`;
+  if (unit === "%")  return `${v}%`;
+  return v >= 1000   ? `${(v / 1000).toFixed(1)}k` : `${v}`;
+};
 
-  const chartData = useMemo(() => {
-    if (!chronoStats.length) return [];
+/* ─── 커스텀 툴팁 ──────────────────────────────── */
+const CustomTooltip = ({ active, payload, label, hKey }: any) => {
+  if (!active || !payload?.length) return null;
+  const items = hKey ? payload.filter((p: any) => p.dataKey === hKey) : payload;
+  return (
+    <div
+      className="px-3.5 py-2.5 rounded-2xl"
+      style={{
+        background: "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(20px)",
+        border: "0.5px solid rgba(0,0,0,0.07)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+      }}
+    >
+      <p className="text-[10px] tracking-widest text-black/30 mb-2 font-medium uppercase">
+        {label}요일
+      </p>
+      <div className="space-y-1.5">
+        {items.map((item: any, i: number) => {
+          const meta = METRIC[item.dataKey as MetricKey];
+          if (!meta) return null;
+          const v = Number(item.value);
+          const display =
+            meta.unit === "원" ? `₩${v.toLocaleString()}` :
+            meta.unit === "%" ? `${v}%` :
+            `${v.toLocaleString()}명`;
+          return (
+            <div key={i} className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                <span className="text-[11px]" style={{ color: "rgba(0,0,0,0.45)" }}>{meta.name}</span>
+              </div>
+              <span className="text-[12px] font-semibold tabular-nums" style={{ color: "rgba(0,0,0,0.8)" }}>
+                {display}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
-    if (highlightedKey) {
-      // ── StatCard hover 중: 해당 지표만 실제 값으로 표시 ──
-      return chronoStats.map((d) => {
-        const raw = Number((d as any)[highlightedKey]) || 0;
-        return {
-          dayLabel: d.dayLabel,
-          [highlightedKey]: raw,
-          [`_raw_${highlightedKey}`]: raw,
-        };
-      });
-    }
+/* ─── 커스텀 라벨 (수치 표시) ──────────────────── */
+const DataLabel = ({ x, y, value, unit, color }: any) => {
+  if (value == null || value === 0) return null;
+  const text = labelFmt(Number(value), unit);
+  return (
+    <text
+      x={x}
+      y={y - 6}
+      textAnchor="middle"
+      fontSize={10}
+      fontWeight={600}
+      fill={color}
+      style={{ pointerEvents: "none" }}
+    >
+      {text}
+    </text>
+  );
+};
 
-    // ── hover 없을 때: 5개 지표 각각 0~100 정규화 → Y축 공유 가능 ──
-    const ranges: Record<string, { min: number; max: number }> = {};
-    METRIC_KEYS.forEach((k) => {
-      const vals = chronoStats.map((d) => Number((d as any)[k]) || 0);
-      ranges[k] = { min: Math.min(...vals), max: Math.max(...vals) };
-    });
+/* ─── 액티브 도트 ──────────────────────────────── */
+const ActiveDot = ({ cx, cy, stroke }: any) => (
+  <g>
+    <circle cx={cx} cy={cy} r={8}  fill={stroke} opacity={0.15} />
+    <circle cx={cx} cy={cy} r={4}  fill={stroke} opacity={0.3}  />
+    <circle cx={cx} cy={cy} r={2.5} fill="white" stroke={stroke} strokeWidth={1.5} />
+  </g>
+);
 
-    return chronoStats.map((d) => {
-      const entry: any = { dayLabel: d.dayLabel };
-      METRIC_KEYS.forEach((k) => {
-        const raw = Number((d as any)[k]) || 0;
-        const { min, max } = ranges[k];
-        const range = max - min;
-        entry[`_raw_${k}`] = raw;
-        // 10~90 범위로 정규화 (값이 모두 같으면 50 고정)
-        entry[k] = range === 0 ? 50 : ((raw - min) / range) * 80 + 10;
-      });
-      return entry;
-    });
-  }, [chronoStats, highlightedKey]);
+/* ─── 메인 컴포넌트 ─────────────────────────────── */
+const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: WeeklyChartProps) => {
+  const chartData = useMemo(() => [...liveStats].reverse(), [liveStats]);
+  const hKey = highlightedKey as MetricKey | null;
+  const hMeta = hKey ? METRIC[hKey] : null;
 
-  const highlightedConfig = LINE_CONFIG.find((l) => l.key === highlightedKey);
+  const yAxisBase = {
+    axisLine: false as const,
+    tickLine: false as const,
+    tick: { fontSize: 10, fill: "rgba(0,0,0,0.3)" },
+    width: 42,
+  };
 
-  // 툴팁: _raw_<key>로 실제 값 표시
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload?.length) return null;
-    const items = highlightedKey
-      ? payload.filter((p: any) => p.dataKey === highlightedKey)
-      : payload;
-    return (
-      <div className="bg-[#0a0a0f]/90 backdrop-blur-2xl border border-white/[0.06] px-4 py-3 rounded-xl shadow-[0_16px_48px_rgba(0,0,0,0.4)]">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-2.5 font-medium">
-          {label}요일
-        </p>
-        <div className="space-y-1.5">
-          {items.map((item: any, i: number) => {
-            const config = LINE_CONFIG.find((l) => l.key === item.dataKey);
-            const rawValue = item.payload[`_raw_${item.dataKey}`] ?? item.value;
-            const display =
-              config?.unit === "원"
-                ? `₩${rawValue.toLocaleString()}`
-                : config?.unit === "%"
-                  ? `${rawValue}%`
-                  : rawValue.toLocaleString();
+  return (
+    <div
+      className="h-full flex flex-col rounded-[22px]"
+      style={{
+        background: "rgba(255,255,255,0.78)",
+        backdropFilter: "blur(28px)",
+        WebkitBackdropFilter: "blur(28px)",
+        border: "0.5px solid rgba(0,0,0,0.07)",
+        boxShadow: "0 2px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
+      }}
+    >
+      {/* ── 헤더 ── */}
+      <div className="flex-shrink-0 px-6 pt-5 pb-3 flex items-center justify-between">
+        <div>
+          <h3 className="text-[13px] font-medium tracking-tight" style={{ color: "rgba(0,0,0,0.78)" }}>
+            주간 방송 추이
+          </h3>
+          <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,0,0,0.3)" }}>
+            {hKey ? `${hMeta?.name} · 7일 상세` : "후원 + 시청자 흐름"}
+          </p>
+        </div>
+
+        {/* 범례 */}
+        <div className="flex items-center gap-3 flex-wrap justify-end">
+          {ALL_KEYS.map((k) => {
+            const m = METRIC[k];
             return (
-              <div key={i} className="flex items-center justify-between gap-6">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: item.color, boxShadow: `0 0 6px ${item.color}50` }}
-                  />
-                  <span className="text-[11px] text-white/50">{item.name ?? config?.name}</span>
-                </div>
-                <span className="text-[12px] font-semibold text-white/90 tabular-nums">
-                  {display}
-                </span>
+              <div
+                key={k}
+                className="flex items-center gap-1.5 transition-opacity duration-200"
+                style={{ opacity: hKey && hKey !== k ? 0.2 : 1 }}
+              >
+                <div className="w-3.5 h-[2px] rounded-full" style={{ background: m.color }} />
+                <span className="text-[10px]" style={{ color: "rgba(0,0,0,0.35)" }}>{m.name}</span>
               </div>
             );
           })}
         </div>
       </div>
-    );
-  };
 
-  const ActiveDot = (props: any) => {
-    const { cx, cy, stroke } = props;
-    return (
-      <g>
-        <circle cx={cx} cy={cy} r={10} fill={stroke} opacity={0.1} />
-        <circle cx={cx} cy={cy} r={6} fill={stroke} opacity={0.2} />
-        <circle cx={cx} cy={cy} r={3.5} fill="#0a0a0f" stroke={stroke} strokeWidth={2} />
-      </g>
-    );
-  };
-
-  const handleMouseMove = (state: any) => {
-    if (state?.activeTooltipIndex !== undefined) onHoverIndex(state.activeTooltipIndex);
-  };
-
-  const getLineStyle = (key: string) => {
-    if (!highlightedKey) return { strokeWidth: 2, opacity: 1 };
-    if (key === highlightedKey) return { strokeWidth: 3, opacity: 1 };
-    return { strokeWidth: 0, opacity: 0 }; // 다른 라인 완전히 숨김
-  };
-
-  return (
-    <div className="h-full flex flex-col rounded-2xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.05]">
-      {/* 헤더 */}
-      <div className="flex-shrink-0 px-6 pt-5 pb-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-            <TrendingUp className="w-3.5 h-3.5 text-white/40" />
-          </div>
-          <div>
-            <h3 className="text-[13px] font-medium text-white/70 tracking-tight">주간 방송 추이</h3>
-            <p className="text-[10px] text-white/20 mt-0.5">
-              {highlightedKey
-                ? `${highlightedConfig?.name} · 실제 수치`
-                : "최근 7일 · 상대 추이"}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 flex-wrap">
-          {LINE_CONFIG.map((line) => (
-            <div
-              key={line.key}
-              className={`flex items-center gap-1.5 transition-opacity duration-300 ${
-                highlightedKey && highlightedKey !== line.key ? "opacity-20" : "opacity-100"
-              }`}
-            >
-              <div className="w-4 h-[2px] rounded-full" style={{ backgroundColor: line.color }} />
-              <span className="text-[10px] text-white/30">{line.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 차트 */}
-      <div className="flex-1 min-h-0 px-2">
+      {/* ── 차트 ── */}
+      <div className="flex-1 min-h-0 px-2 pb-2">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
+          <ComposedChart
             data={chartData}
-            margin={{ top: 20, right: 24, left: highlightedKey ? 8 : 0, bottom: 4 }}
-            onMouseMove={handleMouseMove}
+            margin={{ top: 24, right: 16, left: 0, bottom: 4 }}
+            onMouseMove={(s: any) => {
+              if (s?.activeTooltipIndex !== undefined) onHoverIndex(s.activeTooltipIndex);
+            }}
             onMouseLeave={() => onHoverIndex(null)}
           >
             <defs>
-              {LINE_CONFIG.map((line) => (
-                <linearGradient key={line.key} id={`gradient_${line.key}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor={line.color} stopOpacity={highlightedKey === line.key ? 0.3 : 0.1} />
-                  <stop offset="100%" stopColor={line.color} stopOpacity={0} />
-                </linearGradient>
-              ))}
+              <linearGradient id="wc_avg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#0ea5e9" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.02} />
+              </linearGradient>
+              <linearGradient id="wc_peak" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#818cf8" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
+              </linearGradient>
+              <linearGradient id="wc_total" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#10b981" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+              </linearGradient>
+              <linearGradient id="wc_chat" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#f43f5e" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.02} />
+              </linearGradient>
+              <linearGradient id="wc_fund_bar" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="#fbbf24" stopOpacity={1}   />
+                <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.6} />
+              </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.03)" vertical={false} />
+
+            <CartesianGrid stroke="rgba(0,0,0,0.04)" strokeDasharray="0" vertical={false} />
+
             <XAxis
               dataKey="dayLabel"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "rgba(255,255,255,0.2)", fontWeight: 500 }}
+              tick={{ fontSize: 11, fill: "rgba(0,0,0,0.3)", fontWeight: 500 }}
               dy={6}
             />
-            {/* highlightedKey 일 때는 실제 Y축, 아닐 때는 숨김 */}
-            {highlightedKey ? (
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.15)" }}
-                tickFormatter={(v) =>
-                  highlightedConfig?.unit === "원"
-                    ? v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
-                    : highlightedConfig?.unit === "%"
-                      ? `${v}%`
-                      : v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
-                }
-                width={36}
+
+            {/* Y축 — 시청자 (왼쪽) */}
+            {(!hKey || hMeta?.axis === "viewers") && (
+              <YAxis {...yAxisBase} yAxisId="viewers" orientation="left"
+                tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
               />
-            ) : (
-              <YAxis hide domain={[0, 100]} />
             )}
+            {/* Y축 — 후원 (오른쪽) */}
+            {(!hKey || hMeta?.axis === "fund") && (
+              <YAxis {...yAxisBase} yAxisId="fund" orientation="right"
+                tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(0)}만` : String(v)}
+              />
+            )}
+            {/* Y축 — 전환율 */}
+            {hKey === "intoChatRate" && (
+              <YAxis {...yAxisBase} yAxisId="pct" orientation="left"
+                domain={[0, 100]} tickFormatter={(v) => `${v}%`}
+              />
+            )}
+
             <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ stroke: "rgba(255,255,255,0.06)", strokeWidth: 1, strokeDasharray: "4 4" }}
+              content={<CustomTooltip hKey={hKey} />}
+              cursor={{ stroke: "rgba(0,0,0,0.06)", strokeWidth: 1, strokeDasharray: "4 4" }}
             />
-            {LINE_CONFIG.map((line) => {
-              const style = getLineStyle(line.key);
-              if (style.strokeWidth === 0) return null; // 완전 숨김
-              return (
-                <Area
-                  key={line.key}
-                  type="monotone"
-                  dataKey={line.key}
-                  name={line.name}
-                  stroke={line.color}
-                  strokeWidth={style.strokeWidth}
-                  strokeOpacity={style.opacity}
-                  fill={`url(#gradient_${line.key})`}
-                  fillOpacity={highlightedKey === line.key ? 0.8 : 0.5}
-                  activeDot={<ActiveDot />}
-                  dot={false}
-                  style={{ transition: "stroke-width 0.3s ease" }}
-                />
-              );
-            })}
-          </AreaChart>
+
+            {/* ── 후원 막대 ── */}
+            {(!hKey || hKey === "fund") && (
+              <Bar
+                yAxisId="fund" dataKey="fund" name="후원금액"
+                radius={[6, 6, 0, 0]} maxBarSize={28}
+                fill="url(#wc_fund_bar)"
+                opacity={hKey === "fund" ? 1 : 0.5}
+              >
+                {hKey === "fund" && (
+                  <LabelList
+                    dataKey="fund"
+                    content={(props: any) => (
+                      <DataLabel {...props} unit="원" color={METRIC.fund.color} />
+                    )}
+                  />
+                )}
+                {chartData.map((_, i) => (
+                  <Cell key={i} opacity={hoveredIndex === i ? 1 : hKey === "fund" ? 0.75 : 0.5} />
+                ))}
+              </Bar>
+            )}
+
+            {/* ── 평균 시청자 에어리어 ── */}
+            {(!hKey || hKey === "avgViewer") && (
+              <Area
+                yAxisId="viewers" type="monotone" dataKey="avgViewer" name="평균 시청자"
+                stroke="#0ea5e9" strokeWidth={hKey === "avgViewer" ? 2.5 : 1.8}
+                fill="url(#wc_avg)" fillOpacity={hKey === "avgViewer" ? 1 : 0.7}
+                dot={false} activeDot={<ActiveDot />}
+                opacity={hKey && hKey !== "avgViewer" ? 0 : 1}
+              >
+                {hKey === "avgViewer" && (
+                  <LabelList
+                    dataKey="avgViewer"
+                    content={(props: any) => (
+                      <DataLabel {...props} unit="명" color={METRIC.avgViewer.color} />
+                    )}
+                  />
+                )}
+              </Area>
+            )}
+
+            {/* ── 최고 시청자 에어리어 ── */}
+            {(!hKey || hKey === "peakViewers") && (
+              <Area
+                yAxisId="viewers" type="monotone" dataKey="peakViewers" name="최고 시청자"
+                stroke="#818cf8" strokeWidth={hKey === "peakViewers" ? 2.5 : 1.5}
+                strokeDasharray={hKey ? "0" : "5 3"}
+                fill="url(#wc_peak)"
+                fillOpacity={hKey === "peakViewers" ? 1 : 0}
+                dot={false} activeDot={<ActiveDot />}
+                opacity={hKey && hKey !== "peakViewers" ? 0 : 1}
+              >
+                {hKey === "peakViewers" && (
+                  <LabelList
+                    dataKey="peakViewers"
+                    content={(props: any) => (
+                      <DataLabel {...props} unit="명" color={METRIC.peakViewers.color} />
+                    )}
+                  />
+                )}
+              </Area>
+            )}
+
+            {/* ── 총 방문자 에어리어 ── */}
+            {(!hKey || hKey === "totalVisitors") && (
+              <Area
+                yAxisId="viewers" type="monotone" dataKey="totalVisitors" name="총 방문자"
+                stroke="#10b981" strokeWidth={hKey === "totalVisitors" ? 2.5 : 1.5}
+                fill="url(#wc_total)"
+                fillOpacity={hKey === "totalVisitors" ? 1 : 0}
+                dot={false} activeDot={<ActiveDot />}
+                opacity={hKey && hKey !== "totalVisitors" ? 0 : 1}
+              >
+                {hKey === "totalVisitors" && (
+                  <LabelList
+                    dataKey="totalVisitors"
+                    content={(props: any) => (
+                      <DataLabel {...props} unit="명" color={METRIC.totalVisitors.color} />
+                    )}
+                  />
+                )}
+              </Area>
+            )}
+
+            {/* ── 채팅 전환율 ── */}
+            {(!hKey || hKey === "intoChatRate") && (
+              <Area
+                yAxisId={hKey === "intoChatRate" ? "pct" : "viewers"}
+                type="monotone" dataKey="intoChatRate" name="채팅 전환율"
+                stroke="#f43f5e" strokeWidth={hKey === "intoChatRate" ? 2.5 : 1.5}
+                fill="url(#wc_chat)" fillOpacity={hKey === "intoChatRate" ? 1 : 0}
+                dot={false} activeDot={<ActiveDot />}
+                opacity={hKey && hKey !== "intoChatRate" ? 0 : 0.9}
+              >
+                {hKey === "intoChatRate" && (
+                  <LabelList
+                    dataKey="intoChatRate"
+                    content={(props: any) => (
+                      <DataLabel {...props} unit="%" color={METRIC.intoChatRate.color} />
+                    )}
+                  />
+                )}
+              </Area>
+            )}
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
 
@@ -246,9 +339,11 @@ const WeeklyChart = ({
         {chartData.map((_, i) => (
           <div
             key={i}
-            className={`h-[3px] rounded-full transition-all duration-300 ${
-              hoveredIndex === i ? "w-6 bg-white/40" : "w-2 bg-white/[0.08]"
-            }`}
+            className="h-[3px] rounded-full transition-all duration-300"
+            style={{
+              width: hoveredIndex === i ? 24 : 8,
+              background: hoveredIndex === i ? "rgba(14,165,233,0.45)" : "rgba(0,0,0,0.08)",
+            }}
           />
         ))}
       </div>

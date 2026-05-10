@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes sweep {
+  0%, 35% {
+    transform: translateX(-180%) skewX(-20deg);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  65%, 100% {
+    transform: translateX(280%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-sweep {
+  animation: sweep 2.8s ease-in-out infinite;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Login_authbar from "./login_authbar";
 
 const Navbar = () => {
@@ -14,12 +15,14 @@ const Navbar = () => {
     >
       {/* 로고 — 왼쪽으로 100px */}
       <div style={{ paddingLeft: 100 }}>
-        <span
-          className="text-[17px] font-bold tracking-tight"
-          style={{ color: "rgba(255,255,255,0.9)" }}
-        >
-          로고
-        </span>
+        <Link href="/">
+          <span
+            className="text-[17px] font-bold tracking-tight cursor-pointer"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          >
+            로고
+          </span>
+        </Link>
       </div>
 
       <Login_authbar />

@@ -174,21 +174,28 @@ const LiveStats = ({
     return mapped;
   }, [rawStats]);
 
+  // WeeklyChart는 reversed(오래된→최신) 이므로 hover 인덱스를 역변환
+  const currentDataIndex = useMemo(() => {
+    if (!liveStatsWeek?.length) return 0;
+    if (hoveredChartIndex === null) return 0;
+    return Math.min(liveStatsWeek.length - 1 - hoveredChartIndex, liveStatsWeek.length - 1);
+  }, [liveStatsWeek, hoveredChartIndex]);
+
   const currentData = useMemo(() => {
     if (!liveStatsWeek?.length) return null;
-    if (hoveredChartIndex === null) return liveStatsWeek[0];
-    // WeeklyChart는 reversed(오래된→최신 순)이므로 인덱스를 역변환
-    const reversedIndex = liveStatsWeek.length - 1 - hoveredChartIndex;
-    return liveStatsWeek[reversedIndex] ?? liveStatsWeek[0];
-  }, [liveStatsWeek, hoveredChartIndex]);
+    return liveStatsWeek[currentDataIndex] ?? liveStatsWeek[0];
+  }, [liveStatsWeek, currentDataIndex]);
 
   const highlightedKey = useMemo(() => {
     if (hoveredCardIndex === null) return null;
     return STAT_FIELDS[hoveredCardIndex]?.key ?? null;
   }, [hoveredCardIndex]);
 
-  const latestData = liveStatsWeek?.[0] ?? null;
-  const prevData = liveStatsWeek?.[1] ?? null;
+  // delta 비교: 현재 hover된 날의 전날 (index + 1 = 한 단계 더 오래된 날)
+  const comparisonData = useMemo(() => {
+    if (!liveStatsWeek?.length) return null;
+    return liveStatsWeek[currentDataIndex + 1] ?? null;
+  }, [liveStatsWeek, currentDataIndex]);
 
   // 전체 카드 데이터 (미니 카드용)
   const allCardsData: MiniCardInfo[] = useMemo(
@@ -198,9 +205,9 @@ const LiveStats = ({
         title: f.title,
         unit: f.unit,
         value: currentData ? f.toNumber(currentData[f.key] as string | number) : 0,
-        prevValue: prevData ? f.toNumber(prevData[f.key] as string | number) : null,
+        prevValue: comparisonData ? f.toNumber(comparisonData[f.key] as string | number) : null,
       })),
-    [currentData, prevData],
+    [currentData, comparisonData],
   );
 
   const handleCardClick = (index: number) => {
@@ -505,9 +512,9 @@ const LiveStats = ({
               {STAT_FIELDS.map((field, index) => {
                 const rawValue = currentData?.[field.key];
                 const numericValue = rawValue != null ? field.toNumber(rawValue as string | number) : 0;
-                const todayVal = latestData ? field.toNumber(latestData[field.key] as string | number) : null;
-                const prevVal = prevData ? field.toNumber(prevData[field.key] as string | number) : null;
-                const delta = todayVal !== null && prevVal !== null ? todayVal - prevVal : undefined;
+                const currentVal = currentData ? field.toNumber(currentData[field.key] as string | number) : null;
+                const prevVal = comparisonData ? field.toNumber(comparisonData[field.key] as string | number) : null;
+                const delta = currentVal !== null && prevVal !== null ? currentVal - prevVal : undefined;
                 return (
                   <StatCard
                     key={field.key}
@@ -540,12 +547,12 @@ const LiveStats = ({
             </div>
 
             {/* 시청자 유지율 — WeeklyChart와 동일한 flex 구조로 width 일치 */}
-            {latestData && (
+            {currentData && (
               <div className="flex flex-row gap-4">
                 <div className="w-2/3">
                   <RetentionRate
-                    totalVisitors={latestData.totalVisitors}
-                    retentionRate={latestData.retentionRate}
+                    totalVisitors={currentData.totalVisitors}
+                    retentionRate={currentData.retentionRate}
                   />
                 </div>
                 <div className="w-1/3" />

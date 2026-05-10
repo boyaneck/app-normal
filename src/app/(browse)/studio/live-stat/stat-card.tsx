@@ -115,39 +115,75 @@ const StatCard = ({
       {/* 글래스 반사 */}
       <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
 
-      {/* AI 아이콘 (1초 hover 후 등장) — glow는 아이콘에만 */}
+      {/* AI 아이콘 (1초 hover 후 등장) */}
       <AnimatePresence>
         {showAI && (
+          {/* 툴팁 + 아이콘 wrapper */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5, y: -4 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              boxShadow: [
-                `0 2px 8px ${c}70`,
-                `0 0 18px 8px ${c}60, 0 0 32px 14px ${c}35`,
-                `0 2px 8px ${c}70`,
-              ],
-            }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: -4 }}
-            transition={{
-              opacity: { type: "spring", stiffness: 420, damping: 20 },
-              scale: { type: "spring", stiffness: 420, damping: 20 },
-              y: { type: "spring", stiffness: 420, damping: 20 },
-              boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 },
-            }}
-            className="absolute top-2.5 right-2.5 w-6 h-6 rounded-lg flex items-center justify-center z-10"
-            style={{ background: glow.ai }}
+            transition={{ type: "spring", stiffness: 420, damping: 20 }}
+            className="absolute top-2.5 right-2.5 z-20 group"
+            style={{ cursor: "pointer" }}
           >
-            <svg width="13" height="13" viewBox="0 0 110 110" fill="none">
-              <circle cx="40" cy="40" r="9" fill="white" opacity="0.95" />
-              <circle cx="70" cy="40" r="9" fill="white" opacity="0.95" />
-              <circle cx="55" cy="66" r="9" fill="white" opacity="0.95" />
-              <line x1="40" y1="40" x2="70" y2="40" stroke="white" strokeWidth="5" opacity="0.75" />
-              <line x1="40" y1="40" x2="55" y2="66" stroke="white" strokeWidth="5" opacity="0.75" />
-              <line x1="70" y1="40" x2="55" y2="66" stroke="white" strokeWidth="5" opacity="0.75" />
-            </svg>
+            {/* 툴팁 */}
+            <div
+              className="absolute bottom-full right-0 mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap"
+              style={{
+                background: "rgba(7,20,38,0.88)",
+                backdropFilter: "blur(12px)",
+                border: "0.5px solid rgba(56,189,248,0.2)",
+                borderRadius: 8,
+                padding: "4px 8px",
+                fontSize: 10,
+                color: "rgba(255,255,255,0.85)",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              }}
+            >
+              AI에게 물어보기
+              {/* 말풍선 꼬리 */}
+              <div
+                className="absolute top-full right-2.5"
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeft: "4px solid transparent",
+                  borderRight: "4px solid transparent",
+                  borderTop: "4px solid rgba(7,20,38,0.88)",
+                }}
+              />
+            </div>
+
+            {/* AI 아이콘 */}
+            <div
+              className="w-7 h-7 rounded-xl flex items-center justify-center overflow-hidden"
+              style={{
+                background: "white",
+                border: "0.5px solid rgba(56,189,248,0.2)",
+                boxShadow: "0 1px 6px rgba(14,165,233,0.12)",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z"
+                  fill="#38bdf8"
+                />
+                <circle cx="19.5" cy="4.5" r="2.2" fill="#0ea5e9" />
+              </svg>
+              {/* 거울 햇빛 훑는 효과 */}
+              <div
+                className="animate-sweep pointer-events-none"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "55%",
+                  height: "100%",
+                  background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.9) 50%, transparent 80%)",
+                }}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
