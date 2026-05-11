@@ -10,11 +10,11 @@ import { PostLiveStats } from "@/types/live";
 type MetricKey = "avgViewer" | "peakViewers" | "totalVisitors" | "fund" | "intoChatRate";
 
 const METRIC: Record<MetricKey, { name: string; color: string; unit: string; axis: "viewers" | "fund" | "pct" }> = {
-  avgViewer:     { name: "평균 시청자", color: "#0ea5e9", unit: "명", axis: "viewers" },
-  peakViewers:   { name: "최고 시청자", color: "#818cf8", unit: "명", axis: "viewers" },
-  totalVisitors: { name: "총 방문자",   color: "#10b981", unit: "명", axis: "viewers" },
-  fund:          { name: "후원금액",    color: "#f59e0b", unit: "원", axis: "fund"    },
-  intoChatRate:  { name: "채팅 전환율", color: "#f43f5e", unit: "%",  axis: "pct"     },
+  avgViewer:     { name: "평균 시청자", color: "#38bdf8", unit: "명", axis: "viewers" },
+  peakViewers:   { name: "최고 시청자", color: "#a78bfa", unit: "명", axis: "viewers" },
+  totalVisitors: { name: "총 방문자",   color: "#2dd4bf", unit: "명", axis: "viewers" },
+  fund:          { name: "후원금액",    color: "#e9a800", unit: "원", axis: "fund"    },
+  intoChatRate:  { name: "채팅 전환율", color: "#fb7185", unit: "%",  axis: "pct"     },
 };
 
 const ALL_KEYS = Object.keys(METRIC) as MetricKey[];
@@ -170,24 +170,24 @@ const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: 
           >
             <defs>
               <linearGradient id="wc_avg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#0ea5e9" stopOpacity={0.22} />
-                <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.02} />
+                <stop offset="0%"   stopColor="#38bdf8" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="wc_peak" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#818cf8" stopOpacity={0.22} />
-                <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
+                <stop offset="0%"   stopColor="#a78bfa" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="wc_total" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#10b981" stopOpacity={0.22} />
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+                <stop offset="0%"   stopColor="#2dd4bf" stopOpacity={0.22} />
+                <stop offset="100%" stopColor="#2dd4bf" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="wc_chat" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#f43f5e" stopOpacity={0.2} />
-                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.02} />
+                <stop offset="0%"   stopColor="#fb7185" stopOpacity={0.2} />
+                <stop offset="100%" stopColor="#fb7185" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="wc_fund_bar" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#fbbf24" stopOpacity={1}   />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.6} />
+                <stop offset="0%"   stopColor="#f0c040" stopOpacity={1}   />
+                <stop offset="100%" stopColor="#e9a800" stopOpacity={0.7} />
               </linearGradient>
             </defs>
 
@@ -251,7 +251,7 @@ const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: 
             {(!hKey || hKey === "avgViewer") && (
               <Area
                 yAxisId="viewers" type="monotone" dataKey="avgViewer" name="평균 시청자"
-                stroke="#0ea5e9" strokeWidth={hKey === "avgViewer" ? 2.5 : 1.8}
+                stroke="#38bdf8" strokeWidth={hKey === "avgViewer" ? 2.5 : 1.8}
                 fill="url(#wc_avg)" fillOpacity={hKey === "avgViewer" ? 1 : 0.7}
                 dot={false} activeDot={<ActiveDot />}
                 opacity={hKey && hKey !== "avgViewer" ? 0 : 1}
@@ -271,7 +271,7 @@ const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: 
             {(!hKey || hKey === "peakViewers") && (
               <Area
                 yAxisId="viewers" type="monotone" dataKey="peakViewers" name="최고 시청자"
-                stroke="#818cf8" strokeWidth={hKey === "peakViewers" ? 2.5 : 1.5}
+                stroke="#a78bfa" strokeWidth={hKey === "peakViewers" ? 2.5 : 1.5}
                 strokeDasharray={hKey ? "0" : "5 3"}
                 fill="url(#wc_peak)"
                 fillOpacity={hKey === "peakViewers" ? 1 : 0}
@@ -293,7 +293,7 @@ const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: 
             {(!hKey || hKey === "totalVisitors") && (
               <Area
                 yAxisId="viewers" type="monotone" dataKey="totalVisitors" name="총 방문자"
-                stroke="#10b981" strokeWidth={hKey === "totalVisitors" ? 2.5 : 1.5}
+                stroke="#2dd4bf" strokeWidth={hKey === "totalVisitors" ? 2.5 : 1.5}
                 fill="url(#wc_total)"
                 fillOpacity={hKey === "totalVisitors" ? 1 : 0}
                 dot={false} activeDot={<ActiveDot />}
@@ -315,7 +315,7 @@ const WeeklyChart = ({ liveStats, onHoverIndex, hoveredIndex, highlightedKey }: 
               <Area
                 yAxisId={hKey === "intoChatRate" ? "pct" : "viewers"}
                 type="monotone" dataKey="intoChatRate" name="채팅 전환율"
-                stroke="#f43f5e" strokeWidth={hKey === "intoChatRate" ? 2.5 : 1.5}
+                stroke="#fb7185" strokeWidth={hKey === "intoChatRate" ? 2.5 : 1.5}
                 fill="url(#wc_chat)" fillOpacity={hKey === "intoChatRate" ? 1 : 0}
                 dot={false} activeDot={<ActiveDot />}
                 opacity={hKey && hKey !== "intoChatRate" ? 0 : 0.9}

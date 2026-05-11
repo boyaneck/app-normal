@@ -1,71 +1,59 @@
+"use client";
+
 import { insertAndUpdateLiveInfo } from "@/api";
 import { useLiveSettingStore } from "@/store/live-setting";
 import useUserStore from "@/store/user";
-import { AnimatePresence, motion } from "framer-motion";
-import { Settings, Square } from "lucide-react";
-import React, { useState } from "react";
-motion;
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { IoPlaySharp, IoStopSharp } from "react-icons/io5";
 
 const LiveSettingButton = () => {
   const { desc, title, thumb_url } = useLiveSettingStore((state) => state);
   const { user } = useUserStore((state) => state);
-  const [live_setting_done, set_live_setting_done] = useState<boolean>(false);
+  const [live_setting_done, set_live_setting_done] = useState(false);
 
   const toggleButton = () => {
     const next = !live_setting_done;
     set_live_setting_done(next);
-
-    if (next === true) {
-      const obj = { desc, title, thumb_url, user_id: user?.user_id };
-      insertAndUpdateLiveInfo(obj);
+    if (next) {
+      insertAndUpdateLiveInfo({ desc, title, thumb_url, user_id: user?.user_id });
     }
   };
-  return (
-    <motion.div>
-      {" "}
-      <motion.button
-        onClick={toggleButton}
-        className={`relative w-64 h-16 rounded-2xl flex items-center justify-center gap-3 font-bold text-lg shadow-2xl overflow-hidden
-            ${
-              live_setting_done
-                ? "bg-gradient-to-r from-red-200 to-rose-300"
-                : "bg-gradient-to-r from-blue-200 to-blue-300"
-            }`}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 15 }}
-      >
-        {/* Icon Animation */}
-        <motion.div
-          key={live_setting_done ? "stop" : "start"}
-          initial={{ scale: 0, rotate: -90 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        >
-          {live_setting_done ? (
-            <Square size={22} fill="currentColor" />
-          ) : (
-            <Settings size={22} />
-          )}
-        </motion.div>
 
-        {/* Text Sliding Animation */}
-        <div className="relative h-6 w-24 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={live_setting_done ? "streaming" : "idle"}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute inset-0 flex items-center justify-center whitespace-nowrap"
-            >
-              {live_setting_done ? "방송 설정 완료" : "방송 시작"}
-            </motion.span>
-          </AnimatePresence>
-        </div>
-      </motion.button>
-    </motion.div>
+  return (
+    <motion.button
+      onClick={toggleButton}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="h-11 px-8 rounded-2xl flex items-center justify-center gap-2 text-[13px] font-semibold tracking-tight transition-all duration-300"
+      style={{
+        background: live_setting_done
+          ? "rgba(239,68,68,0.1)"
+          : "rgba(56,189,248,0.15)",
+        border: live_setting_done
+          ? "0.5px solid rgba(239,68,68,0.22)"
+          : "0.5px solid rgba(56,189,248,0.35)",
+        color: live_setting_done ? "rgba(220,38,38,0.8)" : "rgba(14,165,233,0.9)",
+        boxShadow: live_setting_done
+          ? "0 2px 12px rgba(239,68,68,0.07)"
+          : "0 2px 12px rgba(56,189,248,0.15)",
+      }}
+    >
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={live_setting_done ? "stop" : "start"}
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.7 }}
+          transition={{ duration: 0.15 }}
+          className="flex items-center gap-2"
+        >
+          {live_setting_done ? <IoStopSharp size={14} /> : <IoPlaySharp size={14} />}
+          {live_setting_done ? "방송 종료" : "방송 시작"}
+        </motion.span>
+      </AnimatePresence>
+    </motion.button>
   );
 };
 

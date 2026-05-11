@@ -212,9 +212,9 @@ const LiveStats = ({
 
   const handleCardClick = (index: number) => {
     if (selectedCardIndex === index) {
-      onCardSelect(null, []);
+      onCardSelect?.(null, []);
     } else {
-      onCardSelect(index, allCardsData);
+      onCardSelect?.(index, allCardsData);
     }
   };
 
@@ -332,9 +332,9 @@ const LiveStats = ({
                   <p className="text-[11px] leading-relaxed" style={{ color: "rgba(0,0,0,0.55)" }}>
                     {`이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`}
                   </p>
-                  {prevData && (() => {
+                  {comparisonData && (() => {
                     const prev = selectedField
-                      ? selectedField.toNumber(prevData[selectedField.key] as string | number)
+                      ? selectedField.toNumber(comparisonData[selectedField.key] as string | number)
                       : 0;
                     const diff = selectedValue - prev;
                     return (
