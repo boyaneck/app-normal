@@ -6,7 +6,11 @@ import { StudioAIInput } from "./_components/AI-input";
 import LiveStat, { MiniCardInfo } from "./live-stat/live-stat";
 import useUserStore from "@/store/user";
 import { ChatMessage } from "@/types/live";
-
+import { IoStatsChartOutline } from "react-icons/io5";
+import { IoStatsChartSharp } from "react-icons/io5";
+import { IoSettingsOutline } from "react-icons/io5";
+import { IoSettingsSharp } from "react-icons/io5";
+import axios from "axios";
 const LiveSetting = dynamic(() => import("./live-setting/page"));
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -50,19 +54,17 @@ const StudioPage = () => {
           ? allCards.find((c) => c.index === selectedCardIndex)
           : null;
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`,
+        {
           cardTitle: selectedCard?.title ?? "",
           currentValue: selectedCard?.value ?? 0,
           prevValue: selectedCard?.prevValue ?? null,
           unit: selectedCard?.unit ?? "",
           messages: updatedMessages.slice(-6),
-        }),
-      });
+        },
+      );
 
-      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         {
@@ -110,23 +112,14 @@ const StudioPage = () => {
     {
       key: "liveStat",
       label: "통계",
-      icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="20" x2="18" y2="10" />
-          <line x1="12" y1="20" x2="12" y2="4" />
-          <line x1="6" y1="20" x2="6" y2="14" />
-        </svg>
-      ),
+      iconOutline: <IoStatsChartOutline size={20} />,
+      iconSharp: <IoStatsChartSharp size={20} />,
     },
     {
       key: "liveSetting",
       label: "설정",
-      icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-      ),
+      iconOutline: <IoSettingsOutline size={20} />,
+      iconSharp: <IoSettingsSharp size={20} />,
     },
   ];
 
@@ -176,6 +169,7 @@ const StudioPage = () => {
                 className="flex flex-col items-center gap-1.5"
               >
                 <div
+                  className="width:48 height:48 radius:"
                   style={{
                     width: 48,
                     height: 48,
@@ -183,21 +177,18 @@ const StudioPage = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: isActive ? "rgba(124,106,255,0.3)" : "rgba(255,255,255,0.18)",
-                    border: isActive ? "1.5px solid rgba(124,106,255,0.7)" : "1.5px solid rgba(255,255,255,0.55)",
-                    boxShadow: isActive ? "0 0 20px rgba(124,106,255,0.35)" : "0 2px 8px rgba(0,0,0,0.12)",
-                    color: isActive ? "#a78bfa" : "rgba(255,255,255,0.9)",
-                    transition: "all 0.2s",
                   }}
                 >
-                  {tab.icon}
+                  {isActive ? tab.iconSharp : tab.iconOutline}
                 </div>
-                <span style={{
-                  fontSize: 10,
-                  fontWeight: 500,
-                  color: isActive ? "#a78bfa" : "rgba(255,255,255,0.75)",
-                  letterSpacing: "0.04em",
-                }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    color: isActive ? "#a78bfa" : "rgba(255,255,255,0.75)",
+                    letterSpacing: "0.04em",
+                  }}
+                >
                   {tab.label}
                 </span>
               </motion.button>

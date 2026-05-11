@@ -24,15 +24,24 @@ const ThumbUpload = () => {
   };
 
   return (
-    <div className="">
-      <div className="flex justify-between w-1/3 items-center">
+    <div
+      className="rounded-[22px] px-6 py-5 space-y-3"
+      style={{
+        background: "rgba(255,255,255,0.94)",
+        backdropFilter: "blur(28px)",
+        WebkitBackdropFilter: "blur(28px)",
+        border: "0.5px solid rgba(0,0,0,0.07)",
+        boxShadow: "0 2px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
+      }}
+    >
+      <div className="flex justify-between w-full items-center">
         <span>썸네일 업로드</span>
         <span className="text-xs text-gray-400">JPG, PNG, WEBP (Max 5MB)</span>
       </div>
       <div
         className={`relative group
-        w-1/3 h-[200px]
-     hover:cursor-pointer 
+        w-full h-[200px]
+     hover:cursor-pointer
      transition-all duration-200 ease-in-out
      ${!thumb_url && "hover:scale-[1.01]"}
       ${
@@ -62,9 +71,9 @@ const ThumbUpload = () => {
             className={`w-full h-full  flex flex-col items-center justify-center
              group-hover:bg-white
              transition-all duration-300 ease-out transform
-            hover:scale-[1.01] active:scale-[0.98] 
+            hover:scale-[1.01] active:scale-[0.98]
              will-change-transform
-            ${isDragActive ? "bg-white" : "bg-gray-100"}
+            ${isDragActive ? "bg-white" : "bg-gray-50"}
              `}
           >
             {thumb_url ? (
