@@ -9,25 +9,24 @@ import { useQuery } from "@tanstack/react-query";
 import { getLiveStatsWeek } from "@/api/live";
 import { PostLiveStats, ChatMessage } from "@/types/live";
 import ClipPanel from "./live-highlight-clip";
-import AICard from "../_components/AI-card";
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const STAT_FIELDS = [
   {
-    key: "avgViewer" as const,
+    key: "avg_viewer" as const,
     title: "평균 시청자",
     unit: "명",
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "peakViewers" as const,
+    key: "peak_viewers" as const,
     title: "최고 시청자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
   },
   {
-    key: "totalVisitors" as const,
+    key: "total_visitors" as const,
     title: "총 방문자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
@@ -39,7 +38,7 @@ const STAT_FIELDS = [
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "intoChatRate" as const,
+    key: "into_chat_rate" as const,
     title: "채팅 전환율",
     unit: "%",
     toNumber: (v: string | number) => parseFloat(String(v)) || 0,
@@ -105,7 +104,9 @@ const LiveStats = ({
   onChatAISendMsg,
   isAiTyping = false,
 }: Props) => {
-  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(
+    null,
+  );
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   const [chatInput, setChatInput] = useState("");
 
@@ -153,49 +154,33 @@ const LiveStats = ({
 
   const liveStatsWeek: PostLiveStats[] | null = useMemo(() => {
     if (!rawStats) return null;
-    const mapped = rawStats.map((item: Record<string, any>) => ({
+    return rawStats.map((item: Record<string, any>) => ({
       roomName: item.room_name,
-      startedAt: item.started_at ?? null,
+      startedAt: item.started_at,
       dayLabel: item.started_at
         ? DAY_LABELS[new Date(item.started_at).getDay()]
         : "-",
-      totalVisitors: Number(item.total_visitors) || 0,
-      avgViewer: Number(item.avg_viewer) || 0,
-      peakViewers: Number(item.peak_viewers) || 0,
-      fund: Number(item.fund) || 0,
-      intoChatRate: parseFloat(item.into_chat_rate) || 0,
-      retentionRate: Number(item.retention_rate) || 0,
+      totalVisitors: item.total_visitors,
+      avgViewer: item.avg_viewer,
+      peakViewers: item.peak_viewers,
+      fund: item.fund,
+      intoChatRate: item.into_chat_rate,
+      retentionRate: item.retention_rate,
     }));
-    // 최신 날짜가 index 0 이 되도록 보장 (API 정렬이 신뢰되지 않을 때 방어)
-    mapped.sort((a, b) => {
-      if (!a.startedAt || !b.startedAt) return 0;
-      return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
-    });
-    return mapped;
   }, [rawStats]);
-
-  // WeeklyChart는 reversed(오래된→최신) 이므로 hover 인덱스를 역변환
-  const currentDataIndex = useMemo(() => {
-    if (!liveStatsWeek?.length) return 0;
-    if (hoveredChartIndex === null) return 0;
-    return Math.min(liveStatsWeek.length - 1 - hoveredChartIndex, liveStatsWeek.length - 1);
-  }, [liveStatsWeek, hoveredChartIndex]);
 
   const currentData = useMemo(() => {
     if (!liveStatsWeek?.length) return null;
-    return liveStatsWeek[currentDataIndex] ?? liveStatsWeek[0];
-  }, [liveStatsWeek, currentDataIndex]);
+    return liveStatsWeek[hoveredChartIndex ?? 0] ?? liveStatsWeek[0];
+  }, [liveStatsWeek, hoveredChartIndex]);
 
   const highlightedKey = useMemo(() => {
     if (hoveredCardIndex === null) return null;
     return STAT_FIELDS[hoveredCardIndex]?.key ?? null;
   }, [hoveredCardIndex]);
 
-  // delta 비교: 현재 hover된 날의 전날 (index + 1 = 한 단계 더 오래된 날)
-  const comparisonData = useMemo(() => {
-    if (!liveStatsWeek?.length) return null;
-    return liveStatsWeek[currentDataIndex + 1] ?? null;
-  }, [liveStatsWeek, currentDataIndex]);
+  const latestData = liveStatsWeek?.[0] ?? null;
+  const prevData = liveStatsWeek?.[1] ?? null;
 
   // 전체 카드 데이터 (미니 카드용)
   const allCardsData: MiniCardInfo[] = useMemo(
@@ -204,17 +189,21 @@ const LiveStats = ({
         index: i,
         title: f.title,
         unit: f.unit,
-        value: currentData ? f.toNumber(currentData[f.key] as string | number) : 0,
-        prevValue: comparisonData ? f.toNumber(comparisonData[f.key] as string | number) : null,
+        value: currentData
+          ? f.toNumber(currentData[f.key] as string | number)
+          : 0,
+        prevValue: prevData
+          ? f.toNumber(prevData[f.key] as string | number)
+          : null,
       })),
-    [currentData, comparisonData],
+    [currentData, prevData],
   );
 
   const handleCardClick = (index: number) => {
     if (selectedCardIndex === index) {
-      onCardSelect?.(null, []);
+      onCardSelect(null, []);
     } else {
-      onCardSelect?.(index, allCardsData);
+      onCardSelect(index, allCardsData);
     }
   };
 
@@ -289,7 +278,7 @@ const LiveStats = ({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-row gap-2"
-            style={{ height: "calc(100vh - 310px)", marginLeft: 80 }}
+            style={{ height: "calc(100vh - 310px)", marginLeft: 150 }}
           >
             {/* ===== 왼쪽: 클립 패널 (35%) ===== */}
             <div className="h-full flex-shrink-0" style={{ width: "35%" }}>
@@ -320,7 +309,8 @@ const LiveStats = ({
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
                     border: "0.5px solid rgba(135,206,250,0.4)",
-                    boxShadow: "0 2px 16px rgba(100,180,255,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+                    boxShadow:
+                      "0 2px 16px rgba(100,180,255,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
                   }}
                 >
                   <span
@@ -329,22 +319,31 @@ const LiveStats = ({
                   >
                     AI 분석 요약 · {selectedField?.title}
                   </span>
-                  <p className="text-[11px] leading-relaxed" style={{ color: "rgba(0,0,0,0.55)" }}>
+                  <p
+                    className="text-[11px] leading-relaxed"
+                    style={{ color: "rgba(0,0,0,0.55)" }}
+                  >
                     {`이번 방송 ${selectedField?.title}은 ${selectedValue.toLocaleString()}${selectedField?.unit}을 기록했습니다.`}
                   </p>
-                  {comparisonData && (() => {
-                    const prev = selectedField
-                      ? selectedField.toNumber(comparisonData[selectedField.key] as string | number)
-                      : 0;
-                    const diff = selectedValue - prev;
-                    return (
-                      <p className="text-[11px] leading-relaxed mt-0.5" style={{ color: "rgba(0,0,0,0.55)" }}>
-                        {diff >= 0
-                          ? `전 방송 대비 ${diff.toLocaleString()}${selectedField?.unit} 증가했습니다.`
-                          : `전 방송 대비 ${Math.abs(diff).toLocaleString()}${selectedField?.unit} 감소했습니다.`}
-                      </p>
-                    );
-                  })()}
+                  {prevData &&
+                    (() => {
+                      const prev = selectedField
+                        ? selectedField.toNumber(
+                            prevData[selectedField.key] as string | number,
+                          )
+                        : 0;
+                      const diff = selectedValue - prev;
+                      return (
+                        <p
+                          className="text-[11px] leading-relaxed mt-0.5"
+                          style={{ color: "rgba(0,0,0,0.55)" }}
+                        >
+                          {diff >= 0
+                            ? `전 방송 대비 ${diff.toLocaleString()}${selectedField?.unit} 증가했습니다.`
+                            : `전 방송 대비 ${Math.abs(diff).toLocaleString()}${selectedField?.unit} 감소했습니다.`}
+                        </p>
+                      );
+                    })()}
                 </div>
               </div>
 
@@ -359,7 +358,11 @@ const LiveStats = ({
                       key={msg.id}
                       initial={{ opacity: 0, y: 10, scale: 0.97 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 380,
+                        damping: 28,
+                      }}
                       className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                     >
                       {/* AI 아바타 — Gemini 아이콘 */}
@@ -367,16 +370,20 @@ const LiveStats = ({
                         <div
                           className="w-7 h-7 rounded-lg flex-shrink-0 mb-0.5 flex items-center justify-center"
                           style={{
-                            background: "white",
-                            boxShadow: "0 1px 6px rgba(14,165,233,0.2)",
-                            border: "0.5px solid rgba(56,189,248,0.2)",
+                            background:
+                              "linear-gradient(135deg, #4285F4, #1a56c4)",
                           }}
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            {/* AI 스파클 (4포인트) */}
-                            <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="#38bdf8"/>
-                            {/* LIVE 도트 */}
-                            <circle cx="19.5" cy="4.5" r="2.2" fill="#0ea5e9"/>
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z"
+                              fill="white"
+                            />
                           </svg>
                         </div>
                       )}
@@ -386,7 +393,8 @@ const LiveStats = ({
                         style={
                           msg.role === "user"
                             ? {
-                                background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                                background:
+                                  "linear-gradient(135deg, #7c6aff, #5b4adf)",
                                 color: "rgba(255,255,255,0.95)",
                                 borderRadius: "18px 18px 4px 18px",
                                 boxShadow: "0 2px 12px rgba(92,74,223,0.25)",
@@ -416,10 +424,21 @@ const LiveStats = ({
                     >
                       <div
                         className="w-7 h-7 rounded-lg flex-shrink-0 mb-0.5 flex items-center justify-center"
-                        style={{ background: "linear-gradient(135deg, #4285F4, #1a56c4)" }}
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #4285F4, #1a56c4)",
+                        }}
                       >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                          <path d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z" fill="white"/>
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M12 2C11.5 6.5 9.5 9.5 2 12C9.5 14.5 11.5 17.5 12 22C12.5 17.5 14.5 14.5 22 12C14.5 9.5 12.5 6.5 12 2Z"
+                            fill="white"
+                          />
                         </svg>
                       </div>
                       <div
@@ -435,7 +454,11 @@ const LiveStats = ({
                             key={i}
                             className="w-1.5 h-1.5 rounded-full bg-black/25 block"
                             animate={{ y: [0, -4, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: i * 0.15,
+                            }}
                           />
                         ))}
                       </div>
@@ -474,7 +497,11 @@ const LiveStats = ({
                     placeholder="궁금한 거 물어보세요..."
                     disabled={isAiTyping}
                     className="flex-1 text-sm outline-none bg-transparent disabled:opacity-50 resize-none leading-relaxed"
-                    style={{ color: "#1a1a2e", maxHeight: "120px", overflowY: "auto" }}
+                    style={{
+                      color: "#1a1a2e",
+                      maxHeight: "120px",
+                      overflowY: "auto",
+                    }}
                   />
                   <AnimatePresence>
                     {chatInput.trim() && !isAiTyping && (
@@ -484,9 +511,21 @@ const LiveStats = ({
                         exit={{ opacity: 0, scale: 0.7 }}
                         onClick={handleChatSend}
                         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                        }}
                       >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <line x1="22" y1="2" x2="11" y2="13" />
                           <polygon points="22 2 15 22 11 13 2 9 22 2" />
                         </svg>
@@ -511,10 +550,20 @@ const LiveStats = ({
             <div className="flex flex-row gap-3">
               {STAT_FIELDS.map((field, index) => {
                 const rawValue = currentData?.[field.key];
-                const numericValue = rawValue != null ? field.toNumber(rawValue as string | number) : 0;
-                const currentVal = currentData ? field.toNumber(currentData[field.key] as string | number) : null;
-                const prevVal = comparisonData ? field.toNumber(comparisonData[field.key] as string | number) : null;
-                const delta = currentVal !== null && prevVal !== null ? currentVal - prevVal : undefined;
+                const numericValue =
+                  rawValue != null
+                    ? field.toNumber(rawValue as string | number)
+                    : 0;
+                const todayVal = latestData
+                  ? field.toNumber(latestData[field.key] as string | number)
+                  : null;
+                const prevVal = prevData
+                  ? field.toNumber(prevData[field.key] as string | number)
+                  : null;
+                const delta =
+                  todayVal !== null && prevVal !== null
+                    ? todayVal - prevVal
+                    : undefined;
                 return (
                   <StatCard
                     key={field.key}
@@ -524,7 +573,9 @@ const LiveStats = ({
                     delta={delta}
                     isChartHovered={hoveredChartIndex !== null}
                     index={index}
-                    onHover={(hovered) => setHoveredCardIndex(hovered ? index : null)}
+                    onHover={(hovered) =>
+                      setHoveredCardIndex(hovered ? index : null)
+                    }
                     onClick={() => handleCardClick(index)}
                   />
                 );
@@ -546,19 +597,15 @@ const LiveStats = ({
               </div>
             </div>
 
-            {/* 시청자 유지율 — WeeklyChart와 동일한 flex 구조로 width 일치 */}
-            {currentData && (
-              <div className="flex flex-row gap-4">
-                <div className="w-2/3">
-                  <RetentionRate
-                    totalVisitors={currentData.totalVisitors}
-                    retentionRate={currentData.retentionRate}
-                  />
-                </div>
-                <div className="w-1/3" />
+            {/* 시청자 유지율 (항상 최신 방송 기준, 2/3 너비) */}
+            {latestData && (
+              <div className="w-2/3">
+                <RetentionRate
+                  totalVisitors={latestData.totalVisitors}
+                  retentionRate={latestData.retentionRate}
+                />
               </div>
             )}
-            <AICard />
           </motion.div>
         )}
       </AnimatePresence>
