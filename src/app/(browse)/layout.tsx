@@ -11,9 +11,21 @@ interface Props {
 const layout = ({ children }: Props) => {
   const pathname = usePathname();
   const isAuthPage = pathname === "/signin" || pathname === "/login";
+  const isHomePage = pathname === "/";
 
   if (isAuthPage) {
     return <>{children}</>;
+  }
+
+  if (isHomePage) {
+    return (
+      <>
+        <Navbar />
+        <div className="mt-20 h-[calc(100vh-5rem)]">
+          {children}
+        </div>
+      </>
+    );
   }
 
   return (
