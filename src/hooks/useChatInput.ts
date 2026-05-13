@@ -17,7 +17,7 @@ const useChatInput = ({ current_host_id }: props) => {
   const [is_hover, set_is_hover] = useState<boolean>(false);
   const [is_overflow, set_is_overflow] = useState<boolean>(false);
 
-  const { socket, connect_socket } = useSocketStore();
+  const { socket, connectSocket } = useSocketStore();
   const user_info = useUserStore((state) => state.user);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -25,11 +25,11 @@ const useChatInput = ({ current_host_id }: props) => {
 
   // 1. 소켓 연결 관리
   useEffect(() => {
-    if (!socket) connect_socket();
+    if (!socket) connectSocket();
     return () => {
       socket?.off("receive_message");
     };
-  }, [socket, connect_socket]);
+  }, [socket, connectSocket]);
 
   // 2. 입력 핸들러 (글자수 제한 포함)
   const inputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

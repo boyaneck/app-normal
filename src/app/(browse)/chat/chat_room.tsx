@@ -45,7 +45,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const message_input_ref = useRef(null);
   const chatContainerRef = useRef(null); // 채팅 컨테이너 ref 생성
   const user_info = useUserStore((state) => state.user);
-  const { socket, connect_socket } = useSocketStore();
+  const { socket, connectSocket } = useSocketStore();
   const [message_remove, set_message_remove] = useState(null);
   const [hearts, set_hearts] = useState<heart[]>([]); // 하트 목록 상태
 
@@ -68,7 +68,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
 
   useEffect(() => {
     if (!socket) {
-      connect_socket();
+      connectSocket();
     }
     if (socket) {
       socket.on("receive_message", (message_info) => {
@@ -78,7 +78,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     return () => {
       socket?.off("receive_message");
     };
-  }, [socket, connect_socket]);
+  }, [socket, connectSocket]);
 
   const { data: chat_info } = useQuery({
     queryKey: ["getChatInfo"],
