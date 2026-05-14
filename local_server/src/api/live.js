@@ -51,6 +51,26 @@ export const insertLiveStats = async ({
   }
 };
 
+export const getPrevLive = async (roomName) => {
+  try {
+    const { data, error } = await supabase
+      .from("live_stats")
+      .select("*")
+      .eq("room_name", roomName)
+      .order("started_at", { ascending: false })
+      .range(1, 5);
+    if (error) throw error;
+
+    return data || [];
+  } catch (error) {
+    console.log(
+      "호스트의 지난 최신 5개의 방송 데이터를 가져오는데 오류가 발생했습니다.",
+      error,
+    );
+    return [];
+  }
+};
+
 export const insertAIReports = async (roomName, report) => {
   try {
     const { error } = await supabase.from("ai_reports").insert({
