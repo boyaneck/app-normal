@@ -1,7 +1,6 @@
 import { supabaseForClient } from "@/supabase/supabase_client";
-import { post_live_stats_props } from "@/types/live";
+import { LiveStatsProps } from "@/types/live";
 import axios from "axios";
-import { randomUUID } from "crypto";
 interface live_info_insert_props {
   user_email?: string;
   thumb_url: string;
@@ -65,20 +64,22 @@ export const getHomeTrendingLiveList = async () => {
   return res.data;
 };
 
-export const getPostLiveStatsWeek = async (room_name: string | undefined) => {
-  const { data: post_live_stats, error } = await supabaseForClient
-    .from("post_live_stats")
+export const getLiveStatsWeek = async (roomName: string | undefined) => {
+  console.log("제대로 된 방송 넘버 ", roomName);
+  const { data: liveStats, error } = await supabaseForClient
+    .from("live_stats")
     .select("*")
-    .eq("broad_num", room_name)
-    .order("live_started_at", { ascending: false })
+    .eq("room_name", roomName)
+    .order("started_at", { ascending: false })
     .limit(7);
 
+  console.log("리턴값 ", liveStats);
   if (error) {
     console.log("❌방송 종료후 방송통계를 가져오는데 오류 발생", error.message);
     throw new Error(error.message);
   }
 
-  return post_live_stats ? post_live_stats : null;
+  return liveStats ? liveStats : null;
 };
 
 export const getWeekleyPost = async (room_name: string) => {
@@ -129,6 +130,44 @@ export const insertAndUpdateLiveInfo = async ({
     console.error("저장 중 오류 발생:", error.message);
     return null;
   }
+};
+
+export const getTopSupporters = async () => {
+  const { data, error } = await supabaseForClient
+    .from("payments")
+    .select("user_nickname, amount");
+
+  if (error) throw new Error(error.message);
+  if (!data || data.length === 0) return [];
+
+  // amount가 text 타입이라 직접 집계
+  const map = new Map<string, { amount: number; count: number }>();
+  for (const row of data) {
+    const amt = parseInt(row.amount ?? "0", 10) || 0;
+    const nick = row.user_nickname ?? "익명";
+    const prev = map.get(nick) ?? { amount: 0, count: 0 };
+    map.set(nick, { amount: prev.amount + amt, count: prev.count + 1 });
+  }
+
+  return Array.from(map.entries())
+    .map(([nickname, { amount, count }]) => ({ nickname, amount, count }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+};
+
+export const getHighlights = async (roomName: string | undefined) => {
+  if (!roomName) return [];
+  const { data, error } = await supabaseForClient
+    .from("highlights")
+    .select("id, type, public_url, highlight_started_at")
+    .eq("room_name", roomName)
+    .order("highlight_started_at", { ascending: true });
+
+  if (error) {
+    console.error("하이라이트 로드 오류:", error.message);
+    return [];
+  }
+  return data ?? [];
 };
 
 export const getLiveListNow = async () => {

@@ -1,29 +1,160 @@
 "use client";
-
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import StudioMainBanner from "./studio_main_banner";
-import ManageViewerPage from "../studio_sidebar/manage_viewer/page";
+import { motion, AnimatePresence } from "framer-motion";
+import { StudioAIInput } from "./_components/AI-input";
+import StudioSidebar from "./_components/studio-sidebar";
+import LiveStat, { MiniCardInfo } from "./live-stat/live-stat";
+import useUserStore from "@/store/user";
+import { ChatMessage } from "@/types/live";
+import axios from "axios";
+const LiveSetting = dynamic(() => import("./live-setting/page"));
+
+const CARD_COLORS = ["#38bdf8", "#a78bfa", "#2dd4bf", "#e9a800", "#fb7185"];
+
 const StudioPage = () => {
-  const [select_menu, set_select_menu] = useState<string>("");
-  const onHandlerMenu = (menu: string) => {
-    set_select_menu(menu);
+  const { user } = useUserStore();
+
+  const [selectTab, setSelectTab] = useState<string>("");
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [allCards, setAllCards] = useState<MiniCardInfo[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isAiTyping, setIsAiTyping] = useState(false);
+  const [hoveredMiniCard, setHoveredMiniCard] = useState<number | null>(null);
+
+  const handleCardSelect = (index: number | null, cards: MiniCardInfo[]) => {
+    setSelectedCardIndex(index);
+    setAllCards(cards);
+    if (index !== null) {
+      setMessages([{ id: "init", role: "ai", content: "궁금한 거 물어보세요" }]);
+    } else {
+      setMessages([]);
+    }
   };
+
+  const onChatAISendMsg = async (text: string) => {
+    const userMsg: ChatMessage = { id: `u_${Date.now()}`, role: "user", content: text };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    setIsAiTyping(true);
+
+    try {
+      const selectedCard =
+        selectedCardIndex !== null ? allCards.find((c) => c.index === selectedCardIndex) : null;
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`,
+        {
+          cardTitle: selectedCard?.title ?? "",
+          currentValue: selectedCard?.value ?? 0,
+          prevValue: selectedCard?.prevValue ?? null,
+          unit: selectedCard?.unit ?? "",
+          messages: updatedMessages.slice(-6),
+        },
+      );
+
+      setMessages((prev) => [
+        ...prev,
+        { id: `a_${Date.now()}`, role: "ai", content: data.answer ?? "응답을 받지 못했습니다." },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { id: `a_${Date.now()}`, role: "ai", content: "AI 연결에 실패했습니다. 잠시 후 다시 시도해주세요." },
+      ]);
+    } finally {
+      setIsAiTyping(false);
+    }
+  };
+
+  const miniCards =
+    selectedCardIndex !== null ? allCards.filter((c) => c.index !== selectedCardIndex) : [];
+
+  const renderLiveStat = () => (
+    <LiveStat
+      roomName={user?.userId}
+      selectedCardIndex={selectedCardIndex}
+      onCardSelect={handleCardSelect}
+      messages={messages}
+      onChatAISendMsg={onChatAISendMsg}
+      isAiTyping={isAiTyping}
+    />
+  );
+
+  const TabContents: Record<string, React.ReactNode> = {
+    liveStat: renderLiveStat(),
+    liveSetting: <LiveSetting />,
+  };
+
+  const activeTab = selectTab || "liveStat";
+
   return (
-    <div
-      className=" border border-red-500 grid grid-cols-10 h-1/2
-  "
-    >
-      <div className="col-span-2">
-        <div onClick={() => onHandlerMenu("live_stat")}>라이브 통계</div>
-        <div onClick={() => onHandlerMenu("live_setting")}>
-          라이브 및 방송 설정
-        </div>
-        <div onClick={() => onHandlerMenu("analysis")}>분석</div>
-        <div onClick={() => onHandlerMenu("notice")}>공지사항</div>
+    <div className="flex h-full">
+      <StudioSidebar
+        activeTab={activeTab}
+        onTabChange={setSelectTab}
+        selectedCardIndex={selectedCardIndex}
+        onBack={() => handleCardSelect(null, [])}
+      />
+
+      <div className="flex-1 h-full overflow-y-auto pb-[160px]">
+        {TabContents[activeTab] || renderLiveStat()}
+        {selectedCardIndex === null && activeTab === "liveStat" && (
+          <StudioAIInput onSend={onChatAISendMsg} />
+        )}
       </div>
-      <div className="col-span-8 h-1/2 ">
-        <StudioMainBanner selected_menu={select_menu} />
-      </div>
+
+      {/* ===== 미니 카드 오버레이 (AI 입력창 위) ===== */}
+      <AnimatePresence>
+        {miniCards.length > 0 && activeTab === "liveStat" && (
+          <motion.div
+            className="fixed bottom-[84px] left-[calc(50%+92px)] flex gap-2 z-40"
+            style={{ x: "-50%" }}
+            initial={{ opacity: 0, y: 16, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 420, damping: 30 }}
+          >
+            {miniCards.map((card, i) => {
+              const color = CARD_COLORS[card.index % CARD_COLORS.length];
+              const isHovered = hoveredMiniCard === card.index;
+              return (
+                <motion.button
+                  key={card.index}
+                  initial={{ opacity: 0, y: 12, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26, delay: i * 0.05 }}
+                  whileHover={{ scale: 1.06, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => handleCardSelect(card.index, allCards)}
+                  onMouseEnter={() => setHoveredMiniCard(card.index)}
+                  onMouseLeave={() => setHoveredMiniCard(null)}
+                  className="flex flex-col items-center px-4 py-2.5 rounded-xl min-w-[88px] bg-white/80 backdrop-blur-xl transition-all duration-200"
+                  style={{
+                    border: isHovered ? `1px solid ${color}99` : "0.5px solid rgba(0,0,0,0.08)",
+                    boxShadow: isHovered
+                      ? `0 4px 20px ${color}22, inset 0 1px 0 rgba(255,255,255,0.9)`
+                      : "0 2px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  }}
+                >
+                  <span
+                    className={`text-[9px] uppercase tracking-[0.12em] mb-0.5 transition-colors duration-200 ${
+                      isHovered ? "" : "text-black/30"
+                    }`}
+                    style={isHovered ? { color } : undefined}
+                  >
+                    {card.title}
+                  </span>
+                  <span className="text-[15px] font-semibold text-black/80 tabular-nums leading-none">
+                    {card.value.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] text-black/25 mt-0.5">{card.unit}</span>
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

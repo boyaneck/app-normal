@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "Read(//c/Users/min/Desktop/LiveStreamingApp/**)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/chat/chat-spike-detector.js C:/Users/min/Desktop/LiveStreamingApp/express/src/chat/chat-spike-detector.js)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/socket/chat-socket.js C:/Users/min/Desktop/LiveStreamingApp/express/src/socket/chat-socket.js)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/payment/donation-spike-detector.js C:/Users/min/Desktop/LiveStreamingApp/express/src/payment/)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/payment/payment-service.js C:/Users/min/Desktop/LiveStreamingApp/express/src/payment/)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/payment/payment-webhook.js C:/Users/min/Desktop/LiveStreamingApp/express/src/payment/)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/payment/portone-client.js C:/Users/min/Desktop/LiveStreamingApp/express/src/payment/)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/chat/chat-spike-detector.js C:/Users/min/Desktop/LiveStreamingApp/express/src/chat/)",
+      "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/socket/chat-socket.js C:/Users/min/Desktop/LiveStreamingApp/express/src/socket/)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

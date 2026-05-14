@@ -154,7 +154,7 @@
 "use client";
 import { getHomeTrendingLiveList, getLiveUser } from "@/api";
 import { useViewerToken } from "@/hooks/useViewerToken";
-import { useSidebarStore } from "@/store/bar_store";
+import { useSidebarStore } from "@/store/bar-store";
 import useUserStore from "@/store/user";
 import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";

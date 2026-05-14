@@ -12,9 +12,9 @@ import Offline_Video from "./offline_video";
 import Loading_Video from "./loading-screen";
 import LiveVideo from "./live_video";
 import { Button } from "@/components/ui/button";
-import { useSocketStore } from "@/store/socket_store";
+import { useSocketStore } from "@/store/socket-store";
 import clsx from "clsx";
-import { useStreamingBarStore } from "@/store/bar_store";
+import { useStreamingBarStore } from "@/store/bar-store";
 import { useVideoStore } from "@/store/video";
 import { FaPlay, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import LoadingScreen from "./loading-screen";
@@ -49,11 +49,11 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   );
 
   //실시간 시청자를 확인하기 위한 socket----
-  const { socket, connect_socket } = useSocketStore();
+  const { socket, connectSocket } = useSocketStore();
   const [total_viewer, set_total_viewer] = useState<number>(0);
   useEffect(() => {
     if (!socket) {
-      connect_socket();
+      connectSocket();
       console.log("소켓에 연결되었습니다.");
     }
     set_total_viewer(participants.length - 1);

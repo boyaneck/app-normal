@@ -14,7 +14,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import StatCard from "../../studio/live_stat/stat_card";
+import StatCard from "../../studio/live-stat/stat-card";
 import { post_live_stats_props } from "@/types/live";
 import { DollarSign } from "lucide-react";
 const ManageRevenuePage = () => {

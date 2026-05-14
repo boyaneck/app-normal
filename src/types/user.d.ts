@@ -1,16 +1,16 @@
 export interface userData {
-  user_nickname: string;
-  avatar_url: string;
-  user_email: string;
-  created_at: string;
+  userNickname: string;
+  avatarURL: string;
+  userEmail: string;
+  createdAt: string;
   isLive: boolean;
-  user_id: string;
+  userId: string;
 }
 
 export interface User {
   id: string;
   name: string;
   user_email: string;
-  user_nickname?: string;
-  avatar_url: string;
+  userNickname?: string;
+  avatarURL: string;
 }

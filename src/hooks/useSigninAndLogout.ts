@@ -31,11 +31,11 @@ const useSigninAndLogout = () => {
             console.log("세션나와랴 얍얍얍", session.user?.email);
             if (fetchedUserInfo) {
               const userInfo = {
-                user_id: fetchedUserInfo.id,
-                user_nickname: fetchedUserInfo.user_nickname,
-                avatar_url: fetchedUserInfo.avatar_url,
-                user_email: fetchedUserInfo.user_email,
-                created_at: fetchedUserInfo.created_at,
+                userId: fetchedUserInfo.id,
+                userNickname: fetchedUserInfo.user_nickname,
+                avatarURL: fetchedUserInfo.avatar_url,
+                userEmail: fetchedUserInfo.user_email,
+                createdAt: fetchedUserInfo.created_at,
                 isLive: fetchedUserInfo.isLive,
               };
 

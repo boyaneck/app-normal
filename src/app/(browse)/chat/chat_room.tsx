@@ -18,7 +18,7 @@ import {
   remove_message_props,
   warning_chat,
 } from "../../../types/chat";
-import { useSocketStore } from "@/store/socket_store";
+import { useSocketStore } from "@/store/socket-store";
 import { getChatInfo } from "@/api/chat";
 import clsx from "clsx";
 import { max_messages, option_data, sanction_duration } from "@/utils/chat";
@@ -26,7 +26,7 @@ import { AnimatedHeart } from "./_components/animated_heart";
 import { AnimatedMessage } from "./_components/animated_message";
 import { ChatInput } from "./_components/chat_input";
 import ChatSanction from "./_components/chat_sanction";
-import { useSidebarStore, useStreamingBarStore } from "@/store/bar_store";
+import { useSidebarStore, useStreamingBarStore } from "@/store/bar-store";
 import { createPortal } from "react-dom";
 import { AnimatePresence } from "framer-motion";
 import { CreditCardIcon, Send } from "lucide-react";
@@ -45,7 +45,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const message_input_ref = useRef(null);
   const chatContainerRef = useRef(null); // 채팅 컨테이너 ref 생성
   const user_info = useUserStore((state) => state.user);
-  const { socket, connect_socket } = useSocketStore();
+  const { socket, connectSocket } = useSocketStore();
   const [message_remove, set_message_remove] = useState(null);
   const [hearts, set_hearts] = useState<heart[]>([]); // 하트 목록 상태
 
@@ -68,7 +68,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
 
   useEffect(() => {
     if (!socket) {
-      connect_socket();
+      connectSocket();
     }
     if (socket) {
       socket.on("receive_message", (message_info) => {
@@ -78,7 +78,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     return () => {
       socket?.off("receive_message");
     };
-  }, [socket, connect_socket]);
+  }, [socket, connectSocket]);
 
   const { data: chat_info } = useQuery({
     queryKey: ["getChatInfo"],
