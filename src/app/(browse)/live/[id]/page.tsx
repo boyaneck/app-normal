@@ -8,7 +8,6 @@ import useUserStore from "@/store/user";
 import ChatPage from "../../chat/page";
 import { useQuery } from "@tanstack/react-query";
 import { getRecommendLiveList } from "@/api";
-import StreamerInfoBar from "../_components/streamer_info_bar";
 import { useStreamingBarStore } from "@/store/bar-store";
 import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
@@ -35,12 +34,7 @@ const LivePage = () => {
   if (recommendLiveList) console.log("알고리즘 데이터 확인", recommendLiveList);
 
   const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
-  const stream_nav_bar = [
-    { id: "chat", icon: "💬" },
-    { id: "streamer", icon: "👤" },
-    { id: "settings", icon: "⚙️" },
-    { id: "info", icon: "🎬" },
-  ];
+
   // const live_information = get_user_info_about_live?.live_information[0];
   const [room_name, set_room_name] = useState("");
   //유저일 때와  , 비로그인 유저일대를
@@ -132,11 +126,6 @@ const LivePage = () => {
               host_identity={current_host_id}
             />
           </LiveKitRoom>
-
-          <StreamerInfoBar
-            items={stream_nav_bar}
-            show={show_streamer_info_bar}
-          />
         </div>
         <div
           className={`col-start-9 col-span-3 
