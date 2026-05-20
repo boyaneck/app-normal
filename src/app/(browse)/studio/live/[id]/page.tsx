@@ -3,6 +3,7 @@ import { useViewerToken } from "@/hooks/useViewerToken";
 import { LiveKitRoom } from "@livekit/components-react";
 import Video from "@/app/(browse)/live/_components/video";
 import { useRef, useState } from "react";
+import AICopilot from "./_components/AI-copilot";
 
 const StudioLivePage = ({ params }: { params: { id: string } }) => {
   const { id } = params;
@@ -10,7 +11,6 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   const videoRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [show_streamer_info_bar, set_show_streamer_info_bar] = useState(false);
 
   const handleFullScreen = () => {
     if (!isFullScreen) {
@@ -31,12 +31,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="grid grid-cols-12 h-[75vh] relative">
-      <div
-        ref={videoRef}
-        className="col-start-2 col-span-10 h-full"
-        onMouseOver={() => set_show_streamer_info_bar(true)}
-        onMouseLeave={() => set_show_streamer_info_bar(false)}
-      >
+      <div ref={videoRef} className="col-start-2 col-span-10 h-full">
         <LiveKitRoom
           audio={true}
           token={token}
@@ -49,6 +44,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
           <Video host_name={id} host_identity={id} />
         </LiveKitRoom>
       </div>
+      <AICopilot />
     </div>
   );
 };
