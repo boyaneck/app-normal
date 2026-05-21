@@ -18,12 +18,12 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setGreetingPhase("expand"),   600),
-      setTimeout(() => setGreetingPhase("text"),    1100),
+      setTimeout(() => setGreetingPhase("expand"), 600),
+      setTimeout(() => setGreetingPhase("text"), 1100),
       setTimeout(() => setGreetingPhase("hideText"), 3000),
-      setTimeout(() => setGreetingPhase("shrink"),   3200),
-      setTimeout(() => setGreetingPhase("done"),     3600),
-      setTimeout(() => setShowInput(true),           3700),
+      setTimeout(() => setGreetingPhase("shrink"), 3200),
+      setTimeout(() => setGreetingPhase("done"), 3600),
+      setTimeout(() => setShowInput(true), 3700),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -43,18 +43,17 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
   };
 
   const greetingAnimate: Record<string, any> = {
-    square:   { width: 48,  height: 48, borderRadius: 12, y: "-50%" },
-    expand:   { width: 360, height: 52, borderRadius: 26, y: "-50%" },
-    text:     { width: 360, height: 52, borderRadius: 26, y: "-50%" },
+    square: { width: 48, height: 48, borderRadius: 12, y: "-50%" },
+    expand: { width: 360, height: 52, borderRadius: 26, y: "-50%" },
+    text: { width: 360, height: 52, borderRadius: 26, y: "-50%" },
     hideText: { width: 360, height: 52, borderRadius: 26, y: "-50%" },
-    shrink:   { width: 0, height: 52, borderRadius: 26, y: "-50%", opacity: 0 },
+    shrink: { width: 0, height: 52, borderRadius: 26, y: "-50%", opacity: 0 },
   };
 
   const iconCenter = greetingPhase === "square";
   const iconHidden = greetingPhase === "shrink" || greetingPhase === "done";
 
-  const showText =
-    greetingPhase === "expand" || greetingPhase === "text";
+  const showText = greetingPhase === "expand" || greetingPhase === "text";
 
   return (
     <>
@@ -72,14 +71,20 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
               boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
               x: "-50%",
             }}
-            initial={{ width: 48, height: 48, borderRadius: 12, y: "-50%", opacity: 0 }}
+            initial={{
+              width: 48,
+              height: 48,
+              borderRadius: 12,
+              y: "-50%",
+              opacity: 0,
+            }}
             animate={{ ...greetingAnimate[greetingPhase], opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.25 } }}
             transition={{
-              width:        { duration: 0.3, ease: [0.4, 0, 1, 1] },
-              height:       { duration: 0.3, ease: EASE },
+              width: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+              height: { duration: 0.3, ease: EASE },
               borderRadius: { duration: 0.3 },
-              opacity:      { duration: 0.1, delay: 0.22 },
+              opacity: { duration: 0.1, delay: 0.22 },
             }}
           >
             {/* AI 아이콘 */}
@@ -93,9 +98,20 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
             >
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+                style={{
+                  background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                }}
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
@@ -107,7 +123,12 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
             <AnimatePresence>
               {showText && (
                 <motion.div
-                  style={{ marginLeft: 50, display: "flex", gap: 0, whiteSpace: "nowrap" }}
+                  style={{
+                    marginLeft: 50,
+                    display: "flex",
+                    gap: 0,
+                    whiteSpace: "nowrap",
+                  }}
                   exit={{ opacity: 0, transition: { duration: 0.15 } }}
                 >
                   {`${username}님 안녕하세요`.split("").map((char, i) => (
@@ -118,7 +139,7 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
                         initial={{ y: 14, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{
-                          y:       { duration: 0.25, delay: i * 0.03, ease: EASE },
+                          y: { duration: 0.25, delay: i * 0.03, ease: EASE },
                           opacity: { duration: 0.01, delay: i * 0.03 },
                         }}
                       >
@@ -159,9 +180,20 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
             <div className="absolute left-[14px] flex items-center justify-center">
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+                style={{
+                  background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                }}
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
@@ -184,8 +216,7 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
                 onKeyDown={handleKeyDown}
                 placeholder="AI에게 무엇이든 물어보세요..."
                 autoFocus
-                className="text-sm flex-1 outline-none bg-transparent"
-                style={{ color: "#1a1a2e" }}
+                className="text-sm flex-1 outline-none bg-transparent #1a1a2e"
               />
               <AnimatePresence>
                 {inputValue.trim() && (
@@ -195,14 +226,26 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
                     exit={{ opacity: 0, scale: 0.7 }}
                     onClick={handleSend}
                     className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ml-1"
-                    style={{ background: "linear-gradient(135deg, #7c6aff, #5b4adf)" }}
+                    style={{
+                      background: "linear-gradient(135deg, #7c6aff, #5b4adf)",
+                    }}
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <line x1="22" y1="2" x2="11" y2="13" />
                       <polygon points="22 2 15 22 11 13 2 9 22 2" />
                     </svg>
                   </motion.button>
                 )}
+                ""
               </AnimatePresence>
             </motion.div>
           </motion.div>
