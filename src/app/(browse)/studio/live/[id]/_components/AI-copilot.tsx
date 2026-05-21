@@ -100,11 +100,11 @@ const AICopilot = () => {
           )}
         </motion.button>
       </div>
-
       {/* 상태 텍스트 */}
       <p className="text-sm text-white/40 tracking-widest">
         {isListening ? "듣고 있어요..." : "마이크를 눌러 말해보세요"}
       </p>
+      "unstaged 된 코드 커밋하기 확인 메세지(2)"
     </div>
   );
 };
