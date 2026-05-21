@@ -11,10 +11,10 @@ import { IoStatsChartSharp } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoSettingsSharp } from "react-icons/io5";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 const LiveSetting = dynamic(() => import("./live-setting/page"));
 
 const CARD_COLORS = ["#38bdf8", "#a78bfa", "#2dd4bf", "#e9a800", "#fb7185"];
-
 const TABS = [
   {
     key: "liveStat",
@@ -33,6 +33,7 @@ const TABS = [
 const StudioPage = () => {
   const { user } = useUserStore();
 
+  const router = useRouter();
   const [selectTab, setSelectTab] = useState<string>("");
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
     null,
@@ -269,6 +270,14 @@ const StudioPage = () => {
             })}
           </motion.div>
         )}
+        <div
+          className="w-7 h-7 rounded-full bg-sky-200 border border-gray-400"
+          onClick={() => {
+            router.push(`studio/live/${user?.userId}`);
+          }}
+        >
+          호스트 방송 모니터링
+        </div>
       </AnimatePresence>
     </div>
   );
