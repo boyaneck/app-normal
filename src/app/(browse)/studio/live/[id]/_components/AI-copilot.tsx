@@ -15,12 +15,19 @@ const AICopilot = () => {
 
     const catcher = new VoiceCatcher();
     catcher.lang = "ko-KR";
-    catcher.continuous = false;    // 말 끝나면 자동 종료
+    catcher.continuous = true; // 말 끝나면 자동 종료
     catcher.interimResults = false; // 텍스트 실시간 표시 안 함
 
     catcher.onresult = (e) => {
       const result = e.results[e.results.length - 1][0].transcript;
       setTranscript(result);
+    };
+
+    catcher.onstart = () => {
+      const silenceTimer = setTimeout(() => {
+        voiceCatcherRef.current?.stop();
+        setIsListening(false);
+      }, 2000);
     };
 
     // 말이 끝나면 자동으로 멈춤
@@ -44,10 +51,8 @@ const AICopilot = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8">
-
       {/* 마이크 버튼 */}
       <div className="relative flex items-center justify-center">
-
         {/* 떨리는 외곽 링 — 인식 중일 때만 */}
         <AnimatePresence>
           {isListening && (
@@ -75,9 +80,7 @@ const AICopilot = () => {
         <motion.button
           onClick={toggleListening}
           animate={
-            isListening
-              ? { scale: [1, 1.06, 0.97, 1.04, 1] }
-              : { scale: 1 }
+            isListening ? { scale: [1, 1.06, 0.97, 1.04, 1] } : { scale: 1 }
           }
           transition={
             isListening
@@ -102,7 +105,6 @@ const AICopilot = () => {
       <p className="text-sm text-white/40 tracking-widest">
         {isListening ? "듣고 있어요..." : "마이크를 눌러 말해보세요"}
       </p>
-
     </div>
   );
 };
