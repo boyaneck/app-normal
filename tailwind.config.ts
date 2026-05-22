@@ -124,12 +124,17 @@ module.exports = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "liquid-shine": {
+          "0%": { backgroundPosition: "-200% center" },
+          "100%": { backgroundPosition: "300% center" },
+        },
       },
       animation: {
         "border-glow": "borderGlow 3s ease-in-out infinite",
         sweep: "sweep 3s ease-in-out infinite",
         "icon-float": "iconFloat 3s ease-in-out infinite",
         shimmer: "shimmer 2s infinite",
+        "liquid-shine": "liquid-shine 4s ease-in-out infinite",
         "slide-in": "slide-in-left 0.3s ease-out forwards",
         "slide-out": "slide-out-right 0.3s ease-out forwards",
         "slide-out-down": "slide-out-down-animation 0.3s ease-in-out forwards",
