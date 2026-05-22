@@ -4,6 +4,7 @@ import { LiveKitRoom } from "@livekit/components-react";
 import Video from "@/app/(browse)/live/_components/video";
 import { useRef, useState } from "react";
 import AICopilot from "./_components/AI-copilot";
+import AIAnswer from "./_components/AI-answer";
 
 const StudioLivePage = ({ params }: { params: { id: string } }) => {
   const { id } = params;
@@ -31,7 +32,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="grid grid-cols-12 h-[75vh] relative">
-      <div ref={videoRef} className="col-start-2 col-span-10 h-full">
+      <div ref={videoRef} className="col-start-2 col-span-10 h-full relative">
         <LiveKitRoom
           audio={true}
           token={token}
@@ -43,6 +44,9 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
         >
           <Video host_name={id} host_identity={id} />
         </LiveKitRoom>
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <AIAnswer />
+        </div>
       </div>
       <AICopilot />
     </div>

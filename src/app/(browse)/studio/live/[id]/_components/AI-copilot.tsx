@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff } from "lucide-react";
+import AIAnswer from "./AI-answer";
 
 const AICopilot = () => {
   //1.기존의 recordType 이랑 ReturnType이랑 먼차이임 ?
@@ -115,6 +116,7 @@ const AICopilot = () => {
         {isListening ? "듣고 있어요..." : "마이크를 눌러 말해보세요"}
       </p>
       "unstaged 된 코드 커밋하기 확인 메세지(2)"
+      <AIAnswer />
     </div>
   );
 };
