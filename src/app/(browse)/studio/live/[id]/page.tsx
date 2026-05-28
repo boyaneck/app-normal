@@ -12,6 +12,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   const videoRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [answer, setAnswer] = useState("");
 
   const handleFullScreen = () => {
     if (!isFullScreen) {
@@ -45,10 +46,10 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
           <Video host_name={id} host_identity={id} />
         </LiveKitRoom>
         <div className="absolute inset-0 z-10 pointer-events-none">
-          <AIAnswer />
+          <AIAnswer answer={answer} />
         </div>
       </div>
-      <AICopilot />
+      <AICopilot hostId={id} onAnswer={setAnswer} />
     </div>
   );
 };
