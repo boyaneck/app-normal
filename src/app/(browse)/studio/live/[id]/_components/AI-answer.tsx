@@ -1,6 +1,8 @@
 "use client";
 
-const AIAnswer = () => {
+type Props = { answer?: string };
+
+const AIAnswer = ({ answer }: Props) => {
   return (
     <div className="relative w-full h-full flex items-end justify-center pb-8 pointer-events-none">
       <div className="relative w-[90%] max-w-xl overflow-hidden rounded-2xl">
@@ -35,7 +37,7 @@ const AIAnswer = () => {
 
           {/* 응답 텍스트 */}
           <p className="text-sm text-white/80 leading-relaxed">
-            여기에 AI 응답이 표시됩니다.
+            {answer ?? "마이크를 눌러 질문해보세요"}
           </p>
 
           {/* 하단 반사 그라디언트 */}

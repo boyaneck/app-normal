@@ -2,10 +2,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff } from "lucide-react";
-import AIAnswer from "./AI-answer";
+import { askAICopilot } from "@/api/AI";
 
-const AICopilot = () => {
-  //1.기존의 recordType 이랑 ReturnType이랑 먼차이임 ?
+type Props = {
+  hostId: string;
+  onAnswer: (answer: string) => void;
+};
+
+const AICopilot = ({ hostId, onAnswer }: Props) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const voiceCatcherRef = useRef<SpeechRecognition | null>(null);
@@ -51,6 +55,12 @@ const AICopilot = () => {
     };
     voiceCatcherRef.current = catcher;
   }, []);
+
+  useEffect(() => {
+    if (!transcript || isListening) return;
+    askAICopilot(transcript, hostId).then(onAnswer).catch(console.error);
+  }, [transcript, isListening]);
+
   const toggleListening = () => {
     if (isListening) {
       voiceCatcherRef.current?.stop();
@@ -115,8 +125,6 @@ const AICopilot = () => {
       <p className="text-sm text-white/40 tracking-widest">
         {isListening ? "듣고 있어요..." : "마이크를 눌러 말해보세요"}
       </p>
-      "unstaged 된 코드 커밋하기 확인 메세지(2)"
-      <AIAnswer />
     </div>
   );
 };
