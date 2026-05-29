@@ -169,4 +169,17 @@ dataContext.timeseries={
 }
 
 
+const getRecentChatContext=async(keys)=>{
+  const fiveMinAgo=Date.now()-5*60*1000
+
+const raw =await redis_client.lRange()
+const recent=raw.map(JSON.parse).filter((msg)=>msg.serverTimstamp > fiveMinAgo).map((msg))
+
+
+}
+
+
+
+
+
 export default router;
