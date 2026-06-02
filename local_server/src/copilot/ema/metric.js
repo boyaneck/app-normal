@@ -1,5 +1,5 @@
-import { redis_client } from "../../../config/redis";
-import { getRedisKeys } from "../../../live/redis-keys";
+import { redis_client } from "../../config/redis";
+import { getRedisKeys } from "../../live/redis-keys";
 import { createDetector } from "./detector";
 
 const WINDOW_MS = 30 * 1000;
@@ -21,7 +21,7 @@ export const sampleMetrics = async (roomName) => {
   const keys = getRedisKeys(roomName);
   const now = Date.now();
   const windowStart = now - WINDOW_MS;
-  const det = getDetector(roomName);
+  const detects = getDetector(roomName);
 
   const chatCount = await redis_client.zCount(
     keys.CHAT_TIMESERIES,
@@ -39,8 +39,8 @@ export const sampleMetrics = async (roomName) => {
   const viewerCount = Number(viewerRaw) || 0;
   return {
     now,
-    chat: { value: chatCount, ...det.chat(chatCount) },
-    donation: { value: donationCount, ...det.donation(donationCount) },
-    viewer: { value: viewerCount, ...det.viewer(viewerCount) },
+    chat: { value: chatCount, ...detects.chat(chatCount) },
+    donation: { value: donationCount, ...detects.donation(donationCount) },
+    viewer: { value: viewerCount, ...detects.viewer(viewerCount) },
   };
 };
