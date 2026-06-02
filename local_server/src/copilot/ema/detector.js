@@ -7,7 +7,7 @@ export const createDetector = ({ alpha = ALPHA, warmUp = WARMUP }) => {
   let ema = 0; //지수이동평균(현재 추세값)
   let ewvar = 0; // 지수가중분산
 
-  const updae = (value) => {
+  const update = (value) => {
     count++;
 
     if (count === 1) {
