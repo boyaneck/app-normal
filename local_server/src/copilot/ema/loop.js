@@ -1,11 +1,12 @@
 // loop.js — 방송당 주기적으로 도는 메인 루프 (의사 코드 수준)
 
-import { sampleMetrics } from "./metrics.js";
+import { getMetrics } from "./metrics.js";
 import { decide } from "./decision.js";
+import { getMetrics } from "./metric.js";
 // import { generateCopilotLine } from "./action.js"; // 다음 단계 (Groq)
 
 export const tick = async (roomName) => {
-  const sample = await sampleMetrics(roomName); // 감지
+  const sample = await getMetrics(roomName); // 감지
   const event = decide(roomName, sample); // 판단
 
   if (!event) return; // 침묵이 기본값

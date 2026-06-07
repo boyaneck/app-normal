@@ -17,7 +17,7 @@ const getDetector = (roomName) => {
   return rooms.get(roomName);
 };
 
-export const sampleMetrics = async (roomName) => {
+export const getMetrics = async (roomName) => {
   const keys = getRedisKeys(roomName);
   const now = Date.now();
   const windowStart = now - WINDOW_MS;
