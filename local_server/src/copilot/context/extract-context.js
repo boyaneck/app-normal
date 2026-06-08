@@ -4,7 +4,7 @@ import { getRedisKeys } from "../../live/redis-keys";
 
 
 
-const WINDOW_MS=60*1000
+const RECENT_MS=5*60*1000
 const METRIC_KOR={
   donation:"후원",
   chat:"채팅",
@@ -45,12 +45,41 @@ const makeChatContext=async(roomName)=>{
  const kyes=getRedisKeys(roomName)
  const now=Date.now()
 
- const chatRawData=await redis_client.zRange(
+ const msgRawDatas=await redis_client.zRange(
   kyes.CHAT_TIMESERIES,
-  now-WINDOW_MS,
+  now-RECENT_MS,
   now,{BY:"SCORE"}
  )
 
- const msg=chatRawData
+ const msgArr=msgRawDatas.map((msg)=>{
+
+ })
+
+ const userCount = {};
+  for (const msg of msgRawDatas) {
+    userCount[msg.nickName] = (userCount[msg.nick] || 0) + 1;
+  }
+  const activeUsers = Object.entries(userCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([nick, count]) => ({ nick, count }));
+
 }
+
+
+//채팅으로 온 이벤트 단순하게 해석하여 한국말로 변형
+const figureOutEvent=async(event)=>{
+const metricName=METRIC_KOR[event.metric] ?? event.metric
+const zScore=event.z.toFixed(2)
+const direction=event.slope >0? "증가":"감소"
+
+return {
+  metric:metricName,
+  z:zScore,
+  direction,
+  meaning:`${metricName}이 평소대비 ${zScore}배 강하게 ${direction}`
+}
+
+}
+
 }
