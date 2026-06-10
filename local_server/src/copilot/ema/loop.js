@@ -6,13 +6,13 @@ import { getMetrics } from "./metric.js";
 // import { generateCopilotLine } from "./action.js"; // 다음 단계 (Groq)
 
 export const tick = async (roomName) => {
-  const sample = await getMetrics(roomName); // 감지
-  const event = decide(roomName, sample); // 판단
+  const metric = await getMetrics(roomName); // 감지
+  const event = decide(roomName, metric); // 판단
 
   if (!event) return; // 침묵이 기본값
 
   // --- 여기서부터 행동 층 (다음 단계) ---
-  // const line = await generateCopilotLine(event, sample);
+  // const line = await generateCopilotLine(event, metric);
   // pushToHost(roomName, line);
 
   // 지금은 로그만 (라벨링용 — 나중에 ✅/❌ 달 데이터)
@@ -21,6 +21,6 @@ export const tick = async (roomName) => {
     z: event.z.toFixed(2),
     score: event.score.toFixed(2),
     value: event.value,
-    at: new Date(sample.now).toISOString(),
+    at: new Date(metric.now).toISOString(),
   });
 };
