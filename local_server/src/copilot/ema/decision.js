@@ -12,19 +12,19 @@ const ACTIONABILITY = {
 
 const lastFired = new Map();
 // /**
-//  * 감지 결과 묶음(sampleMetrics 반환값)을 받아
+//  * 감지 결과 묶음(metricMetrics 반환값)을 받아
 //  * 개입할 사건이 있으면 가장 점수 높은 것 하나를 돌려준다.
 //  * @returns {null | { metric, z, score, value, slope }}
 //  */
-export function decide(roomName, sample) {
-  const now = sample.now;
+export function decide(roomName, metric) {
+  const now = metric.now;
   if (!lastFired.has(roomName)) lastFired.set(roomName, {});
   const fired = lastFired.get(roomName);
 
   const candidates = [];
 
   for (const metric of ["donation", "chat", "viewer"]) {
-    const m = sample[metric];
+    const m = metric[metric];
     if (!m.ready) continue; // 워밍업 안 끝남
     if (m.z < Z_THRESHOLD) continue; // 평범한 변동
     if (m.slope <= 0) continue; // 상승 추세일 때만 (급락 감지는 별도)
