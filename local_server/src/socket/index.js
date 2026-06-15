@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { chatSocket } from "./chat-socket.js";
 import { liveSocket } from "./live-socket.js";
+import { copilotSocket } from "./copilot-socket.js";
 export const initializeSocket = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
@@ -15,6 +16,7 @@ export const initializeSocket = (httpServer) => {
     console.log("Socket 새 연결 🚀 ", socket.id);
     chatSocket(socket, namespaceRoom);
     liveSocket(socket, namespaceRoom);
+    copilotSocket(socket, namespaceRoom);
 
     socket.on("send_streaming_viewer_presence", () => {});
   });
