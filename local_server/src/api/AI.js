@@ -11,10 +11,9 @@ const getChatList = async (roomName) => {
   const keys = getRedisKeys(roomName);
   const now = Date.now();
 
-  const chatList = await redis_client.Zrange(
-    keys.CHAT_TIMESERIES,
-    now - RECENT_MS,
-    now,
-    { BY: "SCORE" },
-  );
+  const chatList = await redis_client.Zrange(keys.MSG, now - RECENT_MS, now, {
+    BY: "SCORE",
+  });
+
+  return chatList;
 };
