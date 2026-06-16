@@ -6,8 +6,8 @@ import { getRedisKeys } from "../live/redis-keys.js";
 
 const router = express.Router();
 
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_URL =process.env.GROQ_URL
+const GROQ_MODEL =process.env.GROQ_MODEL
 
 const groqHeaders = () => ({
   Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
