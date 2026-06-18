@@ -7,13 +7,13 @@ const THRESHOLD = {
 const chatContextRules = [
   {
     priority: 80,
-    match: (c) => c.textStats.questionRate >= THRESHOLD.question,
+    match: (c) => c.textStates.questionRate >= THRESHOLD.question,
     build: (c) => ({
       intention: `might want to answer questions`,
       brief: `질문이 빠르게 올라오는 중 , 대표 질문 한두 개 골라서 답변 하는 것이 바람직함`,
-      requireNickname: false,
+      requiresNickname: false,
       focusData: {
-        questions: c.original.filter(
+        questions: c.originalMsg.filter(
           (l) => l.includes("?") || /어요|나요|까요/.test(l),
         ),
       },
@@ -23,12 +23,12 @@ const chatContextRules = [
     priority: 70,
     match: (c) => c.textStates.laughterRate >= THRESHOLD.laughter,
     build: (c) => ({
+      intention: `might want to elevate laughter `,
       brief: `채팅창에서 사람들의 반응이 좋네, 반응을 확인하고 유도해 봐 `,
       requiresNickname: false,
       focusData: {
         topKeyword: c.keywords[0]?.word ?? null,
-        original: c.original.slice(0, 5),
-        intention: `might want to elevate laughter `,
+        original: c.originalMsg.slice(0, 5),
       },
     }),
   },
@@ -46,10 +46,10 @@ const chatContextRules = [
     priority: 10, // 아무 특징 없을 때 기본값
     match: (c) => true,
     build: (c) => ({
-      intent: "nothing",
+      intention: "nothing",
       brief: "큰 반응이 없음, 조금 더 채팅창의 반응을 살펴볼 것 .",
       requiresNickname: false,
-      focusData: { original: c.original.slice(0, 5) },
+      focusData: { original: c.originalMsg.slice(0, 5) },
     }),
   },
 ];
@@ -57,7 +57,7 @@ const chatContextRules = [
 export const setupGROQIntention = (extractedContexts) => {
   const { donation, chat, viewer } = extractedContexts;
   const makeChatGROQIntention = (chat) => {
-    if (!chat || chat.count <= 0) return null;
+    if (!chat || chat.msgCount <= 0) return null;
     const chatContext = chatContextRules
       .filter((c) => c.match(chat))
       .sort((a, b) => b.priority - a.priority)[0];
