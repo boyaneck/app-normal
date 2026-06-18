@@ -16,31 +16,31 @@ const lastFired = new Map();
 //  * 개입할 사건이 있으면 가장 점수 높은 것 하나를 돌려준다.
 //  * @returns {null | { metric, z, score, value, slope }}
 //  */
-export function decide(roomName, metric) {
+export const decide = (roomName, metric) => {
   const now = metric.now;
   if (!lastFired.has(roomName)) lastFired.set(roomName, {});
   const fired = lastFired.get(roomName);
 
   const candidates = [];
 
-  for (const metric of ["donation", "chat", "viewer"]) {
-    const m = metric[metric];
+  for (const key of ["donation", "chat", "viewer"]) {
+    const m = metric[key];
     if (!m.ready) continue; // 워밍업 안 끝남
     if (m.z < Z_THRESHOLD) continue; // 평범한 변동
     if (m.slope <= 0) continue; // 상승 추세일 때만 (급락 감지는 별도)
 
     // 쿨다운: 같은 지표를 최근에 쐈으면 스킵
-    if (fired[metric] && now - fired[metric] < COOLDOWN_MS) continue;
+    if (fired[key] && now - fired[key] < COOLDOWN_MS) continue;
 
     // 개입점수 계산
     const abnormality = Math.min(m.z / Z_THRESHOLD, 3); // z 정규화 (상한 3)
-    const actionability = ACTIONABILITY[metric];
+    const actionability = ACTIONABILITY[key];
     const timeliness = 1.0; // 지금은 고정. 나중에 방송 국면별로 조정 가능
     const score = abnormality * actionability * timeliness;
 
     if (score >= SCORE_THRESHOLD) {
       candidates.push({
-        metric,
+        metric: key,
         z: m.z,
         score,
         value: m.value,
@@ -57,4 +57,4 @@ export function decide(roomName, metric) {
 
   fired[winner.metric] = now; // 쿨다운 기록
   return winner;
-}
+};
