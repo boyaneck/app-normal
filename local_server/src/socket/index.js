@@ -13,9 +13,8 @@ export const initializeSocket = (httpServer) => {
   const namespaceRoom = io.of("/room");
 
   namespaceRoom.on("connection", (socket) => {
-    console.log("Socket 새 연결 🚀 ", socket.id);
+    console.log("각 유저의 Socket 새 연결 🚀 ", socket.id);
     chatSocket(socket, namespaceRoom);
-    liveSocket(socket, namespaceRoom);
     copilotSocket(socket, namespaceRoom);
 
     socket.on("send_streaming_viewer_presence", () => {});

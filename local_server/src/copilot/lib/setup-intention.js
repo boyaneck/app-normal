@@ -1,3 +1,5 @@
+import { describe } from "node:test";
+
 const THRESHOLD = {
   question: 0.2,
   laughter: 0.3,
@@ -18,6 +20,8 @@ const chatContextRules = [
         ),
       },
     }),
+    describe: (focusData) =>
+      `최근질문:${focusData.questions.join("/") || "없음"}`,
   },
   {
     priority: 70,
@@ -27,10 +31,11 @@ const chatContextRules = [
       brief: `채팅창에서 사람들의 반응이 좋네, 반응을 확인하고 유도해 봐 `,
       requiresNickname: false,
       focusData: {
-        topKeyword: c.keywords[0]?.word ?? null,
+        keywords: c.keywords[0]?.word ?? null,
         original: c.originalMsg.slice(0, 5),
       },
     }),
+    describe: (focusData) => `반응좋은 키워드 :${focusData.keywords ?? "없음"}`,
   },
   {
     priority: 60,
@@ -41,6 +46,7 @@ const chatContextRules = [
       requiresNickname: false,
       focusData: { keywords: c.keywords.slice(0, 3).map((k) => k.word) },
     }),
+    describe: (focusData) => `뜨고 있는 키워드${focusData.keywords.join(":")}`,
   },
   {
     priority: 10, // 아무 특징 없을 때 기본값
@@ -63,4 +69,6 @@ export const setupGROQIntention = (extractedContexts) => {
       .sort((a, b) => b.priority - a.priority)[0];
     return chatContext.build(chat);
   };
+
+  return makeChatGROQIntention(chat);
 };

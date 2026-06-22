@@ -5,7 +5,7 @@ import { getMetrics } from "./metric.js";
 import { makeChatContext } from "../context/chat-context.js";
 import { setupGROQIntention } from "../lib/setup-intention.js";
 import { generateLine } from "../lib/generate-line.js";
-// import { generateCopilotLine } from "./action.js"; // 다음 단계 (Groq)
+import { sendCopilotInsightToHost } from "../../socket/copilot-socket.js";
 
 export const observe = async (roomName) => {
   const metric = await getMetrics(roomName); // 감지
@@ -13,12 +13,12 @@ export const observe = async (roomName) => {
 
   if (!event) return; // 침묵이 기본값
 
-  // --- 여기서부터 행동 층 (다음 단계) ---
-  // const line = await generateCopilotLine(event, metric);
-  // pushToHost(roomName, line);
+  // --- 행동 층: 트리거가 떴을 때만 채팅 분석 → 의도 결정 → GROQ 호출 → 호스트 전달 ---
   const chatContext = await makeChatContext(roomName);
   const intention = setupGROQIntention({ chat: chatContext });
   const line = await generateLine(intention, { chat: chatContext });
+
+  sendCopilotInsightToHost({ hostId: roomName, insightFromGROQ: line });
 
   // 지금은 로그만 (라벨링용 — 나중에 ✅/❌ 달 데이터)
   console.log(`[INTERVENE] ${roomName}`, {
