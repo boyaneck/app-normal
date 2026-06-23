@@ -1,7 +1,7 @@
+let namespace = null;
 export const copilotSocket = (socket, namespace_room) => {
   //클라이언트에서오는 요청
 
-  let namespace = null;
   namespace = namespace_room;
 
   socket.on("copilot-connected", ({ hostId, roomName }) => {
