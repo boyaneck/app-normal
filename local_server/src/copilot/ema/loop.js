@@ -29,3 +29,28 @@ export const observe = async (roomName) => {
     at: new Date(metric.now).toISOString(),
   });
 };
+
+// 방송 중인 room마다 주기적으로 observe()를 돌리기 위한 스케줄러
+const OBSERVE_INTERVAL_MS = 15 * 1000;
+const copilotIntervals = new Map();
+
+export const startCopilotLoop = (roomName) => {
+  if (copilotIntervals.has(roomName)) return;
+
+  const intervalId = setInterval(() => {
+    observe(roomName).catch((err) =>
+      console.error(`[Copilot] ${roomName} observe 오류:`, err.message),
+    );
+  }, OBSERVE_INTERVAL_MS);
+
+  copilotIntervals.set(roomName, intervalId);
+};
+
+export const stopCopilotLoop = (roomName) => {
+  const intervalId = copilotIntervals.get(roomName);
+  if (intervalId) {
+    clearInterval(intervalId);
+    copilotIntervals.delete(roomName);
+    console.log(`[Copilot] ${roomName} observe 루프 중지`);
+  }
+};

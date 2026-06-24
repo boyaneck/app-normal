@@ -22,7 +22,32 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
     }
     setIsFullScreen(!isFullScreen);
   };
+  // --- 코파일럿 소켓 연결 ---
+  useEffect(() => {
+    if (!token) return; // 토큰 받기 전엔 연결 안 함
 
+    const copilotSocket = io("http://localhost:3001/copilot", {
+      auth: { token }, // authorizeHost가 검증할 그 토큰
+      transports: ["websocket"],
+    });
+
+    copilotSocket.on("connect", () => {
+      console.log("[Copilot] 연결 성공:", copilotSocket.id);
+      copilotSocket.emit("copilot-connected"); // 서버가 socket.data.roomName으로 room join
+    });
+
+    copilotSocket.on("copilotInsight", (insight: string) => {
+      setAnswer(insight); // 기존 AIAnswer 컴포넌트 재사용
+    });
+
+    copilotSocket.on("connect_error", (err) => {
+      console.error("[Copilot] 연결 실패:", err.message); // UNAUTHORIZED / NOT_LIVE 등
+    });
+
+    return () => {
+      copilotSocket.disconnect();
+    };
+  }, [token]);
   if (!token) {
     return (
       <div className="flex items-center justify-center h-[75vh] text-white/40 text-sm">
