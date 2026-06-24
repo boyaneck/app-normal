@@ -1,3 +1,6 @@
+import { redis_client } from "../../config/redis.js";
+import { getRedisKeys } from "../../live/redis-keys.js";
+
 const TOP_USERS = 3;
 const TOP_KEYWORDS = 5;
 const STOP_WORDS = new Set([
@@ -21,7 +24,7 @@ const STOP_WORDS = new Set([
 const extractFrequency = (msgs) => {
   const userCount = {};
   for (const msg of msgs) {
-    userCount[msg.nickName] = (userCount[msg.nickName] || 0) + 1;
+    userCount[msg.userNickname] = (userCount[msg.userNickname] || 0) + 1;
   }
 
   const activeUsers = Object.entries(userCount)
@@ -85,6 +88,13 @@ const extractChatStats = (msgs) => {
 };
 
 const extractOriginalMsg = (msgs) => msgs.map((m) => m.msg);
+
+// chat-socket.js가 rPush로 쌓아둔 최근 메시지(최대 50개)를 읽어옴
+const getChat = async (roomName) => {
+  const keys = getRedisKeys(roomName);
+  const raw = await redis_client.lRange(keys.MSG, 0, -1);
+  return raw.map((m) => JSON.parse(m));
+};
 
 export const makeChatContext = async (roomName) => {
   const msgs = await getChat(roomName);

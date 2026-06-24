@@ -4,9 +4,10 @@ export const copilotSocket = (socket, namespace_room) => {
 
   namespace = namespace_room;
 
-  socket.on("copilot-connected", ({ hostId, roomName }) => {
-    socket.join(`copilot:${hostId}`);
-    console.log(`copilot:${hostId} 입장`);
+  socket.on("copilot-connected", () => {
+    const { roomName } = socket.data;
+    socket.join(`copilot:${roomName}`);
+    console.log(`copilot:${roomName} 입장`);
   });
 
   //GROQ에서 응답 받은 걸로 오는

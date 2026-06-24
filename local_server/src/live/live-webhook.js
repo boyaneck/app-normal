@@ -5,6 +5,7 @@ import { detectViewerSpike } from "./viewer-spike-detector.js";
 import { startRecording, stopRecording, waitForEgressComplete } from "./egress-manager.js";
 import { runClipPipeline } from "./clip-pipeline.js";
 import { getRedisKeys } from "./redis-keys.js";
+import { startCopilotLoop, stopCopilotLoop } from "../copilot/ema/loop.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
@@ -72,6 +73,9 @@ export const liveWebhook = async (req, res) => {
 
         // 5분마다 시계열 데이터 저장
         startTimeseriesRecording(roomName);
+
+        // 코파일럿 채팅 분석 루프 시작
+        startCopilotLoop(roomName);
 
         // Egress 녹화 시작 — 방이 완전히 준비될 때까지 3초 대기
         await new Promise((r) => setTimeout(r, 3000));
@@ -160,6 +164,7 @@ export const liveWebhook = async (req, res) => {
 
       case "ingress_ended": {
         stopTimeseriesRecording(roomName);
+        stopCopilotLoop(roomName);
 
         // Egress 중지 요청 (파일 최종화 시작)
         const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
@@ -175,6 +180,7 @@ export const liveWebhook = async (req, res) => {
       case "room_finished": {
         console.log("room_finished 이벤트 수신:", roomName);
         stopTimeseriesRecording(roomName);
+        stopCopilotLoop(roomName);
 
         // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
         const egressId = await redis_client.hGet(keys.EGRESS, "egressId");

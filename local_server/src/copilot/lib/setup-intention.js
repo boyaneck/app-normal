@@ -1,5 +1,3 @@
-import { describe } from "node:test";
-
 const THRESHOLD = {
   question: 0.2,
   laughter: 0.3,
@@ -64,10 +62,10 @@ export const setupGROQIntention = (extractedContexts) => {
   const { donation, chat, viewer } = extractedContexts;
   const makeChatGROQIntention = (chat) => {
     if (!chat || chat.msgCount <= 0) return null;
-    const chatContext = chatContextRules
+    const rule = chatContextRules
       .filter((c) => c.match(chat))
       .sort((a, b) => b.priority - a.priority)[0];
-    return chatContext.build(chat);
+    return { ...rule.build(chat), describe: rule.describe };
   };
 
   return makeChatGROQIntention(chat);

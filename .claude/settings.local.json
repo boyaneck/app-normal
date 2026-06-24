@@ -11,7 +11,8 @@
       "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/payment/portone-client.js C:/Users/min/Desktop/LiveStreamingApp/express/src/payment/)",
       "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/chat/chat-spike-detector.js C:/Users/min/Desktop/LiveStreamingApp/express/src/chat/)",
       "Bash(cp C:/Users/min/Desktop/LiveStreamingApp/appnormal/local_server/src/socket/chat-socket.js C:/Users/min/Desktop/LiveStreamingApp/express/src/socket/)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(git check-ignore *)"
     ]
   }
 }
