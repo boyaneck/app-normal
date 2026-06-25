@@ -1,13 +1,9 @@
 let namespace = null;
-export const copilotSocket = (socket, namespace_room) => {
+export const copilotSocket = (socket) => {
   //클라이언트에서오는 요청
 
-  namespace = namespace_room;
-
   socket.on("copilot-connected", () => {
-    const { roomName } = socket.data;
-    socket.join(`copilot:${roomName}`);
-    console.log(`copilot:${roomName} 입장`);
+    const { roomName } = socket.data.roomName;
   });
 
   //GROQ에서 응답 받은 걸로 오는
