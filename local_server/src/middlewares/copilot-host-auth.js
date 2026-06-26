@@ -17,6 +17,7 @@ export const authorizeHost = async (socket, next) => {
     if (!identity?.startsWith("HOST")) {
       return next(new Error("Unidentified HOST:확인되지 않은 호스트 🚨"));
     }
+    socket.data.roomName = roomName;
     next();
   } catch (error) {
     console.log("Copilot 호스트 인증 오류❌", error.message);
