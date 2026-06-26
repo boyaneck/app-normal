@@ -273,7 +273,7 @@ const StudioPage = () => {
         <div
           className="w-7 h-7 rounded-full bg-sky-200 border border-gray-400"
           onClick={() => {
-            router.push(`studio/live/${user?.userId}`);
+            router.push(`/studio/live/${user?.userId}`);
           }}
         >
           호스트 방송 모니터링

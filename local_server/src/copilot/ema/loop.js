@@ -18,7 +18,7 @@ export const observe = async (roomName) => {
   const intention = setupGROQIntention({ chat: chatContext });
   const line = await generateLine(intention, { chat: chatContext });
 
-  sendCopilotInsightToHost({ hostId: roomName, insightFromGROQ: line });
+  sendCopilotInsightToHost({ hostID: roomName, insightFromGROQ: line });
 
   // 지금은 로그만 (라벨링용 — 나중에 ✅/❌ 달 데이터)
   console.log(`[INTERVENE] ${roomName}`, {
