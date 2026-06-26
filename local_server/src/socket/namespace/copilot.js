@@ -8,6 +8,6 @@ export const copilotNamespace = (io) => {
 
   copilotRoom.on("connection", (socket) => {
     console.log(`copilot-socket 연결 완료 (host: ${socket.data.roomName}) ✅`);
-    copilotSocket(socket);
+    copilotSocket(socket, copilotRoom);
   });
 };
