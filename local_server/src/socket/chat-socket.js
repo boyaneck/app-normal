@@ -84,6 +84,7 @@ export const chatSocket = (socket, namespaceRoom) => {
           });
         }
       } catch (redisError) {
+      
         console.error("[Chat] 히스토리 복구 실패 (입장은 정상):", redisError.message);
       }
 
