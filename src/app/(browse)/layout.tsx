@@ -12,6 +12,7 @@ const layout = ({ children }: Props) => {
   const pathname = usePathname();
   const isAuthPage = pathname === "/signin" || pathname === "/login";
   const isHomePage = pathname === "/";
+  const isStudioLivePage = pathname.startsWith("/studio/live");
 
   if (isAuthPage) {
     return <>{children}</>;
@@ -26,6 +27,10 @@ const layout = ({ children }: Props) => {
         </div>
       </>
     );
+  }
+
+  if (isStudioLivePage) {
+    return <>{children}</>;
   }
 
   return (
