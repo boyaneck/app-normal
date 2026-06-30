@@ -115,24 +115,21 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
         </div>
 
         {/* 채팅 패널 */}
-        <div className="col-start-9 col-span-3 overflow-hidden relative h-full ml-4 rounded-xl border border-black">
+        <div
+          className={`col-start-9 col-span-3 overflow-hidden relative h-full ml-4 rounded-xl border border-black transition-all duration-500 ${
+            answer ? "opacity-[0.08]" : "opacity-100"
+          }`}
+        >
           <div className="absolute inset-0 z-10">
             <ChatPage current_host_nickname={id} current_host_id={id} />
           </div>
-
-          {/* 모달 백드롭 (채팅 위) */}
-          <div
-            className={`absolute inset-0 z-20 bg-black/65 pointer-events-none transition-opacity duration-500 ${
-              answer ? "opacity-100" : "opacity-0"
-            }`}
-          />
         </div>
 
         {/* GROQ LLM 응답 패널 — 채팅 위 수직 중앙 오버레이 */}
         <AnimatePresence>
           {answer && (
             <motion.div
-              className="absolute z-30 flex items-center cursor-pointer"
+              className="absolute z-30 flex items-center"
               style={{
                 left: "calc(66.667% + 1rem)",
                 right: "0",
@@ -148,13 +145,16 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
                 isHoveredRef.current = false;
                 actionsRef.current.scheduleHide();
               }}
-              onClick={() => setIsExpanded((prev) => !prev)}
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 16 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
-              <AIAnswer answer={answer} isExpanded={isExpanded} />
+              <AIAnswer
+                answer={answer}
+                isExpanded={isExpanded}
+                onToggleExpand={() => setIsExpanded((prev) => !prev)}
+              />
             </motion.div>
           )}
         </AnimatePresence>
