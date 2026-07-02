@@ -1,5 +1,6 @@
 import { redis_client } from "../config/redis.js";
 import { getRedisKeys } from "../live/redis-keys.js";
+import { analyzeChatSpike } from "../copilot/services/chat-spike-service.js";
 
 const SPIKE_CHK_SEC = 30 * 1000; // 30초 슬라이딩 윈도우
 const MIN_SPIKE_SEC = 3; // 최소 3윈도우(=1.5분) 이후 감지 시작
@@ -81,4 +82,12 @@ export const detectChatSpike = async (roomName) => {
   console.log(
     ` ${roomName}: ${currentCount}개/30s | 평균 ${Math.round(avgPerWindow)}개의 ${avgPerWindow > 0 ? Math.round(currentCount / avgPerWindow) : "∞"}배`,
   );
+
+  // 6. 코파일럿 분석 트리거 (채팅 브로드캐스트에 영향 없도록 비동기)
+  const spikeData = {
+    currentCount,
+    avgPerWindow: Math.round(avgPerWindow),
+    multiplier: avgPerWindow > 0 ? Math.round((currentCount / avgPerWindow) * 10) / 10 : null,
+  };
+  setImmediate(() => analyzeChatSpike(roomName, spikeData));
 };

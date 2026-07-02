@@ -12,12 +12,16 @@ export const authorizeHost = async (socket, next) => {
     const claims = await verifier.verify(copilotToken);
 
     const identity = claims.sub;
-    const roomName = identity.replace("HOST-", "");
 
-    if (!identity?.startsWith("HOST")) {
+    if (!identity?.startsWith("HOST-")) {
       return next(new Error("Unidentified HOST:확인되지 않은 호스트 🚨"));
     }
-    socket.data.roomName = roomName;
+
+    // 채팅/Redis roomName = URL id 파라미터 (UUID가 아닌 표시 이름)
+    const hostId = socket.handshake.query?.hostId;
+    if (!hostId) return next(new Error("hostId 없음"));
+
+    socket.data.roomName = hostId;
     next();
   } catch (error) {
     console.log("Copilot 호스트 인증 오류❌", error.message);
