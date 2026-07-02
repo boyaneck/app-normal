@@ -8,9 +8,7 @@ import AICopilot from "./_components/AI-copilot";
 import AIAnswer from "./_components/AI-answer";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-
-const TEST_TEXT =
-  "안녕하세요 김민준입니다 반갑습니다.\n오늘 방송에 와주셔서 정말 감사해요.\n같이 즐겁게 게임 해봅시다.\n궁금한 점 있으면 채팅으로 남겨주세요.\n오늘도 재밌는 방송 만들어 볼게요!";
+import { io } from "socket.io-client";
 
 const StudioLivePage = ({ params }: { params: { id: string } }) => {
   const { id } = params;
@@ -23,38 +21,42 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   const isHoveredRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const actionsRef = useRef({ scheduleHide: () => {} });
 
-  // ref로 최신 함수 유지 — setTimeout 내부에서 stale closure 방지
-  const actionsRef = useRef({ scheduleHide: () => {}, scheduleShow: () => {} });
-
+  // 4초 후 패널 자동 닫기 (hover 중이면 onMouseLeave에서 재호출)
   actionsRef.current.scheduleHide = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       if (!isHoveredRef.current) {
         setAnswer("");
         setIsExpanded(false);
-        actionsRef.current.scheduleShow();
       }
-      // hover 중이면 onMouseLeave 에서 scheduleHide 재호출
     }, 4000);
   };
 
-  actionsRef.current.scheduleShow = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setAnswer(TEST_TEXT);
-      actionsRef.current.scheduleHide();
-    }, 1000);
-  };
-
-  // TODO: 테스트용 — 실제 GROQ 연동 시 제거
+  // 코파일럿 소켓 연결 — 채팅 스파이크 발생 시 서버가 push
   useEffect(() => {
     if (!token) return;
-    actionsRef.current.scheduleShow();
+
+    const copilotSocket = io("http://localhost:3001/copilot", {
+      auth: { token },
+      query: { hostId: id },
+      transports: ["websocket"],
+    });
+
+    copilotSocket.emit("copilot-connected");
+
+    copilotSocket.on("copilotInsight", (insight: string) => {
+      setAnswer(insight);
+      setIsExpanded(false);
+      actionsRef.current.scheduleHide();
+    });
+
     return () => {
+      copilotSocket.disconnect();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [token]);
+  }, [token, id]);
 
   const handleFullScreen = () => {
     if (!isFullScreen) {
