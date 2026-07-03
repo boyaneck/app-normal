@@ -53,7 +53,7 @@ const useChat = ({
     const currentSocket = useSocketStore.getState().socket;
     if (currentSocket?.connected && hostId) {
       currentSocket.emit("join_room", {
-        roomId: hostId,
+        hostId,
         userId,
         userNickname,
         isHost,

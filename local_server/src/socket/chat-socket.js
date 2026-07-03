@@ -29,8 +29,16 @@ const chkMsgLimitSec = async (userId) => {
 // XSS 방지
 const escapeHTML = (str) => {
   if (typeof str !== "string") return str;
-  return str.replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;" })[c],
+  return str.replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#x27;",
+      })[c],
   );
 };
 
@@ -84,8 +92,10 @@ export const chatSocket = (socket, namespaceRoom) => {
           });
         }
       } catch (redisError) {
-      
-        console.error("[Chat] 히스토리 복구 실패 (입장은 정상):", redisError.message);
+        console.error(
+          "[Chat] 히스토리 복구 실패 (입장은 정상):",
+          redisError.message,
+        );
       }
 
       console.log(`[Chat] ${hostId}방 입장`);
@@ -126,7 +136,9 @@ export const chatSocket = (socket, namespaceRoom) => {
       setImmediate(() => persistMessage(hostId, safeMsg));
     } catch (error) {
       console.error("[Chat] 메시지 처리 오류:", error.message);
-      socket.emit("error_event", { msg: "메시지 전송 중 오류가 발생했습니다." });
+      socket.emit("error_event", {
+        msg: "메시지 전송 중 오류가 발생했습니다.",
+      });
     }
   });
 
