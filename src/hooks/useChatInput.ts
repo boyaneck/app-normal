@@ -103,22 +103,18 @@ const useChatInput = ({ current_host_id }: props) => {
   const sendMsg = () => {
     if (!input_msg.trim()) return;
 
-    const message_info = {
-      current_host_id,
-      user_nickname: user_info?.user_nickname,
-      avatar_url: user_info?.avatar_url,
-      message: input_msg,
-      date: dayjs().toISOString(),
+    const msgInfo = {
       id: user_info?.user_id,
+      userNickname: user_info?.user_nickname,
+      avatarUrl: user_info?.avatar_url,
       email: user_info?.user_email,
-      current_chat_room_number: "5",
+      msg: input_msg,
+      hostId: current_host_id,
+      chatRoomNum: current_host_id,
+      date: dayjs().toISOString(),
     };
 
-    socket?.emit("send_message", {
-      roomnumber: "5",
-      message_info,
-    });
-
+    socket?.emit("send_msg", { msgInfo });
     set_input_msg("");
   };
 

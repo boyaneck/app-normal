@@ -69,16 +69,16 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   useEffect(() => {
     if (!socket) {
       connectSocket();
+      return;
     }
-    if (socket) {
-      socket.on("receive_message", (message_info) => {
-        set_receive_message_info((prev) => [...prev, message_info]);
-      });
-    }
+    socket.emit("join_room", { hostId: current_host_id });
+    socket.on("receive_msg", (msg) => {
+      set_receive_message_info((prev) => [...prev, msg]);
+    });
     return () => {
-      socket?.off("receive_message");
+      socket?.off("receive_msg");
     };
-  }, [socket, connectSocket]);
+  }, [socket, connectSocket, current_host_id]);
 
   const { data: chat_info } = useQuery({
     queryKey: ["getChatInfo"],
@@ -205,17 +205,17 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
       >
         {/* --채팅메세지 */}
         <div className="">
-          {receive_message_info.map((message_info) => {
-            const isRemoving = message_remove === message_info;
+          {receive_message_info.map((msg) => {
+            const isRemoving = message_remove === msg;
             return (
               <AnimatedMessage
-                key={message_info.id}
-                message={`${message_info.user_nickname}: ${message_info.message}`}
+                key={msg.msgId}
+                message={`${msg.userNickname}: ${msg.msg}`}
                 is_visible={isRemoving}
-                avatar_url={message_info.avatar_url}
-                user_nickname={message_info.user_nickname}
-                user_id={message_info.id}
-                user_email={message_info.email}
+                avatar_url={msg.avatarUrl}
+                user_nickname={msg.userNickname}
+                user_id={msg.id}
+                user_email={msg.email}
                 selected_message_for_modal={selected_message_for_modal}
                 set_selected_message_for_modal={set_selected_message_for_modal}
                 is_modal_open={is_modal_open}

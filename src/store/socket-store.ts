@@ -67,7 +67,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       prev.close();
     }
 
-    const socket = io("http://localhost:3001/room", {
+    const socket = io("http://localhost:3001/chat", {
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 10,
