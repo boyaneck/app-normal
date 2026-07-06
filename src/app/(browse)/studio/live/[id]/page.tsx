@@ -6,7 +6,6 @@ import Video from "@/app/(browse)/live/_components/video";
 import ChatPage from "@/app/(browse)/chat/page";
 import AICopilot from "./_components/AI-copilot";
 import AIAnswer from "./_components/AI-answer";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { io } from "socket.io-client";
 
@@ -46,6 +45,10 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
     copilotSocket.emit("copilot-connected");
 
+    copilotSocket.on("connect_error", (err) => {
+      console.error("[코파일럿 소켓] 연결 실패:", err.message);
+    });
+
     copilotSocket.on("copilotInsight", (insight: string) => {
       setAnswer(insight);
       setIsExpanded(false);
@@ -77,17 +80,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div>
-      <div className="fixed top-0 left-0 h-20 flex items-center z-50" style={{ paddingLeft: 92 }}>
-        <Link href="/">
-          <img
-            src="/images/appnormal_logo.svg"
-            alt="appnormal logo"
-            className="h-[56px] w-auto cursor-pointer"
-          />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-12 h-[75vh] mt-[100px] relative">
+      <div className="grid grid-cols-12 h-[75vh] relative">
 
         {/* 방송 화면 */}
         <div ref={videoRef} className="col-start-2 col-span-7 h-full relative">
