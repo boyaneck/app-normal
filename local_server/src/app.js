@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import bodyParser from "body-parser";
 
 import { handleWebhook } from "./webhook.js";
-import { initialize_socket } from "./socket/index.js";
+import { initializeSocket } from "./socket/index.js";
 import { sanctionChat } from "./sanction/sanction_chat.js";
 import { livekitWebhook } from "./live/live_duration.js";
 import live_route from "./routes/live_route.js";
@@ -28,7 +28,7 @@ app.post("/sanction_chat", sanctionChat);
 
 app.use("/live", live_route);
 
-initialize_socket(server);
+initializeSocket(server);
 
 const startServer = async () => {
   try {
