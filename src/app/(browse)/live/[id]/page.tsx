@@ -13,13 +13,12 @@ import axios from "axios";
 import { useLiveTimer } from "@/hooks/useLiveTimer";
 import LiveRecommendCard from "../_components/live-recommend-card";
 
-const LivePage = () => {
+const LivePage = ({ params }: { params: { id: string } }) => {
   const search_params = useSearchParams();
-  const id = search_params.get("host_id");
   const host_nickname = search_params.get("host_nickname");
   const host_email = search_params.get("host_email");
   const { user } = useUserStore((state) => state);
-  const current_host_id = id === null ? "유저없음" : id;
+  const current_host_id = params.id;
   const current_host_nickname =
     host_nickname === null ? "유저없음" : host_nickname;
   const current_host_email = host_email === null ? "유저없음" : host_email;

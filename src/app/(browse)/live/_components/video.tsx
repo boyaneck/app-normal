@@ -122,7 +122,7 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
         set_show_streaming_bar(false);
       }}
     >
-      {/* {content} */}
+      {content}
 
       <div
         className={clsx(

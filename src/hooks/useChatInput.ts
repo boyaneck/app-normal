@@ -104,10 +104,10 @@ const useChatInput = ({ current_host_id }: props) => {
     if (!input_msg.trim()) return;
 
     const msgInfo = {
-      id: user_info?.user_id,
-      userNickname: user_info?.user_nickname,
-      avatarUrl: user_info?.avatar_url,
-      email: user_info?.user_email,
+      id: user_info?.userId ?? `guest-${Math.random().toString(36).slice(2, 8)}`,
+      userNickname: user_info?.userNickname ?? "게스트",
+      avatarUrl: user_info?.avatarURL,
+      email: user_info?.userEmail ?? "",
       msg: input_msg,
       hostId: current_host_id,
       chatRoomNum: current_host_id,

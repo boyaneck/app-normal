@@ -31,7 +31,7 @@ export const ChatInput = ({ current_host_id }: props) => {
 
   return (
     <div>
-      <div className=" absolute bottom-2 left-0 w-3/4 ">
+      <div className=" absolute bottom-2 left-0 w-[calc(100%-3rem)] flex items-end gap-1 ">
         {/* <script>{scroll_fading}</script> */}
         <div
           className={`relative ml-1 h-9
@@ -73,6 +73,12 @@ export const ChatInput = ({ current_host_id }: props) => {
             "
           />
         </div>
+        <button
+          onClick={() => { if (blankChk) sendMsg(); }}
+          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 hover:bg-sky-600 transition-colors"
+        >
+          <Send size={14} className="text-white" />
+        </button>
       </div>
     </div>
   );

@@ -37,9 +37,7 @@ interface Props {
 const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   console.log("현재 스트리머의 아이디 인데 ???", current_host_id);
   const icon = useStreamingBarStore((state) => state.icon);
-  const [receive_message_info, set_receive_message_info] = useState<
-    chat_props[]
-  >([]);
+  const [receive_message_info, set_receive_message_info] = useState<any[]>([]);
   const [show_emoji_picker, set_show_emoji_picker] = useState(false);
   const [message, set_message] = useState("");
   const message_input_ref = useRef(null);
@@ -241,19 +239,8 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
       </div>
 
-      <div className="border row-span-1  border-black grid grid-cols-[80%_10%_10%] items-center ">
+      <div className="border row-span-1 border-black grid grid-cols-[90%_10%] items-center">
         <ChatInput current_host_id={current_host_id} />
-        <button
-          className={`hover:cursor-pointer
-        
-          `}
-        >
-          <Send
-            className={` w-5 h-5
-              transition-colors duration-300 ease-in-out
-          `}
-          />
-        </button>
         <button className="" onClick={() => set_is_pm_modal_open(true)}>
           <CreditCardIcon />
         </button>
