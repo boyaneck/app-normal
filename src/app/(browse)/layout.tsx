@@ -30,7 +30,14 @@ const layout = ({ children }: Props) => {
   }
 
   if (isStudioLivePage) {
-    return <>{children}</>;
+    return (
+      <>
+        <Navbar />
+        <div className="mt-20 h-[calc(100vh-5rem)]">
+          {children}
+        </div>
+      </>
+    );
   }
 
   return (

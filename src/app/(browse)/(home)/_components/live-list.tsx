@@ -193,7 +193,7 @@ const LiveList = () => {
     user_id: string,
     user_nickname: string | undefined,
   ) => {
-    router.push(`/live/+?host_id=${user_id}&host_nickname=${user_nickname}`);
+    router.push(`/live/${user_id}?host_nickname=${user_nickname}`);
   };
 
   return (
