@@ -81,7 +81,6 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
   return (
     <div>
       <div className="grid grid-cols-12 h-[75vh] relative">
-
         {/* 방송 화면 */}
         <div ref={videoRef} className="col-start-2 col-span-7 h-full relative">
           <LiveKitRoom
@@ -153,7 +152,6 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </div>
   );

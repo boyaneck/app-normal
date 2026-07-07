@@ -1,6 +1,6 @@
 import { redis_client } from "../config/redis.js";
 
-export const streamingSocket = (socket, namespace_room) => {
+export const liveSocket = (socket, namespace_room) => {
   socket.on("", ({ message_info }) => {
     const host_id = message_info?.current_host_id;
     const msg_date = message_info?.date;
@@ -19,13 +19,13 @@ export const streamingSocket = (socket, namespace_room) => {
         await redis_client.sAdd(`${host_id}:room_chat_user`, host_id);
         await redis_client.rPush(
           `${host_id}:room_chat_log`,
-          JSON.stringify(chat_info)
+          JSON.stringify(chat_info),
         );
       } catch (error) {
         console.log(
           "채팅중 레디스에 데이터 넣는 와중 오류 발생",
           error.message,
-          error
+          error,
         );
       }
     };
