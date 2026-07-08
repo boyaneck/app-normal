@@ -7,6 +7,7 @@ export const useViewerToken = (host_id: string | undefined) => {
   const [name, setName] = useState("");
   const [identity, setIdentity] = useState("");
 
+  
   useEffect(() => {
     if (!host_id) {
       return;
