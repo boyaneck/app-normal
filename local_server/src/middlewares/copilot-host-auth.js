@@ -16,7 +16,7 @@ export const authorizeHost = async (socket, next) => {
     if (!identity?.startsWith("HOST-")) {
       return next(new Error("Unidentified HOST:확인되지 않은 호스트 🚨"));
     }
-
+    console.log("제대로 된 호스트로 확인 되었음", identity);
     // 채팅/Redis roomName = URL id 파라미터 (UUID가 아닌 표시 이름)
     const hostId = socket.handshake.query?.hostId;
     if (!hostId) return next(new Error("hostId 없음"));

@@ -24,7 +24,7 @@ const createGuestUser = () => {
  * @returns 게스트 또는 해당 유저의 정보가 들어간 토큰을 발행
  */
 export const createViewerToken = async (hostID: string | undefined) => {
-  let now_user_info;
+  let nowUserInfo;
   console.log("호스트의 아이디 확인하기", hostID);
   try {
     //1.로그인시 supabase로 부터 세션 정보를 받아 브라우저 쿠키에 저장
@@ -37,42 +37,51 @@ export const createViewerToken = async (hostID: string | undefined) => {
       error,
     } = await supabase.auth.getUser();
     if (user && !error) {
-      now_user_info = {
+      nowUserInfo = {
         id: user.id,
         user_nickname: user.user_metadata.user_nickname,
         email: user.email,
       };
     } else {
-      now_user_info = createGuestUser();
+      nowUserInfo = createGuestUser();
     }
   } catch (error) {
     //에러가 발생해도 게스트로 처리
     console.log("Auth 처리 중 에러발생, 게스트로 전환 ", error);
-    now_user_info = createGuestUser();
+    nowUserInfo = createGuestUser();
   }
 
   // 스트리머의 모든 정보 가져오기
   const host = await getUserInfoById(hostID);
-  const is_host = now_user_info?.id === host?.id;
+  console.log("호스트 보기 ", host);
+  const isHost = nowUserInfo?.id === host?.id;
+  console.log(
+    "http only 쿠키를 통한 supabase로부터 인증받은 세션이 들어가 있는 ID",
+    nowUserInfo,
+  );
+  console.log("nowUSerInfo의 ID는 무엇인가요 ?", nowUserInfo?.id);
+  console.log("");
+  // console.log("supabase로 부터 가져온 유저의 iD?", isHost);
 
   // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
     process.env.LIVEKIT_API_SECRET,
     {
-      identity: is_host ? `HOST-${now_user_info.id}` : now_user_info.id,
-      name: now_user_info.email,
+      identity: isHost ? `HOST-${nowUserInfo.id}` : nowUserInfo.id,
+      name: nowUserInfo.email,
     },
   );
 
   token.addGrant({
     room: hostID,
     roomJoin: true,
-    canPublish: is_host,
+    canPublish: isHost,
     canPublishData: true,
   });
 
-  const tokenStr = token.toJwt();
-  console.log("타입은 무엇입니까 ??", typeof tokenStr);
-  return tokenStr;
+  // const tokenStr = await token.toJwt();
+  // console.log("타입은 무엇입니까 ??", typeof tokenStr);
+  // return tokenStr;
+  return await token.toJwt();
 };
