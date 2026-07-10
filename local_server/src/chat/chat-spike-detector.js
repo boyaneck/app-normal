@@ -44,7 +44,7 @@ export const detectChatSpike = async (roomName) => {
   const isSpike = hasPrevData
     ? currentCount >= avgPerWindow * SPIKE_MULTIPLIER
     : currentCount >= COLD_START_THRESHOLD;
-
+  console.log("[DEBUG]", { currentCount, hasPrevData, avgPerWindow, isSpike });
   if (!isSpike) return;
 
   // 4. 쿨다운 체크 — 3분 내 동일 타입 중복 방지
@@ -87,7 +87,10 @@ export const detectChatSpike = async (roomName) => {
   const spikeData = {
     currentCount,
     avgPerWindow: Math.round(avgPerWindow),
-    multiplier: avgPerWindow > 0 ? Math.round((currentCount / avgPerWindow) * 10) / 10 : null,
+    multiplier:
+      avgPerWindow > 0
+        ? Math.round((currentCount / avgPerWindow) * 10) / 10
+        : null,
   };
   setImmediate(() => analyzeChatSpike(roomName, spikeData));
 };

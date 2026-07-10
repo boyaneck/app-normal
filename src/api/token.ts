@@ -1,6 +1,6 @@
 "use server";
 
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, authorizeHeader } from "livekit-server-sdk";
 import { v4 } from "uuid";
 import { getUserInfoById } from "./user";
 import { cookies } from "next/headers";
@@ -25,7 +25,6 @@ const createGuestUser = () => {
  */
 export const createViewerToken = async (hostID: string | undefined) => {
   let nowUserInfo;
-  console.log("호스트의 아이디 확인하기", hostID);
   try {
     //1.로그인시 supabase로 부터 세션 정보를 받아 브라우저 쿠키에 저장
     //2.next.js 서버에게 브라우저에서 받은 쿠키를 자동으로 넘겨줌
@@ -36,6 +35,7 @@ export const createViewerToken = async (hostID: string | undefined) => {
       data: { user },
       error,
     } = await supabase.auth.getUser();
+
     if (user && !error) {
       nowUserInfo = {
         id: user.id,
@@ -53,16 +53,8 @@ export const createViewerToken = async (hostID: string | undefined) => {
 
   // 스트리머의 모든 정보 가져오기
   const host = await getUserInfoById(hostID);
-  console.log("호스트 보기 ", host);
   const isHost = nowUserInfo?.id === host?.id;
-  console.log(
-    "http only 쿠키를 통한 supabase로부터 인증받은 세션이 들어가 있는 ID",
-    nowUserInfo,
-  );
-  console.log("nowUSerInfo의 ID는 무엇인가요 ?", nowUserInfo?.id);
-  console.log("");
-  // console.log("supabase로 부터 가져온 유저의 iD?", isHost);
-
+  console.log("그러면 진짜로 이사람이 호스트 인가요 ??", isHost);
   // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
