@@ -8,15 +8,12 @@ interface url_card_props {
 
 const Url_Card = ({ value }: url_card_props) => {
   return (
-    <div className="rounded-xl bg-muted p-6">
-      <div className="flex items-center gap-x-10">
-        <p className="font-semibold shrink-0"></p>
+    <div className="rounded-xl bg-muted p-6 space-y-2">
+      <p className="font-semibold">Server URL</p>
+      <div className="w-full flex items-center gap-x-2">
+        <Input value={value || ""} disabled placeholder="Server URL" />
+        <Copy_button value={value} />
       </div>
-      Url_card
-      <div className="space-y-2 w-full"></div>
-      <div className="w-full flex items-center gap-x-2"></div>
-      <Input value={value || ""} disabled placeholder="Server URL" />
-      <Copy_button></Copy_button>
     </div>
   );
 };

@@ -21,8 +21,7 @@ const Copy_button = ({ value }: CopyClientProps) => {
   };
   const Icon = isCopied ? CheckCheck : Copy;
   return (
-    <Button onClick={onCopy} disabled={!value || isCopied}>
-      zz
+    <Button variant="outline" size="icon" onClick={onCopy} disabled={!value || isCopied}>
       <Icon className="h-4 w-4" />
     </Button>
   );
