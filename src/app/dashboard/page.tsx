@@ -1,52 +1,52 @@
-// "use client";
-import { Button } from "@/components/ui/button";
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import Url_Card from "./url_card";
 import Key_Card from "./key_card";
 import Connect_Modal from "./connect_modal";
-import { insertIngress } from "@/api/live";
 import Sidebar from "../(browse)/_components/sidebar";
-// import { useSidebarStore } from "@/store/sidebar_store";
-import { cn } from "@/lib/utils";
+import useUserStore from "@/store/user";
+import useSigninAndLogout from "@/hooks/useSigninAndLogout";
 
-const page = async () => {
-  // const { collapsed } = useSidebarStore((state) => state);
-  // const selft =await getSelf()
+interface ConnectionInfo {
+  url: string;
+  streamKey: string;
+}
+
+const DashboardPage = () => {
+  useSigninAndLogout();
+  const { user } = useUserStore((state) => state);
+  const [connection, setConnection] = useState<ConnectionInfo | null>(null);
 
   return (
-    // <div className="p-6">
-    //   page
-    //   <div className="flex items-center justify-between mb-4">
-    //     <h1 className="text-2xl font-bold">Keys URLS</h1>
-    //     <Connect_Modal />
-    //   </div>
-    //   <div className="border border-black space-y-4">
-    //     zzz
-    //     <Url_Card value={``} />
-    //     ss
-    //     <Key_Card value={``} />
-    //   </div>
-    // </div>
-
     <div>
-      <div className={cn("")}>
-        <Sidebar />
-      </div>
-      <div className="flex flex-col md:flex-row">
-        <div className="w-full md:w-auto flex-shrink-0">
-          {/* Navbar 컴포넌트 */}
-        </div>
-        <div className="flex-grow flex justify-center items-center border border-black space-y-4">
-          <Connect_Modal />
-          <div className="border border-black space-y-4">
-            // zzz // <Url_Card value={``} />
-            // ss // <Key_Card value={``} />
-            //{" "}
+      <Sidebar />
+      <div className="max-w-2xl mx-auto pl-24 pr-6 pt-16 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">스트리밍 연결 정보</h1>
+            {user && (
+              <p className="text-sm text-muted-foreground">
+                {user.userNickname}님의 방송 연결 정보예요.
+              </p>
+            )}
           </div>
+          <Connect_Modal onGenerated={setConnection} />
         </div>
+
+        {connection ? (
+          <div className="space-y-4">
+            <Url_Card value={connection.url} />
+            <Key_Card value={connection.streamKey} />
+          </div>
+        ) : (
+          <div className="rounded-xl bg-muted p-6 text-sm text-muted-foreground">
+            아직 발급된 연결 정보가 없어요. "새 연결 생성"을 눌러 RTMP
+            서버 URL과 스트림 키를 발급받은 뒤 OBS에 등록해주세요.
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default page;
+export default DashboardPage;

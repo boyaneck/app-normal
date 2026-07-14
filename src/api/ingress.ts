@@ -9,6 +9,7 @@ import {
 
 import { TrackSource } from "livekit-server-sdk/dist/proto/livekit_models";
 // import { TrackSource } from "@livekit/protocol";
+import { userData } from "@/types/user";
 
 const roomServiceClient = new RoomServiceClient(
   process.env.LIVEKIT_API_URL!,
@@ -38,10 +39,10 @@ export const createIngress = async (
   user: userData | null
 ) => {
   const options: CreateIngressOptions = {
-    name: user?.user_nickname,
-    roomName: user?.user_id,
-    participantName: user?.user_nickname,
-    participantIdentity: user?.user_id,
+    name: user?.userNickname,
+    roomName: user?.userId,
+    participantName: user?.userNickname,
+    participantIdentity: user?.userId,
   };
   if (ingressType === IngressInput.WHIP_INPUT) {
     options.bypassTranscoding = true;

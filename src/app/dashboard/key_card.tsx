@@ -11,20 +11,20 @@ interface key_card_props {
 const Key_Card = ({ value }: key_card_props) => {
   const [show, setShow] = useState(false);
   return (
-    <div className="rounded-xl bg-muted p-6">
-      <div className="flex items-start gap-x-10">
-        <p className="font-semibold shrink-0">Stream key</p>
-        <div className="space-y-2 w-full"></div>
-        <div className="w-full flex items-center gap-x-2"> </div>
+    <div className="rounded-xl bg-muted p-6 space-y-2">
+      <p className="font-semibold">Stream Key</p>
+      <div className="w-full flex items-center gap-x-2">
         <Input
           value={value || ""}
           type={show ? "text" : "password"}
           disabled
           placeholder="Stream Key"
         />
+        <Button variant="outline" onClick={() => setShow(!show)}>
+          {show ? "숨기기" : "보기"}
+        </Button>
         <Copy_button value={value || ""} />
       </div>
-      <Button onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</Button>
     </div>
   );
 };

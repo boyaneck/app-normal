@@ -20,114 +20,85 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { insertIngress } from "@/api/live";
 import useUserStore from "@/store/user";
 
-//IngressInput에 들어갈 각각의 형식에 맞는 수를 문자열로 변환한다.
 const RTMP = String(IngressInput.RTMP_INPUT);
 const WHIP = String(IngressInput.WHIP_INPUT);
 type IngressType = typeof RTMP | typeof WHIP;
 
-const Connect_Modal = () => {
+interface ConnectModalProps {
+  onGenerated: (result: { url: string; streamKey: string }) => void;
+}
+
+const Connect_Modal = ({ onGenerated }: ConnectModalProps) => {
   const closeRef = useRef<ElementRef<"button">>(null);
   const [isPending, startTransition] = useTransition();
   const [ingressType, setIngressType] = useState<IngressType>(RTMP);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useUserStore((state) => state);
-  console.log("왜 유저의 정보가 스튜디오에서 아난오는겆 ㅛ??", user);
+
   const onSubmit = () => {
-    startTransition(() => {
-      if (user === null) {
-        alert("유저의 정보가 없습니다.! 로그인하고 이용해주세요");
-        return;
+    if (user === null) {
+      setError("로그인 후 이용해주세요.");
+      return;
+    }
+
+    setError(null);
+    startTransition(async () => {
+      try {
+        const ingress = await createIngress(parseInt(ingressType), user);
+        onGenerated({ url: ingress.url!, streamKey: ingress.streamKey! });
+        closeRef.current?.click();
+      } catch (err) {
+        console.error("Ingress 생성 실패:", err);
+        setError("연결 정보를 만드는 데 실패했습니다. 다시 시도해주세요.");
       }
-      console.log("클릭시 유저와 함께 정보전달", user);
-      createIngress(parseInt(ingressType), user)
-        .then(() => {
-          console.log("Ingress create succeed");
-          alert("Ingress가 만들어 졌습니다");
-          closeRef?.current?.click();
-        })
-        .catch((error) => {
-          if (isNaN(parseInt(ingressType))) {
-            console.error("Invalid ingressType:", ingressType);
-          }
-
-          alert("error 가 생김");
-          console.log("errr는", error, error.message);
-        });
     });
-    console.log("startTransition이 끝났습니다.");
   };
 
-  const good = () => {
-    createIngress(parseInt(ingressType), user);
-    alert("sss");
-  };
-
-  const ddd = () => {
-    const user_id = "88560f0a-d2bd-47b0-a340-02ac2e3343aa";
-    const user_id_string = user_id.toString();
-    insertIngress(
-      user_id_string,
-      "jinxx9222223@naver.com",
-      "벙찌네",
-      "뭐지",
-      "ㅋㅋㅋㅋ"
-    );
-    alert("");
-  };
   return (
     <Dialog>
-      {/* <Button
-        onClick={() => {
-          ddd();
-        }}
-      >
-        실험테스트
-      </Button> */}
-      <DialogTrigger>
-        {/* <Button>Generate connection</Button> */}
-        <span className="border border-black">Generate Connection</span>
+      <DialogTrigger asChild>
+        <Button variant="outline">새 연결 생성</Button>
       </DialogTrigger>
-      <div>
-        <Button onClick={good}>new button</Button>
-      </div>
       <DialogContent>
         <DialogHeader>
-          <DialogHeader>
-            <DialogTitle>Generate Connection </DialogTitle>
-          </DialogHeader>
+          <DialogTitle>새 연결 생성</DialogTitle>
         </DialogHeader>
+
         <Select
           disabled={isPending}
           value={ingressType}
-          onValueChange={(value: any) => setIngressType(value)}
+          onValueChange={(value: string) => setIngressType(value as IngressType)}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Ingress Type" />
+            <SelectValue placeholder="연결 방식" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={RTMP}>RTMP</SelectItem>
             <SelectItem value={WHIP}>WHIP</SelectItem>
           </SelectContent>
         </Select>
+
         <Alert>
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Warning</AlertTitle>
+          <AlertTitle>주의</AlertTitle>
           <AlertDescription>
-            현재 연결된 것을 이용하여 모든 동적 스트림을 재시작하세요!
+            새로 생성하면 기존 연결 정보는 더 이상 사용할 수 없어요. 방송
+            중이었다면 다시 시작해야 합니다.
           </AlertDescription>
         </Alert>
-        <div className="flex justify-between">
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <div className="flex justify-end gap-x-2">
           <DialogClose ref={closeRef} asChild>
-            {/* <Button variant="ghost">Cancel</Button> */}
-            <Button>Cancel</Button>
+            <Button variant="ghost">취소</Button>
           </DialogClose>
           <Button disabled={isPending} onClick={onSubmit}>
-            Generate
+            {isPending ? "생성 중..." : "생성"}
           </Button>
         </div>
-        새로운버튼
       </DialogContent>
     </Dialog>
   );
