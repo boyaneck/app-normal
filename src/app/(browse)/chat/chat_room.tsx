@@ -73,8 +73,16 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
     socket.on("receive_msg", (msg) => {
       set_receive_message_info((prev) => [...prev, msg]);
     });
+
+    // 서버 재시작 등으로 재연결됐을 때 room에 다시 join (안 하면 브로드캐스트를 못 받음)
+    const rejoinRoom = () => {
+      socket.emit("join_room", { hostId: current_host_id });
+    };
+    socket.io.on("reconnect", rejoinRoom);
+
     return () => {
       socket?.off("receive_msg");
+      socket.io.off("reconnect", rejoinRoom);
     };
   }, [socket, connectSocket, current_host_id]);
 
