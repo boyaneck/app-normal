@@ -17,6 +17,11 @@ const getDetector = (roomName) => {
   return rooms.get(roomName);
 };
 
+// 방송 종료 시 호출 — 다음 방송이 이전 방송의 EMA 기준선을 이어받지 않도록 정리
+export const resetRoomMetrics = (roomName) => {
+  rooms.delete(roomName);
+};
+
 export const getMetrics = async (roomName) => {
   const keys = getRedisKeys(roomName);
   const now = Date.now();
