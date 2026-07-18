@@ -1,5 +1,6 @@
 const ALPHA = 0.3; //EMA 반응성(0~1, 클수록 최근값에 민감)
-const WARMUP = 5; //최소 표본 수 - 이전의 z를 신뢰하지 않음
+// TODO: 데모용 1 — 원래 5였음 (count===1은 항상 ready:false라 사실상 2번째 틱부터 ready, 최솟값)
+const WARMUP = 1; //최소 표본 수 - 이전의 z를 신뢰하지 않음
 const MIN_STD = 1e-6; //0 으로 나누는 것을 방지
 
 export const createDetector = ({ alpha = ALPHA, warmUp = WARMUP } = {}) => {

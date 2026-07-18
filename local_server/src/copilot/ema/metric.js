@@ -2,7 +2,9 @@ import { redis_client } from "../../config/redis";
 import { getRedisKeys } from "../../live/redis-keys";
 import { createDetector } from "./detector";
 
-const WINDOW_MS = 30 * 1000;
+// TODO: 데모용 2초 — loop.js의 OBSERVE_INTERVAL_MS랑 반드시 같은 값으로 유지할 것
+// (둘이 다르면 겹치는/비는 구간이 생겨서 EMA 신호가 다시 희석/누락됨)
+const WINDOW_MS = 2 * 1000;
 
 const rooms = new Map();
 

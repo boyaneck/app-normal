@@ -39,7 +39,8 @@ export const observe = async (roomName) => {
 };
 
 // 방송 중인 room마다 주기적으로 observe()를 돌리기 위한 스케줄러
-// TODO: 디버깅용 2초 — 실제 데모/배포 전에 15 * 1000으로 되돌릴 것
+// TODO: 데모용 2초 — metric.js의 WINDOW_MS랑 반드시 같은 값으로 유지할 것
+// (실제 배포 전에는 15 * 1000 등으로 둘 다 같이 늘릴 것)
 const OBSERVE_INTERVAL_MS = 2 * 1000;
 const copilotIntervals = new Map();
 const runningRooms = new Set(); // 재진입 방지 — 이전 observe()가 아직 안 끝났으면 이번 틱은 건너뜀

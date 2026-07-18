@@ -1,7 +1,9 @@
 // // decision.js — 감지 결과를 받아 "개입할 가치가 있나"를 판단한다
 
-const Z_THRESHOLD = 2.0;
-const SCORE_THRESHOLD = 1.5;
+// TODO: 데모용 — 원래 Z_THRESHOLD=2.0, SCORE_THRESHOLD=1.5 였음
+// 채팅 2~3개만 쳐도 확실히 넘도록 둘 다 크게 낮춰둠.
+const Z_THRESHOLD = 0.3;
+const SCORE_THRESHOLD = 0.1;
 const COOLDOWN_MS = 3 * 60 * 1000;
 
 const ACTIONABILITY = {
