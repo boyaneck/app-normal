@@ -14,6 +14,7 @@ export const observe = async (roomName) => {
   );
 
   if (!event) return; // 침묵이 기본값
+  console.log("ai가 개입해야할 event 발생!!");
 
   // --- 행동 층: 트리거가 떴을 때만 채팅 분석 → 의도 결정 → GROQ 호출 → 호스트 전달 ---
   const chatContext = await makeChatContext(roomName);
