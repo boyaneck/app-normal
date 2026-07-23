@@ -45,6 +45,12 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
     copilotSocket.emit("copilot-connected");
 
+    // 재연결(서버 재시작 등) 시 room에서 빠지므로 다시 join 필요
+    const rejoinCopilotRoom = () => {
+      copilotSocket.emit("copilot-connected");
+    };
+    copilotSocket.io.on("reconnect", rejoinCopilotRoom);
+
     copilotSocket.on("connect_error", (err) => {
       console.error("[코파일럿 소켓] 연결 실패:", err.message);
     });
@@ -56,6 +62,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
     });
 
     return () => {
+      copilotSocket.io.off("reconnect", rejoinCopilotRoom);
       copilotSocket.disconnect();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
