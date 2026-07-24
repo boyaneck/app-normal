@@ -61,7 +61,15 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
       actionsRef.current.scheduleHide();
     });
 
+    // 새로고침/탭 닫기로 브라우저가 페이지를 통째로 날릴 때는
+    // React cleanup이 실행 안 될 수 있어서, 언로드 직전에 직접 끊어줌
+    const handleBeforeUnload = () => {
+      copilotSocket.disconnect();
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       copilotSocket.io.off("reconnect", rejoinCopilotRoom);
       copilotSocket.disconnect();
       if (timerRef.current) clearTimeout(timerRef.current);
