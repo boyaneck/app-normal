@@ -2,7 +2,11 @@ import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
 import { insertLiveStats } from "../api/live.js";
 import { detectViewerSpike } from "./viewer-spike-detector.js";
-import { startRecording, stopRecording, waitForEgressComplete } from "./egress-manager.js";
+import {
+  startRecording,
+  stopRecording,
+  waitForEgressComplete,
+} from "./egress-manager.js";
 import { runClipPipeline } from "./clip-pipeline.js";
 import { getRedisKeys } from "./redis-keys.js";
 import { startCopilotLoop, stopCopilotLoop } from "../copilot/ema/loop.js";
@@ -86,8 +90,14 @@ export const liveWebhook = async (req, res) => {
             filePath,
           });
         } catch (egressErr) {
-          console.error("[Egress] 녹화 시작 실패 (방송은 정상 진행):", egressErr.message);
-          console.error("[Egress] 에러 상세:", JSON.stringify(egressErr, null, 2));
+          console.error(
+            "[Egress] 녹화 시작 실패 (방송은 정상 진행):",
+            egressErr.message,
+          );
+          console.error(
+            "[Egress] 에러 상세:",
+            JSON.stringify(egressErr, null, 2),
+          );
         }
 
         break;
@@ -184,7 +194,10 @@ export const liveWebhook = async (req, res) => {
 
         // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
         const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
-        const recordingFilePath = await redis_client.hGet(keys.EGRESS, "filePath");
+        const recordingFilePath = await redis_client.hGet(
+          keys.EGRESS,
+          "filePath",
+        );
         const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
 
         if (egressId) {
@@ -202,7 +215,9 @@ export const liveWebhook = async (req, res) => {
         const startISO = startedAtStr
           ? new Date(parseInt(startedAtStr, 10)).toISOString()
           : new Date().toISOString();
-        const broadcastStartedAt = startedAtStr ? parseInt(startedAtStr, 10) : Date.now();
+        const broadcastStartedAt = startedAtStr
+          ? parseInt(startedAtStr, 10)
+          : Date.now();
 
         // 누적 방문자 수
         const totalVisitors = await redis_client.sCard(keys.ALL_VISITORS);
@@ -230,18 +245,36 @@ export const liveWebhook = async (req, res) => {
         // 후원 통계
         const fundStr = await redis_client.get(keys.DONATION_TOTAL_AMOUNT);
         const donationCountStr = await redis_client.get(keys.DONATION_COUNT);
-        const donationUniqueUsers = await redis_client.sCard(keys.DONATION_UNIQUE_USERS);
+        const donationUniqueUsers = await redis_client.sCard(
+          keys.DONATION_UNIQUE_USERS,
+        );
         const fund = fundStr ? parseInt(fundStr, 10) : 0;
-        const donationCount = donationCountStr ? parseInt(donationCountStr, 10) : 0;
+        const donationCount = donationCountStr
+          ? parseInt(donationCountStr, 10)
+          : 0;
 
         // 시계열 데이터 (Supabase 저장용)
-        const viewerTimeseries = await redis_client.zRangeWithScores(keys.TIMESERIES, 0, -1);
-        const donationTimeseries = await redis_client.zRangeWithScores(keys.DONATION_TIMESERIES, 0, -1);
+        const viewerTimeseries = await redis_client.zRangeWithScores(
+          keys.TIMESERIES,
+          0,
+          -1,
+        );
+        const donationTimeseries = await redis_client.zRangeWithScores(
+          keys.DONATION_TIMESERIES,
+          0,
+          -1,
+        );
 
         // avg_viewer 계산 (시계열 평균)
-        const avgViewer = viewerTimeseries.length > 0
-          ? Math.round(viewerTimeseries.reduce((sum, e) => sum + parseInt(e.value, 10), 0) / viewerTimeseries.length)
-          : 0;
+        const avgViewer =
+          viewerTimeseries.length > 0
+            ? Math.round(
+                viewerTimeseries.reduce(
+                  (sum, e) => sum + parseInt(e.value, 10),
+                  0,
+                ) / viewerTimeseries.length,
+              )
+            : 0;
 
         // 통계 저장
         const saveSuccess = await insertLiveStats({
@@ -295,7 +328,13 @@ export const liveWebhook = async (req, res) => {
 
         // 클립 파이프라인 — Egress 완전 업로드 후 비동기 실행
         if (egressId && recordingFilePath) {
-          scheduleClipPipeline(roomName, egressId, recordingFilePath, broadcastStartedAt, keys);
+          scheduleClipPipeline(
+            roomName,
+            egressId,
+            recordingFilePath,
+            broadcastStartedAt,
+            keys,
+          );
         }
 
         break;
@@ -310,14 +349,22 @@ export const liveWebhook = async (req, res) => {
  * Egress 업로드 완료를 기다린 후 클립 파이프라인 실행
  * room_finished 이벤트 처리를 블로킹하지 않도록 완전히 비동기 분리
  */
-const scheduleClipPipeline = (roomName, egressId, recordingFilePath, broadcastStartedAt, keys) => {
+const scheduleClipPipeline = (
+  roomName,
+  egressId,
+  recordingFilePath,
+  broadcastStartedAt,
+  keys,
+) => {
   (async () => {
     try {
       console.log(`[ClipPipeline] Egress 업로드 대기 중: ${egressId}`);
       const completed = await waitForEgressComplete(egressId);
 
       if (!completed) {
-        console.warn(`[ClipPipeline] Egress 미완료 — 클립 파이프라인 스킵: ${roomName}`);
+        console.warn(
+          `[ClipPipeline] Egress 미완료 — 클립 파이프라인 스킵: ${roomName}`,
+        );
         return;
       }
 
