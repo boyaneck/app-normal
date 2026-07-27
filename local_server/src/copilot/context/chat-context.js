@@ -20,6 +20,20 @@ const STOP_WORDS = new Set([
   "근데",
   "그래서",
 ]);
+const unescapeHTML = (str) => {
+  if (typeof str !== "string") return str;
+  return str.replace(
+    /&amp;|&lt;|&gt;|&quot;|&#x27;/g,
+    (entity) =>
+      ({
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&#x27;": "'",
+      })[entity],
+  );
+};
 
 const extractFrequency = (msgs) => {
   const userCount = {};
@@ -93,7 +107,10 @@ const extractOriginalMsg = (msgs) => msgs.map((m) => m.msg);
 const getChat = async (roomName) => {
   const keys = getRedisKeys(roomName);
   const raw = await redis_client.lRange(keys.MSG, 0, -1);
-  return raw.map((m) => JSON.parse(m));
+  return raw.map((m) => {
+    const parsed = JSON.parse(m);
+    return { ...parsed, msg: unescapeHTML(parsed.msg) };
+  });
 };
 
 export const makeChatContext = async (roomName) => {
