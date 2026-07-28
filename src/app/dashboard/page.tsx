@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Url_Card from "./url_card";
 import Key_Card from "./key_card";
 import Connect_Modal from "./connect_modal";
-import Sidebar from "../(browse)/_components/sidebar";
 import useUserStore from "@/store/user";
 import useSigninAndLogout from "@/hooks/useSigninAndLogout";
 
@@ -19,7 +18,6 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <Sidebar />
       <div className="max-w-2xl mx-auto pl-24 pr-6 pt-16 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -40,8 +38,8 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="rounded-xl bg-muted p-6 text-sm text-muted-foreground">
-            아직 발급된 연결 정보가 없어요. "새 연결 생성"을 눌러 RTMP
-            서버 URL과 스트림 키를 발급받은 뒤 OBS에 등록해주세요.
+            아직 발급된 연결 정보가 없어요. "새 연결 생성"을 눌러 RTMP 서버
+            URL과 스트림 키를 발급받은 뒤 OBS에 등록해주세요.
           </div>
         )}
       </div>
