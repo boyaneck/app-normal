@@ -28,8 +28,8 @@ import { ChatInput } from "./_components/chat_input";
 import ChatSanction from "./_components/chat_sanction";
 import { useSidebarStore, useStreamingBarStore } from "@/store/bar-store";
 import { createPortal } from "react-dom";
-import { AnimatePresence } from "framer-motion";
-import { CreditCardIcon, Send } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Send } from "lucide-react";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -55,6 +55,20 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const [selected_message_for_modal, set_selected_message_for_modal] =
     useState<remove_message_props | null>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const [donation_burst, set_donation_burst] = useState(0);
+  const [show_donation_burst, set_show_donation_burst] = useState(false);
+  const donation_burst_id_ref = useRef(0);
+
+  const triggerDonationBurst = () => {
+    const id = donation_burst_id_ref.current + 1;
+    donation_burst_id_ref.current = id;
+    set_donation_burst(id);
+    set_show_donation_burst(true);
+    // hover를 계속 유지해도 터지는 이펙트는 한 번 재생되고 끝 — 다시 hover에 들어와야 재생
+    setTimeout(() => {
+      if (donation_burst_id_ref.current === id) set_show_donation_burst(false);
+    }, 700);
+  };
   const onHandlerSelectOption = (reason: string) => {
     if (selected_option === reason) {
       set_selected_option(null);
@@ -140,15 +154,10 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   };
 
   useEffect(() => {
-    if (receive_message_info.length > max_messages) {
-      // 사라질 메시지 설정
-      set_message_remove(receive_message_info[0]);
-
-      // 0.3초 후에 메시지 목록에서 제거
-      setTimeout(() => {
-        set_receive_message_info((prev) => prev.slice(1));
-        set_message_remove(null);
-      }, 300);
+    // 채팅 박스 높이를 넘치면(스크롤 생기면) 애니메이션 없이 바로 가장 오래된 메시지 제거
+    const el = chatContainerRef.current;
+    if (el && el.scrollHeight > el.clientHeight && receive_message_info.length > 0) {
+      set_receive_message_info((prev) => prev.slice(1));
     }
   }, [receive_message_info]);
 
@@ -205,19 +214,22 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
       )}
     >
       <div
-        className=" row-span-9 flex flex-col-reverse "
+        className=" row-span-9 flex flex-col-reverse overflow-hidden "
         id={"payment-modal-target"}
-        ref={paymentRef}
+        ref={(node) => {
+          paymentRef.current = node;
+          chatContainerRef.current = node;
+          if (node) set_id_target(node);
+        }}
       >
         {/* --채팅메세지 */}
         <div className="">
           {receive_message_info.map((msg) => {
-            const isRemoving = message_remove === msg;
             return (
               <AnimatedMessage
                 key={msg.msgId}
                 message={`${msg.userNickname}: ${msg.msg}`}
-                is_visible={isRemoving}
+                is_visible={false}
                 avatar_url={msg.avatarUrl}
                 user_nickname={msg.userNickname}
                 user_id={msg.id}
@@ -247,10 +259,44 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         {/* <div className=" absolute top-2 z-10  bg-red-400 border rounded-xl border-black w-4/5 h-10 flex items-center left-1/2 -translate-x-1/2 "></div> */}
       </div>
 
-      <div className="border row-span-1 border-black grid grid-cols-[90%_10%] items-center">
+      <div className="row-span-1 border-t border-black/[0.07] flex items-center px-1">
         <ChatInput current_host_id={current_host_id} />
-        <button className="" onClick={() => set_is_pm_modal_open(true)}>
-          <CreditCardIcon />
+        <button
+          className="group relative flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-sky-50 hover:bg-sky-100 shadow-sm transition-colors"
+          onClick={() => set_is_pm_modal_open(true)}
+          onMouseEnter={triggerDonationBurst}
+        >
+          <span className="text-lg leading-none select-none grayscale group-hover:grayscale-0 transition-[filter] duration-300">
+            💰
+          </span>
+          <AnimatePresence>
+            {show_donation_burst && (
+              <React.Fragment key={donation_burst}>
+                {/* 돈주머니(중앙)에서 동전+지폐가 뾰로롱 한 번 터졌다 사라지는 빵파레 느낌 — hover 유지해도 재생 안 하고 딱 한 번만 */}
+                {[
+                  { key: "coin-1", type: "🪙", x: -20, y: -10, rotate: -30, delay: 0 },
+                  { key: "bill-1", type: "💵", x: -8, y: -28, rotate: -12, delay: 0.05 },
+                  { key: "bill-2", type: "💵", x: 8, y: -28, rotate: 12, delay: 0.1 },
+                  { key: "coin-2", type: "🪙", x: 20, y: -10, rotate: 30, delay: 0.15 },
+                ].map((p) => (
+                  <motion.span
+                    key={p.key}
+                    className="absolute top-1/2 left-1/2 -ml-2 -mt-2 text-xs pointer-events-none select-none"
+                    initial={{ opacity: 0, x: 0, y: 0, scale: 0.3, rotate: 0 }}
+                    animate={{ opacity: [0, 1, 1, 0], x: p.x, y: p.y, scale: 1, rotate: p.rotate }}
+                    transition={{
+                      duration: 0.65,
+                      times: [0, 0.2, 0.75, 1],
+                      ease: "easeOut",
+                      delay: p.delay,
+                    }}
+                  >
+                    {p.type}
+                  </motion.span>
+                ))}
+              </React.Fragment>
+            )}
+          </AnimatePresence>
         </button>
 
         {id_target &&

@@ -14,7 +14,7 @@ export const sanction_duration = ["60분", "12시간", "24시간", "7일", "30�
 export const max_messages = 11;
 
 // export const FIXED_HEIGHT_PX = 95; // 1.5줄 높이 (약 40px)
-export const FIXED_HEIGHT_PX = 35; // 1.5줄 높이 (약 40px)
+export const FIXED_HEIGHT_PX = 36; // 전송/후원 버튼과 높이 통일 (h-9 = 36px)
 export const LIMIT_HEIGHT_PX = 36;
 export const LINE_HEIGHT_PX = 26; // 실제 한 줄의 높이 (leading-6을 고려하여 설정)
 export const INPUT_AREA_HEIGHT_BUFFER = 40; // 입력창 영역 확보를 위한 카드 하단 여백 (px)

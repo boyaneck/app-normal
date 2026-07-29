@@ -61,7 +61,7 @@ module.exports = {
         },
         "fade-out-up-animation": {
           from: { opacity: 1, transform: "translateY(0)" },
-          to: { opacity: 0, transform: "translateY(-20px)" },
+          to: { opacity: 0, transform: "translateY(-36px)" },
         },
         "money-flap-animation": {
           "0%, 100%": { transform: "rotate(-3deg)" }, // 시작 및 끝: 약간 왼쪽으로 기울임

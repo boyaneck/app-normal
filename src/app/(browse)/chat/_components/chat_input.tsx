@@ -30,11 +30,11 @@ export const ChatInput = ({ current_host_id }: props) => {
   } = useChatInput({ current_host_id });
 
   return (
-    <div>
-      <div className=" absolute bottom-2 left-0 w-[calc(100%-3rem)] flex items-end gap-1 ">
+    <div className="relative flex-1 h-full">
+      <div className=" absolute bottom-2 left-0 w-[calc(100%-0.5rem)] flex items-end gap-1 ">
         {/* <script>{scroll_fading}</script> */}
         <div
-          className={`relative ml-1 h-9
+          className={`relative ml-1 h-9 flex-1 min-w-0
         transition-[height] duration-500 ease-in-out
         ${is_overflow && is_hover ? `  top-fade-mask-active` : ""}`}
           ref={wrapperRef}
@@ -50,7 +50,11 @@ export const ChatInput = ({ current_host_id }: props) => {
             onMouseEnter={mouseEnter}
             onMouseLeave={mouseLeave}
             onKeyDown={(e) => {
-              if (e.code === "Enter" && blankChk) sendMsg();
+              // 한글 입력 중(조합 중)에 Enter를 누르면 조합 확정 이벤트와 실제 Enter가
+              // 각각 keydown을 한 번씩 더 쏴서 sendMsg()가 두 번 불림 — 조합 중이면 무시
+              if (e.code === "Enter" && !e.nativeEvent.isComposing && blankChk) {
+                sendMsg();
+              }
             }}
             className="
           rounded-xl
@@ -75,9 +79,11 @@ export const ChatInput = ({ current_host_id }: props) => {
         </div>
         <button
           onClick={() => { if (blankChk) sendMsg(); }}
-          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 hover:bg-sky-600 transition-colors"
+          className={`flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-2xl transition-colors ${
+            blankChk ? "bg-cyan-500 hover:bg-cyan-600" : "bg-transparent"
+          }`}
         >
-          <Send size={14} className="text-white" />
+          <Send size={18} className={blankChk ? "text-white" : "text-gray-400"} />
         </button>
       </div>
     </div>
