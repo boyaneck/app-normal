@@ -125,7 +125,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 
         {/* 채팅 패널 */}
         <div
-          className={`col-start-9 col-span-3 overflow-hidden relative h-full ml-4 rounded-xl border border-black transition-all duration-500 ${
+          className={`col-start-9 col-span-3 overflow-hidden relative h-full ml-4 rounded-xl border border-black/[0.07] shadow-[0_1px_12px_rgba(0,0,0,0.04)] transition-all duration-500 ${
             answer ? "opacity-[0.08]" : "opacity-100"
           }`}
         >
