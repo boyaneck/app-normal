@@ -16,6 +16,7 @@ const useChatInput = ({ current_host_id }: props) => {
   const [input_msg, set_input_msg] = useState<string>("");
   const [is_hover, set_is_hover] = useState<boolean>(false);
   const [is_overflow, set_is_overflow] = useState<boolean>(false);
+  const [is_login_modal_open, set_is_login_modal_open] = useState<boolean>(false);
 
   // 소켓 연결은 ChatRoom(부모)이 전담해서 관리함 — 여기서 별도로 connectSocket()을 부르면
   // 페이지 진입 시 두 곳에서 거의 동시에 연결을 시도하다가 소켓이 두 개 생기는 레이스가 생김
@@ -97,6 +98,11 @@ const useChatInput = ({ current_host_id }: props) => {
   const sendMsg = () => {
     if (!input_msg.trim()) return;
 
+    if (!user_info) {
+      set_is_login_modal_open(true);
+      return;
+    }
+
     const msgInfo = {
       id: user_info?.userId ?? `guest-${Math.random().toString(36).slice(2, 8)}`,
       userNickname: user_info?.userNickname ?? "게스트",
@@ -124,6 +130,8 @@ const useChatInput = ({ current_host_id }: props) => {
     is_overflow,
     is_hover,
     mouseEnter,
+    is_login_modal_open,
+    close_login_modal: () => set_is_login_modal_open(false),
   };
 };
 

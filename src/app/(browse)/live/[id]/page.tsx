@@ -127,7 +127,7 @@ const LivePage = ({ params }: { params: { id: string } }) => {
           </LiveKitRoom>
         </div>
         <div
-          className={`col-start-9 col-span-3 
+          className={`col-start-9 col-span-3
            overflow-hidden relative
            h-full ml-4 rounded-xl border border-black
           `}

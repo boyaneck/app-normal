@@ -30,6 +30,7 @@ import { useSidebarStore, useStreamingBarStore } from "@/store/bar-store";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Send } from "lucide-react";
+import LoginRequiredModal from "../_components/login-required-modal";
 interface Props {
   current_host_nickname: string;
   current_host_id: string;
@@ -55,6 +56,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const [selected_message_for_modal, set_selected_message_for_modal] =
     useState<remove_message_props | null>(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const [is_login_modal_open, set_is_login_modal_open] = useState(false);
   const [donation_burst, set_donation_burst] = useState(0);
   const [show_donation_burst, set_show_donation_burst] = useState(false);
   const donation_burst_id_ref = useRef(0);
@@ -263,7 +265,13 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
         <ChatInput current_host_id={current_host_id} />
         <button
           className="group relative flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-sky-50 hover:bg-sky-100 shadow-sm transition-colors"
-          onClick={() => set_is_pm_modal_open(true)}
+          onClick={() => {
+            if (!user_info) {
+              set_is_login_modal_open(true);
+              return;
+            }
+            set_is_pm_modal_open(true);
+          }}
           onMouseEnter={triggerDonationBurst}
         >
           <span className="text-lg leading-none select-none grayscale group-hover:grayscale-0 transition-[filter] duration-300">
@@ -309,6 +317,11 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
             />,
             id_target,
           )}
+
+        <LoginRequiredModal
+          is_open={is_login_modal_open}
+          onClose={() => set_is_login_modal_open(false)}
+        />
       </div>
     </div>
   );

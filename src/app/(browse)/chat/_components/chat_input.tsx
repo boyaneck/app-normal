@@ -5,6 +5,7 @@ import { AnimatedHeart } from "./animated_heart";
 import PaymentPage from "../../_components/payment/payment";
 import useChatInput from "@/hooks/useChatInput";
 import { FIXED_HEIGHT_PX, scroll_fading } from "@/utils/chat";
+import LoginRequiredModal from "../../_components/login-required-modal";
 
 interface props {
   current_host_id: string;
@@ -27,10 +28,13 @@ export const ChatInput = ({ current_host_id }: props) => {
     is_hover,
     mouseEnter,
     // set_is_overflow,
+    is_login_modal_open,
+    close_login_modal,
   } = useChatInput({ current_host_id });
 
   return (
     <div className="relative flex-1 h-full">
+      <LoginRequiredModal is_open={is_login_modal_open} onClose={close_login_modal} />
       <div className=" absolute bottom-2 left-0 w-[calc(100%-0.5rem)] flex items-end gap-1 ">
         {/* <script>{scroll_fading}</script> */}
         <div
