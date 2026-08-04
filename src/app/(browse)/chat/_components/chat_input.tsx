@@ -21,6 +21,7 @@ export const ChatInput = ({ current_host_id }: props) => {
     // inputRef,
     // scrollFixRef,
     wrapperRef,
+    
     textareaRef,
     mouseLeave,
     // chkTextLength,
@@ -31,8 +32,8 @@ export const ChatInput = ({ current_host_id }: props) => {
     is_login_modal_open,
     close_login_modal,
   } = useChatInput({ current_host_id });
-
   return (
+
     <div className="relative flex-1 h-full">
       <LoginRequiredModal is_open={is_login_modal_open} onClose={close_login_modal} />
       <div className=" absolute bottom-2 left-0 w-[calc(100%-0.5rem)] flex items-end gap-1 ">

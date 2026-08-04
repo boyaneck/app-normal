@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff } from "lucide-react";
 import { askAICopilot } from "@/api/AI";
+import { Socket } from "socket.io-client";
 
 type Props = {
   hostId: string;
@@ -26,7 +27,7 @@ const AICopilot = ({ hostId, onAnswer }: Props) => {
     silenceTimerRef.current = setTimeout(() => {
       voiceCatcherRef.current?.stop();
       //setIsListening 이 부분은 조건절로 들어가야함, 작동하는게 아닌 대기중이기에 true로 되어있지 않아야하나 ..
-      // setIsListening(false);
+      // setIsListening(false);  
       //Ref에 settimeout을 넣어둔다는게, 이게 ref가 정확히 뭐였지 근데?
     }, ms);
   };

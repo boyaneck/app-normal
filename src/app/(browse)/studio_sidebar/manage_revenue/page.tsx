@@ -1,5 +1,6 @@
 "use client";
 import { getPostLiveStats } from "@/api";
+import { getWeeklyDonations } from "@/api/live";
 
 import useUserStore from "@/store/user";
 import { useQuery } from "@tanstack/react-query";
@@ -39,6 +40,12 @@ const ManageRevenuePage = () => {
     queryFn: () => getPostLiveStats(user?.user_id),
     enabled: !!user?.user_id,
     // staleTime: 1000 * 60 * 60,
+  });
+
+  const { data: weekly_donations } = useQuery({
+    queryKey: ["weeklyDonations", user?.userId],
+    queryFn: () => getWeeklyDonations(user?.userId),
+    enabled: !!user?.userId,
   });
 
   const liveStats = (stat_prop: post_live_stats_props | null | undefined) => {
@@ -99,18 +106,6 @@ const ManageRevenuePage = () => {
     },
   ];
 
-  const stat_graph = [
-    { name: "월요일", 후원금액: 4000, 시청자: 2400 },
-    { name: "화요일", 후원금액: 3000, 시청자: 2210 },
-    { name: "수요일", 후원금액: 2000, 시청자: 2290 },
-    { name: "Apr", 후원금액: 2780, 시청자: 2000 },
-    { name: "May", 후원금액: 1890, 시청자: 2181 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-    { name: "Jun", 후원금액: 2390, 시청자: 2500 },
-  ];
-
   const resultStats = liveStats(post_live_stats);
   return (
     <div style={{ fontFamily: "sans-serif" }}>
@@ -119,25 +114,17 @@ const ManageRevenuePage = () => {
       ))}
 
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={stat_graph}>
+        <LineChart data={weekly_donations ?? []}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />{" "}
           {/* 옅은 격자선 */}
           <XAxis dataKey="name" />
-          <YAxis domain={[0, 10000]} />
+          <YAxis domain={[0, "auto"]} />
           <Tooltip />
           <Legend />
           <Line
             type="monotone"
             dataKey="후원금액"
             stroke="#F56565" // 토스 스타일 파란색
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            dot={false} // 데이터 포인트 제거
-          />
-          <Line
-            type="monotone"
-            dataKey="시청자"
-            stroke="#48BB78" // 토스 스타일 하늘색
             strokeWidth={2}
             activeDot={{ r: 6 }}
             dot={false} // 데이터 포인트 제거

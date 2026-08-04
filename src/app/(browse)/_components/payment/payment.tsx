@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 import { AnimatePresence, easeInOut, motion } from "framer-motion";
+import axios from "axios";
 import useUserStore from "@/store/user";
 
 const MAX_MONEY = 10000000;
@@ -32,61 +33,81 @@ const PaymentPage = ({
   const [showPayment, setShowPayment] = useState(false); // 결제 진행 여부 상태 추가
   const [payment, set_payment] = useState<number>(0);
   useEffect(() => {
-    const iamport = document.createElement("script");
-    iamport.src = "https://cdn.iamport.kr/v1/iamport.js";
-    iamport.onload = () => {
+    const portone = document.createElement("script");
+    portone.src = "https://cdn.portone.io/v2/browser-sdk.js";
+    portone.onload = () => {
       set_is_import_loaded(true);
     };
-    iamport.onerror = () => {
-      console.error("아임포트 로딩 실패");
+    portone.onerror = () => {
+      console.error("PortOne SDK 로딩 실패");
     };
-    document.head.appendChild(iamport);
+    document.head.appendChild(portone);
     return () => {
-      document.head.removeChild(iamport);
+      document.head.removeChild(portone);
     };
   }, []);
 
-  const pay = () => {
+  const [is_paying, set_is_paying] = useState(false);
+
+  const pay = async () => {
     if (!is_import_loaded) {
-      alert("아임포트 스크립트 로딩중입니다. 잠시 후 다시 시도해주세요.");
+      alert("결제 스크립트 로딩중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+    if (!current_host_id) {
+      set_error("후원 대상을 확인할 수 없습니다.");
       return;
     }
 
-    const { IMP } = window as Window as any;
-    if (IMP) {
-      IMP.init(process.env.NEXT_PUBLIC_IAM_PORT_PG_CODE);
+    const { PortOne } = window as Window as any;
+    if (!PortOne) {
+      console.error("PortOne 객체를 가져오는데 실패했습니다.");
+      return;
+    }
 
-      IMP.request_pay(
-        {
-          pg: "tosspayments",
-          pay_method: "card",
-          merchant_uid: `payment-${crypto.randomUUID()}`,
-          name: current_host_nickname + "에게 후원",
+    set_is_paying(true);
+    try {
+      const response = await PortOne.requestPayment({
+        storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID,
+        channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY,
+        paymentId: `payment-${crypto.randomUUID()}`,
+        orderName: `${current_host_nickname}에게 후원`,
+        totalAmount: pureAmount,
+        currency: "CURRENCY_KRW",
+        payMethod: "CARD",
+        customData: JSON.stringify({
+          host_id: current_host_id,
+          user: user?.userNickname,
+        }),
+        customer: {
+          fullName: user?.userNickname ?? "익명",
+          email: user?.userEmail,
+        },
+      });
 
-          custom_data: JSON.stringify({
-            host_id: "!!!!호스트의 아이디가 들어갈수잇도록 할것",
-            user: user?.user_nickname,
-          }),
-          // amount: pay_ref?.current?.value,
-          amount: input_money,
-          buyer_email: "jinxx93@naver.com",
-          buyer_name: user?.user_nickname,
-          buyer_tel: "010-4242-4242",
-          buyer_addr: "서울특별시 강남구 신사동",
-          buyer_postcode: "01181",
-        },
-        function (response: any) {
-          if (response.success) {
-            console.log("결제 성공:", response);
-          } else {
-            console.error("결제 실패:", response);
-          }
-        },
+      if (response?.code !== undefined) {
+        console.error("결제 실패:", response.message);
+        set_error(response.message ?? "결제에 실패했습니다.");
+        return;
+      }
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/payment/verify`,
+        { paymentId: response.paymentId, amount: pureAmount },
       );
-      console.log("결제 데이터가 잘 가는ㄴ지 확인하기", IMP.request_pay);
-      closeModal(); // 결제창 닫기
-    } else {
-      console.error("IMP 객체를 가져오는데 실패했습니다.");
+
+      if (!data.success) {
+        set_error(data.msg ?? "결제 검증에 실패했습니다.");
+        return;
+      }
+
+      console.log("후원 완료:", data);
+      closeModal();
+    } catch (error) {
+      console.error("결제 처리 중 오류:", error);
+      set_error("결제 처리 중 오류가 발생했습니다.");
+    } finally {
+      set_is_paying(false);
     }
   };
 
@@ -104,10 +125,11 @@ const PaymentPage = ({
   // 모달 닫기
   const closeModal = useCallback(() => {
     set_is_modal_open(false);
+    set_is_pm_modal_open(false);
     set_error("");
     set_input_money(""); // 금액 초기화
     set_shake_key(0); // 쉐이크 키 초기화
-  }, []);
+  }, [set_is_pm_modal_open]);
   const moneyChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       let val = e.target.value.replace(/[^0-9]/g, "");
@@ -291,19 +313,23 @@ const PaymentPage = ({
           <div className="grid grid-rows-2 gap-y-5 mt-6">
             <div className="">
               <button
-                disabled={Number(input_money) > MAX_MONEY || input_money === ""}
+                disabled={
+                  Number(input_money) > MAX_MONEY ||
+                  input_money === "" ||
+                  is_paying
+                }
                 className={`bg-blue-400 shadow-md shadow-blue-300
-                transition-all duration-300 ease-in-out 
+                transition-all duration-300 ease-in-out
                 active:shadow-lg
                 w-full
                 text-white font-bold py-2 px-4 rounded
                 disabled:opacity-40
-                
+
                 ${input_money ? "hover:cursr-pointer hover:bg-blue-600" : ""}
                 `}
                 onClick={pay} // 결제 진행 함수 호출
               >
-                {`${formatNum(input_money)}`} 결제
+                {is_paying ? "결제 처리중..." : `${formatNum(input_money)} 결제`}
               </button>
             </div>
 
