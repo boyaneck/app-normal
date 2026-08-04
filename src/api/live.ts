@@ -155,6 +155,43 @@ export const getTopSupporters = async () => {
     .slice(0, 5);
 };
 
+export const getWeeklyDonations = async (hostId: string | undefined) => {
+  if (!hostId) return [];
+
+  const today = new Date();
+  const weekAgo = new Date(today);
+  weekAgo.setDate(today.getDate() - 6);
+  weekAgo.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabaseForClient
+    .from("payments")
+    .select("amount, paid_at")
+    .eq("host_id", hostId)
+    .gte("paid_at", weekAgo.toISOString());
+
+  if (error) {
+    console.error("주간 후원 데이터 로드 오류:", error.message);
+    return [];
+  }
+
+  const dayNames = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+  const byDay = new Map<string, number>();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekAgo);
+    d.setDate(weekAgo.getDate() + i);
+    byDay.set(dayNames[d.getDay()], 0);
+  }
+
+  for (const row of data ?? []) {
+    if (!row.paid_at) continue;
+    const dayName = dayNames[new Date(row.paid_at).getDay()];
+    const amt = parseInt(row.amount ?? "0", 10) || 0;
+    byDay.set(dayName, (byDay.get(dayName) ?? 0) + amt);
+  }
+
+  return Array.from(byDay.entries()).map(([name, 후원금액]) => ({ name, 후원금액 }));
+};
+
 export const getHighlights = async (roomName: string | undefined) => {
   if (!roomName) return [];
   const { data, error } = await supabaseForClient

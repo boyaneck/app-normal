@@ -1,7 +1,20 @@
-export interface payment_props {
+export interface PaymentVerifyRequest {
+  paymentId: string;
   amount: number;
-  order_id: string;
-  user_name: string;
-  user_email: string;
 }
-ㄹ;
+
+export interface DonationInfo {
+  paymentId: string;
+  amount: number;
+  buyerName: string | null;
+  paidAt: string;
+  timestamp: number;
+}
+
+export interface PaymentVerifyResponse {
+  success: boolean;
+  msg: string;
+  reason?: string;
+  duplicate?: boolean;
+  donation?: DonationInfo;
+}
