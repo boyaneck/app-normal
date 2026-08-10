@@ -59,7 +59,7 @@ const PaymentPage = ({
       return;
     }
 
-    const { PortOne } = window as Window as any;
+    const { PortOne } = window as any;
     if (!PortOne) {
       console.error("PortOne 객체를 가져오는데 실패했습니다.");
       return;
@@ -105,6 +105,7 @@ const PaymentPage = ({
       closeModal();
     } catch (error) {
       console.error("결제 처리 중 오류:", error);
+      console.log("결제 오류 ", error);
       set_error("결제 처리 중 오류가 발생했습니다.");
     } finally {
       set_is_paying(false);
@@ -329,7 +330,9 @@ const PaymentPage = ({
                 `}
                 onClick={pay} // 결제 진행 함수 호출
               >
-                {is_paying ? "결제 처리중..." : `${formatNum(input_money)} 결제`}
+                {is_paying
+                  ? "결제 처리중..."
+                  : `${formatNum(input_money)} 결제`}
               </button>
             </div>
 
