@@ -7,7 +7,8 @@ import { detectDonationSpike } from "./donation-spike-detector.js";
 export const verifyPayment = async (impUid, expectedAmount) => {
   const paymentInfo = await getPaymentInfo(impUid);
 
-  if (paymentInfo.status !== "paid") {
+  //결제되지 않은 경우
+  if (paymentInfo.status !== "PAID") {
     return {
       verified: false,
       reason: "결제 안됨",
@@ -15,14 +16,14 @@ export const verifyPayment = async (impUid, expectedAmount) => {
     };
   }
 
-  if (paymentInfo.amount !== expectedAmount) {
+  const paidAmount = paymentInfo.amount?.total;
+  if (expectedAmount !== null && paidAmount !== expectedAmount) {
     return {
       verified: false,
       reason: "결제 금액 불일치",
-      msg: `요청(${expectedAmount}) != 실제(${paymentInfo.amount})`,
+      msg: `요청(${expectedAmount}) != 실제(${paidAmount})`,
     };
   }
-
   return {
     verified: true,
     paymentInfo: {
@@ -39,7 +40,8 @@ export const verifyPayment = async (impUid, expectedAmount) => {
 // 멱등성 체크 — 같은 imp_uid 중복 처리 방지
 export const chkIdempotency = async (impUid) => {
   const isNew = await redis_client.setNX(`payment:processed:${impUid}`, "1");
-  if (isNew) await redis_client.expire(`payment:processed:${impUid}`, 60 * 60 * 24);
+  if (isNew)
+    await redis_client.expire(`payment:processed:${impUid}`, 60 * 60 * 24);
   return isNew;
 };
 
@@ -65,12 +67,18 @@ export const saveDonation = async (hostId, paymentInfo) => {
   await redis_client.incr(keys.DONATION_COUNT);
 
   // 고유 후원자 (buyerName 기준 중복 제거)
-  await redis_client.sAdd(keys.DONATION_UNIQUE_USERS, paymentInfo.buyerName ?? "anonymous");
+  await redis_client.sAdd(
+    keys.DONATION_UNIQUE_USERS,
+    paymentInfo.buyerName ?? "anonymous",
+  );
 
   // 스파이크 감지용 시계열 (score = timestamp, value = JSON)
   await redis_client.zAdd(keys.DONATION_TIMESERIES, {
     score: now,
-    value: JSON.stringify({ amount: paymentInfo.amount, impUid: paymentInfo.impUid }),
+    value: JSON.stringify({
+      amount: paymentInfo.amount,
+      impUid: paymentInfo.impUid,
+    }),
   });
 
   // TTL 설정 (24시간)
