@@ -67,18 +67,24 @@ const PaymentPage = ({
 
     set_is_paying(true);
     try {
+      const paymentId = `payment-${crypto.randomUUID()}`;
+
+      // 결제창을 열기 전에 서버에 먼저 hostId/amount를 등록해둔다.
+      // 이후 검증 단계는 이 사전등록 값만 신뢰하고, customData는 신뢰하지 않는다.
+      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/payment/prepare`, {
+        paymentId,
+        hostId: current_host_id,
+        amount: pureAmount,
+      });
+
       const response = await PortOne.requestPayment({
         storeId: process.env.NEXT_PUBLIC_PORTONE_STORE_ID,
         channelKey: process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY,
-        paymentId: `payment-${crypto.randomUUID()}`,
+        paymentId,
         orderName: `${current_host_nickname}에게 후원`,
         totalAmount: pureAmount,
         currency: "CURRENCY_KRW",
         payMethod: "CARD",
-        customData: JSON.stringify({
-          host_id: current_host_id,
-          user: user?.userNickname,
-        }),
         customer: {
           fullName: user?.userNickname ?? "익명",
           email: user?.userEmail,
@@ -93,7 +99,7 @@ const PaymentPage = ({
 
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/payment/verify`,
-        { paymentId: response.paymentId, amount: pureAmount },
+        { paymentId },
       );
 
       if (!data.success) {
