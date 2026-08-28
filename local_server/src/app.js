@@ -5,11 +5,11 @@ import cors from "cors";
 import { Server } from "socket.io";
 import bodyParser from "body-parser";
 
-import { handleWebhook } from "./webhook.js";
 import { initializeSocket } from "./socket/index.js";
 import { sanctionChat } from "./sanction/sanction_chat.js";
 import { livekitWebhook } from "./live/live_duration.js";
 import live_route from "./routes/live_route.js";
+import paymentRouter from "./routes/payment_route.js";
 import { connectRedis } from "./config/redis.js";
 // import routes from "./routes.js"; // .js 확장자 추가
 
@@ -20,10 +20,13 @@ const server = http.createServer(app);
 const port = 3001;
 
 // 미들웨어 설정
-app.use(bodyParser.json());
 app.use(cors());
 
-app.post("/payment/im_port", handleWebhook);
+// PortOne 웹훅은 서명 검증에 raw body가 필요하므로 전역 JSON 파서보다 먼저 마운트한다
+app.use("/payment", paymentRouter);
+
+app.use(bodyParser.json());
+
 app.post("/sanction_chat", sanctionChat);
 
 app.use("/live", live_route);
