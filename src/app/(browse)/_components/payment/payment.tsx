@@ -69,12 +69,11 @@ const PaymentPage = ({
     try {
       const paymentId = `payment-${crypto.randomUUID()}`;
 
-      // 결제창을 열기 전에 서버에 먼저 hostId/amount를 등록해둔다.
-      // 이후 검증 단계는 이 사전등록 값만 신뢰하고, customData는 신뢰하지 않는다.
+      // 결제창을 열기 전에 서버에 먼저 hostId를 등록해둔다.
+      // 금액은 결제 후 서버가 PortOne에 직접 재조회한 값만 신뢰한다.
       await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/payment/prepare`, {
         paymentId,
         hostId: current_host_id,
-        amount: pureAmount,
       });
 
       const response = await PortOne.requestPayment({

@@ -4,9 +4,27 @@ import { getSupabase } from "../config/supabase.js";
 import { getPaymentInfo } from "./portone-client.js";
 import { detectDonationSpike } from "./donation-spike-detector.js";
 
-// 결제 검증 (PortOne V2 서버 재조회 + 금액 대조 + custom_data에서 host_id 추출)
-// expectedAmount가 없으면(웹훅 경로 — 대조할 클라이언트 입력이 없음) 금액 비교를 생략하고 조회된 금액을 그대로 신뢰한다
-export const verifyPayment = async (paymentId, expectedAmount) => {
+const pendingKey = (paymentId) => `payment:pending:${paymentId}`;
+
+// 결제 사전등록 — 결제창을 띄우기 전에 클라이언트가 먼저 호출한다.
+// hostId는 포트원이 알 수 없는 정보(어느 방송에 대한 후원인지)라서 우리가 직접 들고 있어야 한다.
+// TTL 10분(그 안에 결제 안 하면 만료).
+export const preparePayment = async (paymentId, hostId) => {
+  await redis_client.set(pendingKey(paymentId), hostId, { EX: 60 * 10 });
+};
+
+// 결제 검증 — 금액/상태는 PortOne V2 서버 재조회 결과만 신뢰하고,
+// hostId는 사전등록 단계에서 우리 서버가 저장해둔 값에서만 가져온다 (포트원은 hostId를 모름)
+export const verifyPayment = async (paymentId) => {
+  const hostId = await redis_client.get(pendingKey(paymentId));
+  if (!hostId) {
+    return {
+      verified: false,
+      reason: "사전등록 없음",
+      msg: "사전등록되지 않았거나 만료된 결제입니다.",
+    };
+  }
+
   const paymentInfo = await getPaymentInfo(paymentId);
 
   if (paymentInfo.status !== "PAID") {
@@ -17,35 +35,12 @@ export const verifyPayment = async (paymentId, expectedAmount) => {
     };
   }
 
-  const paidAmount = paymentInfo.amount?.total;
-  if (expectedAmount != null && paidAmount !== expectedAmount) {
-    return {
-      verified: false,
-      reason: "결제 금액 불일치",
-      msg: `요청(${expectedAmount}) != 실제(${paidAmount})`,
-    };
-  }
-
-  // host_id는 클라이언트가 아닌 포트원에 저장된 custom_data에서 서버가 직접 추출한다 (위변조 방지)
-  let hostId = null;
-  try {
-    hostId = JSON.parse(paymentInfo.customData || "{}").host_id ?? null;
-  } catch {}
-
-  if (!hostId) {
-    return {
-      verified: false,
-      reason: "hostId 누락",
-      msg: "결제 데이터에서 host_id를 찾을 수 없습니다.",
-    };
-  }
-
   return {
     verified: true,
     hostId,
     paymentInfo: {
       paymentId: paymentInfo.id,
-      amount: paidAmount,
+      amount: paymentInfo.amount?.total,
       buyerName: paymentInfo.customer?.name ?? null,
       paidAt: paymentInfo.paidAt,
       status: paymentInfo.status,
@@ -56,8 +51,7 @@ export const verifyPayment = async (paymentId, expectedAmount) => {
 // 멱등성 체크 — 같은 paymentId 중복 처리 방지
 export const chkIdempotency = async (paymentId) => {
   const isNew = await redis_client.setNX(`payment:processed:${paymentId}`, "1");
-  if (isNew)
-    await redis_client.expire(`payment:processed:${paymentId}`, 60 * 60 * 24);
+  if (isNew) await redis_client.expire(`payment:processed:${paymentId}`, 60 * 60 * 24);
   return isNew;
 };
 
@@ -85,18 +79,12 @@ export const saveDonation = async (hostId, paymentInfo) => {
   await redis_client.incr(keys.DONATION_COUNT);
 
   // 고유 후원자 (buyerName 기준 중복 제거)
-  await redis_client.sAdd(
-    keys.DONATION_UNIQUE_USERS,
-    paymentInfo.buyerName ?? "anonymous",
-  );
+  await redis_client.sAdd(keys.DONATION_UNIQUE_USERS, paymentInfo.buyerName ?? "anonymous");
 
   // 스파이크 감지용 시계열 (score = timestamp, value = JSON)
   await redis_client.zAdd(keys.DONATION_TIMESERIES, {
     score: now,
-    value: JSON.stringify({
-      amount: paymentInfo.amount,
-      paymentId: paymentInfo.paymentId,
-    }),
+    value: JSON.stringify({ amount: paymentInfo.amount, paymentId: paymentInfo.paymentId }),
   });
 
   // TTL 설정 (24시간)
@@ -128,15 +116,15 @@ export const saveDonation = async (hostId, paymentInfo) => {
 };
 
 // 결제 처리 메인 오케스트레이터
-export const processPayment = async ({ paymentId, amount }) => {
+export const processPayment = async ({ paymentId }) => {
   // 1. 중복 처리 방지
   const isNew = await chkIdempotency(paymentId);
   if (!isNew) {
     return { success: true, msg: "이미 결제된 후원입니다.", duplicate: true };
   }
 
-  // 2. 결제 검증 (호스트 ID는 포트원 custom_data에서 서버가 직접 추출)
-  const verification = await verifyPayment(paymentId, amount);
+  // 2. 결제 검증 (hostId는 사전등록 레코드에서, 금액/상태는 PortOne 재조회 결과에서)
+  const verification = await verifyPayment(paymentId);
   if (!verification.verified) {
     // 검증 실패 시 멱등성 키 제거 (재시도 허용)
     await redis_client.del(`payment:processed:${paymentId}`);
@@ -148,10 +136,8 @@ export const processPayment = async ({ paymentId, amount }) => {
   }
 
   // 3. 저장 + 스파이크 감지
-  const donationData = await saveDonation(
-    verification.hostId,
-    verification.paymentInfo,
-  );
+  const donationData = await saveDonation(verification.hostId, verification.paymentInfo);
+  await redis_client.del(pendingKey(paymentId));
 
   return {
     success: true,
