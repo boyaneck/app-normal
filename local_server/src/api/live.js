@@ -88,14 +88,3 @@ export const insertAIReports = async (roomName, report) => {
 };
 
 export const insertAvgKeep = async () => {};
-
-export const egressWebRTC = async () => {
-  //1.Egress 요청 객체 생성 및 설정
-  // const request: StartTrackCompositeEgressREquest = {
-  //   room_name: room_id,
-  //   //오디오 트랙 설정: 방에 있는 모든 오디오 Egress에 포함
-  //   audio_track: {
-  //     source: TrackSource.ANY_PUBLISHER,
-  //   },
-  // };
-};

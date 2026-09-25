@@ -18,5 +18,4 @@ export const getRedisKeys = (roomName) => ({
   CHAT_TIMESERIES: `live:${roomName}:chat:timeseries`,
   VIEWER_RANK: `live:rank`,
   MSG: `live:${roomName}:msg`,
-  EGRESS: `live:${roomName}:egress`,
 });

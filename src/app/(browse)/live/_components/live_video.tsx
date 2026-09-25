@@ -4,6 +4,7 @@ import {
   useConnectionState,
   useTrack,
   VideoTrack,
+  AudioTrack,
 } from "@livekit/components-react";
 import { useVideoStore } from "@/store/video";
 import { useEffect, useRef } from "react";
@@ -14,7 +15,6 @@ interface LiveVideoProps {
 
 const LiveVideo = ({ participant }: LiveVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const { isPlaying, volume, muted, togglePlayButton } = useVideoStore(
     (state) => state,
   );
@@ -28,15 +28,6 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
       videoElement.pause();
     }
   }, [isPlaying]);
-
-  // 볼륨 제어
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-
-    audioElement.volume = volume / 100;
-    audioElement.muted = muted;
-  }, [volume, muted]);
 
   const { track: video_track, publication: video_publication } = useTrack({
     source: Track.Source.Camera,
@@ -78,11 +69,13 @@ const LiveVideo = ({ participant }: LiveVideoProps) => {
 
       {/* 오디오 */}
       {audio_track && audio_publication?.isSubscribed && (
-        <audio
-          ref={audioRef}
-          autoPlay
-          playsInline
-          style={{ display: "none" }}
+        <AudioTrack
+          trackRef={{
+            participant: participant,
+            source: Track.Source.Microphone,
+            publication: audio_publication,
+          }}
+          volume={muted ? 0 : volume / 100}
         />
       )}
 
