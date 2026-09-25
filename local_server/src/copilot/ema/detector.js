@@ -19,7 +19,7 @@ export const createDetector = ({ alpha = ALPHA, warmUp = WARMUP } = {}) => {
     const prevEma = ema;
     const delta = value - ema;
 
-    //EWVar 갱신
+    //EWVar 갱신 ,alpha의 값이 일정해야하나 ?
     ema = ema + alpha * delta;
     ewvar = (1 - alpha) * (ewvar + alpha * delta * delta);
 

@@ -2,12 +2,6 @@ import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
 import { insertLiveStats } from "../api/live.js";
 import { detectViewerSpike } from "./viewer-spike-detector.js";
-import {
-  startRecording,
-  stopRecording,
-  waitForEgressComplete,
-} from "./egress-manager.js";
-import { runClipPipeline } from "./clip-pipeline.js";
 import { getRedisKeys } from "./redis-keys.js";
 import { startCopilotLoop, stopCopilotLoop } from "../copilot/ema/loop.js";
 
@@ -80,25 +74,6 @@ export const liveWebhook = async (req, res) => {
 
         // 코파일럿 채팅 분석 루프 시작
         startCopilotLoop(roomName);
-
-        // Egress 녹화 시작 — 방이 완전히 준비될 때까지 3초 대기
-        await new Promise((r) => setTimeout(r, 3000));
-        try {
-          const { egressId, filePath } = await startRecording(roomName);
-          await redis_client.hSet(keys.EGRESS, {
-            egressId,
-            filePath,
-          });
-        } catch (egressErr) {
-          console.error(
-            "[Egress] 녹화 시작 실패 (방송은 정상 진행):",
-            egressErr.message,
-          );
-          console.error(
-            "[Egress] 에러 상세:",
-            JSON.stringify(egressErr, null, 2),
-          );
-        }
 
         break;
       }
@@ -176,14 +151,6 @@ export const liveWebhook = async (req, res) => {
         stopTimeseriesRecording(roomName);
         stopCopilotLoop(roomName);
 
-        // Egress 중지 요청 (파일 최종화 시작)
-        const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
-        if (egressId) {
-          stopRecording(egressId).catch((err) =>
-            console.error("[Egress] 중지 실패:", err.message),
-          );
-        }
-
         break;
       }
 
@@ -192,17 +159,7 @@ export const liveWebhook = async (req, res) => {
         stopTimeseriesRecording(roomName);
         stopCopilotLoop(roomName);
 
-        // Egress 중지 (ingress_ended에서 이미 했을 수 있지만 안전하게 재호출)
-        const egressId = await redis_client.hGet(keys.EGRESS, "egressId");
-        const recordingFilePath = await redis_client.hGet(
-          keys.EGRESS,
-          "filePath",
-        );
         const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
-
-        if (egressId) {
-          await stopRecording(egressId);
-        }
 
         // 최대 시청자 수
         const peakViewersStr = await redis_client.hGet(
@@ -215,9 +172,6 @@ export const liveWebhook = async (req, res) => {
         const startISO = startedAtStr
           ? new Date(parseInt(startedAtStr, 10)).toISOString()
           : new Date().toISOString();
-        const broadcastStartedAt = startedAtStr
-          ? parseInt(startedAtStr, 10)
-          : Date.now();
 
         // 누적 방문자 수
         const totalVisitors = await redis_client.sCard(keys.ALL_VISITORS);
@@ -314,8 +268,7 @@ export const liveWebhook = async (req, res) => {
             keys.DONATION_UNIQUE_USERS,
             keys.CHAT_UNIQUE_USERS,
             keys.CHAT_TIMESERIES,
-            keys.EGRESS,
-            // keys.HIGHLIGHTS — 클립 파이프라인에서 읽고 나서 삭제
+            keys.HIGHLIGHTS,
           ];
 
           for (const key of keysToDelete) {
@@ -326,56 +279,12 @@ export const liveWebhook = async (req, res) => {
           console.error("Supabase 저장 실패 — Redis 데이터 유지");
         }
 
-        // 클립 파이프라인 — Egress 완전 업로드 후 비동기 실행
-        if (egressId && recordingFilePath) {
-          scheduleClipPipeline(
-            roomName,
-            egressId,
-            recordingFilePath,
-            broadcastStartedAt,
-            keys,
-          );
-        }
-
         break;
       }
     }
   } catch (error) {
     console.error("Webhook processing error:", error);
   }
-};
-
-/**
- * Egress 업로드 완료를 기다린 후 클립 파이프라인 실행
- * room_finished 이벤트 처리를 블로킹하지 않도록 완전히 비동기 분리
- */
-const scheduleClipPipeline = (
-  roomName,
-  egressId,
-  recordingFilePath,
-  broadcastStartedAt,
-  keys,
-) => {
-  (async () => {
-    try {
-      console.log(`[ClipPipeline] Egress 업로드 대기 중: ${egressId}`);
-      const completed = await waitForEgressComplete(egressId);
-
-      if (!completed) {
-        console.warn(
-          `[ClipPipeline] Egress 미완료 — 클립 파이프라인 스킵: ${roomName}`,
-        );
-        return;
-      }
-
-      await runClipPipeline(roomName, recordingFilePath, broadcastStartedAt);
-
-      // 파이프라인 완료 후 HIGHLIGHTS 삭제
-      await redis_client.del(keys.HIGHLIGHTS);
-    } catch (err) {
-      console.error(`[ClipPipeline] 비동기 실행 오류: ${err.message}`);
-    }
-  })();
 };
 
 // 시계열 데이터 기록

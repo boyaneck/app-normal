@@ -25,6 +25,7 @@ export const decide = (roomName, metric) => {
 
   const candidates = [];
 
+  //데이터의 판단 유무를 결정짓는
   for (const key of ["donation", "chat", "viewer"]) {
     const m = metric[key];
     if (!m.ready) continue; // 워밍업 안 끝남
