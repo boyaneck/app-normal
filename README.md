@@ -16,6 +16,58 @@
 - 방송 설정 및 실시간 시청 통계,후원 등 대시보드 구현 및 방송 데이터 기반 AI 대화 구현
 - EMA 기반 실시간 이상 탐지 및  LLM 프롬프트 엔지니어링으로 방송 중 코칭 가능한 코파일럿 구현
 ### 아키텍쳐
+ ```mermaid
+  flowchart LR
+      subgraph Client
+          OBS["OBS<br/>방송 송출"]
+          Web["Next.js<br/>시청자 · 호스트"]
+      end
+
+      subgraph Media
+          LK["LiveKit Cloud"]
+      end
+
+      subgraph Backend
+          API["Express<br/>REST · Webhook"]
+          WS["Socket.io<br/>/chat · /copilot"]
+          CP["Copilot<br/>EMA 감지 루프"]
+      end
+
+      subgraph Data
+          Redis[("Redis<br/>실시간 집계")]
+          DB[("Supabase<br/>인증 · 통계 · 결제")]
+      end
+
+      subgraph External
+          Groq["Groq LLM"]
+          PO["PortOne"]
+      end
+
+      OBS -->|RTMP| LK
+      LK -->|WebRTC| Web
+      LK -->|Webhook| API
+      PO -->|"Webhook · 서명 검증"| API
+      Web <-->|채팅| WS
+      WS --> Redis
+      API --> Redis
+      API -->|방송 종료 시 저장| DB
+      CP -->|2초마다 조회| Redis
+      CP -->|급증 시 요청| Groq
+      CP -->|피드백| WS
+  ```
+
+  ### 코파일럿 처리 흐름
+
+  ```mermaid
+  flowchart LR
+      A["채팅 수 집계<br/>2초 간격"] --> B{"급증?<br/>z-score"}
+      B -->|아니오| A
+      B -->|예| C["채팅 분석<br/>질문 · 웃음 · 키워드"]
+      C --> D["의도 결정<br/>규칙 기반"]
+      D --> E["프롬프트 구성"]
+      E --> F["Groq"]
+      F --> G["호스트 화면"]
+  ```
 
 
  ### 기술 스택과 선택이유
@@ -23,7 +75,20 @@
  - typescript
  - Socket.io
  - Redis
- - 
+ - Livekit
+ - Groq API
+ - express
+
+ -   │ Next.js   │ 서버 코드(서버 액션)를 같은 프로젝트에 둘 수 있어서, LiveKit 토큰처럼 비밀키가 필요한 작업을 브라우저에 노출하지 않고 처리 · 파일 기반 라우팅 · Vercel 배포가 간편  │
+  │ Express   │ 가볍고 자유도가 높아 웹훅, 소켓, REST를 한 서버에 구성하기 쉬움 · 미들웨어로 라우트별 처리(예: 웹훅만 raw body로 받기) 가능 · 자료와 레퍼런스가 많음                │
+  │ Socket.io │ 방(room)과 네임스페이스로 방송별 채팅과 호스트 전용 채널을 분리 · 연결이 끊기면 자동 재연결 · Redis 어댑터로 서버 여러 대 확장 가능                                 │
+  │ Redis     │ 메모리 기반이라 쓰기와 읽기가 매우 빠름 → 방송 중 자주 바뀌는 수치에 적합 · 자료구조가 다양함(Sorted Set으로 시계열, Set으로 중복 없는 유저 집계) · TTL로 임시      │
+  │           │ 데이터 자동 정리 · INCR, SETNX 같은 원자적 연산으로 속도 제한과 멱등성 처리                                                                                         │
+  │ Supabase  │ PostgreSQL 기반이라 통계 조회와 집계를 SQL로 처리 · 인증(소셜 로그인)을 기본 제공 · 별도 DB 서버 관리 없이 사용                                                     │
+  │ LiveKit   │ WebRTC 미디어 서버를 직접 운영하지 않아도 됨 · OBS(RTMP) 입력을 받는 Ingress 기본 제공 · 웹훅으로 방송과 시청자 이벤트를 받을 수 있음 · 토큰으로 권한(송출/시청)    │
+  │           │ 제어                                                                                                                                                                │
+  │ Groq      │ 응답이 매우 빠름(실시간 피드백에 중요) · OpenAI와 같은 API 형식이라 교체가 쉬움 · 무료 사용량으로 개발 가능                                                         │
+  │ PortOne   │ 여러 PG사를 하나의 API로 연동 · 웹훅 서명 검증과 결제 재조회 API 제공          
  ### 핵심 구현 
 ##### 코파일럿: 2초(임의 설정)마다 채팅을 분석하고 유의미한 데이터로 판단 될 경우 프롬프트와 함께 AI(LLM)에게 보내 스트리머에게 도움될 만한 피드백을 하는 기능
 - 2초마다 채팅 수를 EMA/EWVar 기반 z-score로 계산해 급증 여부 판단하여 급증했을 때만 분석/LLM 호출 하여 불필요한 API 비용 절
