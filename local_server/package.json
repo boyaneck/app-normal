@@ -1,7 +1,7 @@
 {
   "name": "local_server",
   "version": "1.0.0",
-  "description": "Live streaming backend server",
+  "description": "appnormal(Live Streaming) backend server",
   "main": "src/app.js",
   "type": "module",
   "scripts": {
