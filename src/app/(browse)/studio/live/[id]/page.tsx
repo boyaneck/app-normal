@@ -3,7 +3,7 @@ import { useViewerToken } from "@/hooks/useViewerToken";
 import { useRef, useState, useEffect } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
 import Video from "@/app/(browse)/live/_components/video";
-import ChatPage from "@/app/(browse)/chat/page";
+import ChatPage from "@/app/(browse)/chat/chat-page";
 import AICopilot from "./_components/AI-copilot";
 import AIAnswer from "./_components/AI-answer";
 import { motion, AnimatePresence } from "framer-motion";

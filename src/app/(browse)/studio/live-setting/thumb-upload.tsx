@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImageIcon, X } from "lucide-react";
@@ -31,7 +32,8 @@ const ThumbUpload = () => {
         backdropFilter: "blur(28px)",
         WebkitBackdropFilter: "blur(28px)",
         border: "0.5px solid rgba(0,0,0,0.07)",
-        boxShadow: "0 2px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
+        boxShadow:
+          "0 2px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
       }}
     >
       <div className="flex justify-between w-full items-center">
@@ -50,8 +52,8 @@ const ThumbUpload = () => {
             ? "border-2 border-dashed border-red-500 rounded-lg bg-red-50"
             : "border-2 border-dashed border-green-500 rounded-lg bg-green-50 "
           : is_hover
-          ? "border-2 border-dashed border-gray-400 rounded-lg"
-          : "border-2 border-dashed border-gray-200 rounded-lg"
+            ? "border-2 border-dashed border-gray-400 rounded-lg"
+            : "border-2 border-dashed border-gray-200 rounded-lg"
       }
 
       `}
@@ -126,10 +128,10 @@ const ThumbUpload = () => {
                       isDragReject
                         ? "text-red-500"
                         : isDragAccept
-                        ? "text-green-400"
-                        : is_hover
-                        ? "text-gray-600"
-                        : "text-gray-400"
+                          ? "text-green-400"
+                          : is_hover
+                            ? "text-gray-600"
+                            : "text-gray-400"
                     }
                   />
                 </motion.div>

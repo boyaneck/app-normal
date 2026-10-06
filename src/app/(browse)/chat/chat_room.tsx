@@ -1,3 +1,4 @@
+"use client";
 import React, {
   useEffect,
   useRef,
@@ -158,7 +159,11 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   useEffect(() => {
     // 채팅 박스 높이를 넘치면(스크롤 생기면) 애니메이션 없이 바로 가장 오래된 메시지 제거
     const el = chatContainerRef.current;
-    if (el && el.scrollHeight > el.clientHeight && receive_message_info.length > 0) {
+    if (
+      el &&
+      el.scrollHeight > el.clientHeight &&
+      receive_message_info.length > 0
+    ) {
       set_receive_message_info((prev) => prev.slice(1));
     }
   }, [receive_message_info]);
@@ -282,16 +287,50 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
               <React.Fragment key={donation_burst}>
                 {/* 돈주머니(중앙)에서 동전+지폐가 뾰로롱 한 번 터졌다 사라지는 빵파레 느낌 — hover 유지해도 재생 안 하고 딱 한 번만 */}
                 {[
-                  { key: "coin-1", type: "🪙", x: -20, y: -10, rotate: -30, delay: 0 },
-                  { key: "bill-1", type: "💵", x: -8, y: -28, rotate: -12, delay: 0.05 },
-                  { key: "bill-2", type: "💵", x: 8, y: -28, rotate: 12, delay: 0.1 },
-                  { key: "coin-2", type: "🪙", x: 20, y: -10, rotate: 30, delay: 0.15 },
+                  {
+                    key: "coin-1",
+                    type: "🪙",
+                    x: -20,
+                    y: -10,
+                    rotate: -30,
+                    delay: 0,
+                  },
+                  {
+                    key: "bill-1",
+                    type: "💵",
+                    x: -8,
+                    y: -28,
+                    rotate: -12,
+                    delay: 0.05,
+                  },
+                  {
+                    key: "bill-2",
+                    type: "💵",
+                    x: 8,
+                    y: -28,
+                    rotate: 12,
+                    delay: 0.1,
+                  },
+                  {
+                    key: "coin-2",
+                    type: "🪙",
+                    x: 20,
+                    y: -10,
+                    rotate: 30,
+                    delay: 0.15,
+                  },
                 ].map((p) => (
                   <motion.span
                     key={p.key}
                     className="absolute top-1/2 left-1/2 -ml-2 -mt-2 text-xs pointer-events-none select-none"
                     initial={{ opacity: 0, x: 0, y: 0, scale: 0.3, rotate: 0 }}
-                    animate={{ opacity: [0, 1, 1, 0], x: p.x, y: p.y, scale: 1, rotate: p.rotate }}
+                    animate={{
+                      opacity: [0, 1, 1, 0],
+                      x: p.x,
+                      y: p.y,
+                      scale: 1,
+                      rotate: p.rotate,
+                    }}
                     transition={{
                       duration: 0.65,
                       times: [0, 0.2, 0.75, 1],
