@@ -38,7 +38,7 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="rounded-xl bg-muted p-6 text-sm text-muted-foreground">
-            아직 발급된 연결 정보가 없어요. "새 연결 생성"을 눌러 RTMP 서버
+            아직 발급된 연결 정보가 없어요. “새 연결 생성”을 눌러 RTMP 서버
             URL과 스트림 키를 발급받은 뒤 OBS에 등록해주세요.
           </div>
         )}

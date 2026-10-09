@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { live_timer_props } from "@/types/live";
 
-export const useLiveTimer = ({ streaming_timer }: live_timer_props) => {
+interface UseLiveTimerProps {
+  streaming_timer: string | null;
+}
+
+export const useLiveTimer = ({ streaming_timer }: UseLiveTimerProps) => {
   // ✅ 1. 타이머 ID와 표시 시간을 훅 내부에서 관리
   const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [live_time, set_live_time] = useState<string>("00:00");

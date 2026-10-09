@@ -14,19 +14,19 @@ const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const STAT_FIELDS = [
   {
-    key: "avg_viewer" as const,
+    key: "avgViewer" as const,
     title: "평균 시청자",
     unit: "명",
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "peak_viewers" as const,
+    key: "peakViewers" as const,
     title: "최고 시청자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
   },
   {
-    key: "total_visitors" as const,
+    key: "totalVisitors" as const,
     title: "총 방문자",
     unit: "명",
     toNumber: (v: string | number) => Number(v) || 0,
@@ -38,7 +38,7 @@ const STAT_FIELDS = [
     toNumber: (v: string | number) => Math.round(parseFloat(String(v)) || 0),
   },
   {
-    key: "into_chat_rate" as const,
+    key: "intoChatRate" as const,
     title: "채팅 전환율",
     unit: "%",
     toNumber: (v: string | number) => parseFloat(String(v)) || 0,
@@ -201,9 +201,9 @@ const LiveStats = ({
 
   const handleCardClick = (index: number) => {
     if (selectedCardIndex === index) {
-      onCardSelect(null, []);
+      onCardSelect?.(null, []);
     } else {
-      onCardSelect(index, allCardsData);
+      onCardSelect?.(index, allCardsData);
     }
   };
 
@@ -258,7 +258,7 @@ const LiveStats = ({
   }
 
   const selectedField =
-    selectedCardIndex !== null ? STAT_FIELDS[selectedCardIndex] : null;
+    selectedCardIndex != null ? STAT_FIELDS[selectedCardIndex] : null;
   const selectedValue =
     selectedField && currentData
       ? selectedField.toNumber(

@@ -82,6 +82,24 @@ export const getLiveStatsWeek = async (roomName: string | undefined) => {
   return liveStats ? liveStats : null;
 };
 
+// 가장 최근 방송 1회의 종료 후 통계
+export const getPostLiveStats = async (roomName: string | undefined) => {
+  const { data, error } = await supabaseForClient
+    .from("live_stats")
+    .select("*")
+    .eq("room_name", roomName)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.log("❌최근 방송 통계를 가져오는데 오류 발생", error.message);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 export const getWeekleyPost = async (room_name: string) => {
   const today = new Date();
   const end_date = today.toISOString();
@@ -230,7 +248,7 @@ export const getLiveListNow = async () => {
         user_id: info.user_id,
         title: info.title,
         thumb_url: info.thumb_url,
-        score: score_map.get(info.user_id) || 0,
+        score: Number(score_map.get(info.user_id)) || 0,
       };
     });
 

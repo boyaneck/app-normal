@@ -43,7 +43,7 @@ const ChatRoom = ({ current_host_nickname, current_host_id }: Props) => {
   const [show_emoji_picker, set_show_emoji_picker] = useState(false);
   const [message, set_message] = useState("");
   const message_input_ref = useRef(null);
-  const chatContainerRef = useRef(null); // 채팅 컨테이너 ref 생성
+  const chatContainerRef = useRef<HTMLDivElement | null>(null); // 채팅 컨테이너 ref 생성
   const user_info = useUserStore((state) => state.user);
   const { socket, connectSocket } = useSocketStore();
   const [message_remove, set_message_remove] = useState(null);

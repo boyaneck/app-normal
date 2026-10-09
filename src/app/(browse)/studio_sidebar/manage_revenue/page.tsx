@@ -16,8 +16,14 @@ import {
   CartesianGrid,
 } from "recharts";
 import StatCard from "../../studio/live-stat/stat-card";
-import { post_live_stats_props } from "@/types/live";
-import { DollarSign } from "lucide-react";
+
+// Supabase live_stats 테이블 행 (컬럼명 snake_case 그대로)
+interface LiveStatsRow {
+  avg_viewer: number | string | null;
+  peak_viewers: number | string | null;
+  into_chat_rate: number | string | null;
+  fund: number | string | null;
+}
 const ManageRevenuePage = () => {
   //여기가 방송 관리 페이지로 변경경
 
@@ -35,10 +41,10 @@ const ManageRevenuePage = () => {
     return days[date.getDay()];
   };
 
-  const { data: post_live_stats } = useQuery<post_live_stats_props | null>({
-    queryKey: [`post_live_stats`, user?.user_id],
-    queryFn: () => getPostLiveStats(user?.user_id),
-    enabled: !!user?.user_id,
+  const { data: post_live_stats } = useQuery<LiveStatsRow | null>({
+    queryKey: [`post_live_stats`, user?.userId],
+    queryFn: () => getPostLiveStats(user?.userId),
+    enabled: !!user?.userId,
     // staleTime: 1000 * 60 * 60,
   });
 
@@ -48,28 +54,14 @@ const ManageRevenuePage = () => {
     enabled: !!user?.userId,
   });
 
-  const liveStats = (stat_prop: post_live_stats_props | null | undefined) => {
+  const liveStats = (stat_prop: LiveStatsRow | null | undefined) => {
     if (!stat_prop) return null;
 
     return [
-      {
-        title: "평균 시청자 수 ",
-        value: stat_prop?.avg_viewer,
-        positive_color: "",
-      },
-      {
-        title: "최대 시청자 수 ",
-        value: stat_prop?.peak_viewer,
-      },
-      {
-        title: "채팅 전환률 ",
-        value: stat_prop?.into_chat_rate,
-      },
-      {
-        title: "총 후원 금액",
-        value: stat_prop?.fund,
-        icon: DollarSign,
-      },
+      { title: "평균 시청자 수", value: Number(stat_prop.avg_viewer) || 0, unit: "명" },
+      { title: "최대 시청자 수", value: Number(stat_prop.peak_viewers) || 0, unit: "명" },
+      { title: "채팅 전환률", value: Number(stat_prop.into_chat_rate) || 0, unit: "%" },
+      { title: "총 후원 금액", value: Number(stat_prop.fund) || 0, unit: "원" },
     ];
   };
 
@@ -109,8 +101,16 @@ const ManageRevenuePage = () => {
   const resultStats = liveStats(post_live_stats);
   return (
     <div style={{ fontFamily: "sans-serif" }}>
-      {resultStats?.map((stat) => (
-        <StatCard key={stat.title} live_stats_card={stat} />
+      {resultStats?.map((stat, index) => (
+        <StatCard
+          key={stat.title}
+          title={stat.title}
+          value={stat.value}
+          unit={stat.unit}
+          index={index}
+          isChartHovered={false}
+          onHover={() => {}}
+        />
       ))}
 
       <ResponsiveContainer width="100%" height={400}>

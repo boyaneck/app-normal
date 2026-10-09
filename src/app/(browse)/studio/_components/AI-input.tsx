@@ -245,7 +245,6 @@ export const StudioAIInput = ({ username = "호스트 님", onSend }: Props) => 
                     </svg>
                   </motion.button>
                 )}
-                ""
               </AnimatePresence>
             </motion.div>
           </motion.div>

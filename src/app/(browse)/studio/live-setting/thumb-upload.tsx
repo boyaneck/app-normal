@@ -84,6 +84,8 @@ const ThumbUpload = () => {
               "
               >
                 <img
+                  alt="
+                썸네일 미리보기"
                   src={thumb_url}
                   className="w-full h-full object-cover max-w-full max-h-full
                   group-hover:brightness-75 group-hover:blur-[1px]

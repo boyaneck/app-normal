@@ -160,11 +160,18 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { User } from "@/types/user";
 import LiveListVideo from "./live_list_video";
 
+// Supabase users 테이블에서 그대로 받아오는 행 (컬럼명 snake_case)
+interface LiveUserRow {
+  id: string;
+  user_nickname: string;
+  profile_image?: string | null;
+  stream_title?: string | null;
+}
+
 const LiveList = () => {
-  const [liveuser, setLiveUser] = useState<User[]>([]);
+  const [liveuser, setLiveUser] = useState<LiveUserRow[]>([]);
   const { user } = useUserStore((state) => state);
   const { data: LiveUser, isLoading } = useQuery({
     queryKey: ["LiveUser"],
