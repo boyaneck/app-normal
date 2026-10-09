@@ -14,8 +14,7 @@ interface banner_props {
 }
 
 interface banner_obj_props {
-  live_list_now: banner_props[];
-  tokenResults: (string | undefined)[];
+  live_list_now: banner_props[] | undefined;
 }
 
 const MOCK_BANNER: banner_props[] = [
@@ -63,7 +62,7 @@ const MOCK_BANNER: banner_props[] = [
   },
 ];
 
-const MainBanner = ({ live_list_now, tokenResults }: banner_obj_props) => {
+const MainBanner = ({ live_list_now }: banner_obj_props) => {
   const [curr_idx, set_curr_idx] = useState<number>(0);
   const [slider_stop, set_slider_stop] = useState<boolean>(false);
   const [banner_title_in, set_banner_title_in] = useState<boolean>(true);

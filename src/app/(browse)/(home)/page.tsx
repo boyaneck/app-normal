@@ -1,6 +1,6 @@
 "use client";
-import { createViewerToken, getLiveListNow } from "@/api";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { getLiveListNow } from "@/api";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/store/bar-store";
 import MainBanner from "./_components/main-banner";
@@ -12,18 +12,6 @@ export default function Home() {
     queryFn: getLiveListNow,
   });
 
-  const tokenResults = useQueries({
-    queries: (live_list_now ?? []).map((item) => ({
-      queryKey: ["top7_viewers_token", item.user_id],
-      queryFn: async () => {
-        const res = await createViewerToken(item.user_id);
-        return res;
-      },
-      enabled: !!item.user_id,
-      staleTime: 1000 * 60 * 5,
-    })),
-  });
-
   const { collapsed } = useSidebarStore();
 
   return (
@@ -33,7 +21,7 @@ export default function Home() {
         collapsed ? "ml-[160px]" : "ml-[210px]",
       )}
     >
-      <MainBanner live_list_now={live_list_now} tokenResults={tokenResults} />
+      <MainBanner live_list_now={live_list_now} />
       <LiveList />
     </div>
   );

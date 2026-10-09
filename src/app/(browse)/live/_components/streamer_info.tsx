@@ -26,14 +26,14 @@ const StreamerInfo = ({
   current_host_id,
   current_host_email,
 }: streamer_info_props) => {
-  const { followMutation } = useFollow();
-
   const { user, setUser } = useUserStore();
   const current_user_email =
-    user?.user_email !== undefined ? user.user_email : "";
+    user?.userEmail !== undefined ? user.userEmail : "";
+  const { followMutation } = useFollow(current_user_email);
+
   const host_email = current_host_email !== undefined ? current_host_email : "";
   const host_id = current_host_id !== undefined ? current_host_id : "";
-  const current_user_id = user?.user_id !== undefined ? user.user_id : "";
+  const current_user_id = user?.userId !== undefined ? user.userId : "";
   const live_info = live_information;
   console.log(typeof live_information);
 

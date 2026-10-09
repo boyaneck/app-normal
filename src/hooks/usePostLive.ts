@@ -93,6 +93,7 @@ export const usePostLive = () => {
 
   const animateCount = (post_live_obj: props) => {
     if (!post_live_obj?.ref || !post_live_obj.payload) return;
+    const refs = post_live_obj.ref;
 
     const duration = 500;
 
@@ -105,7 +106,7 @@ export const usePostLive = () => {
     // 💡 3. 모든 지표를 순회하며 각각의 애니메이션을 독립적으로 실행합니다.
     (Object.keys(STAT_CONFIG) as stat_key[]).forEach((key) => {
       const config = STAT_CONFIG[key];
-      const ref_element = post_live_obj?.ref[key]; // Ref DOM 요소
+      const ref_element = refs[key]; // Ref DOM 요소
 
       // 목표 값 (payload에서 가져옴)
       const after_value = Number(post_live_obj.payload[key]);

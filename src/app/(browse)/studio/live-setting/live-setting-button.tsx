@@ -16,7 +16,7 @@ const LiveSettingButton = () => {
     const next = !live_setting_done;
     set_live_setting_done(next);
     if (next) {
-      insertAndUpdateLiveInfo({ desc, title, thumb_url, user_id: user?.user_id });
+      insertAndUpdateLiveInfo({ desc, title, thumb_url, user_id: user?.userId });
     }
   };
 

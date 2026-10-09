@@ -92,6 +92,7 @@ export const useStreamDuration = ({
       const elapsed = Date.now() - start_time;
       set_duration(formatDuration(elapsed));
     }, 1000);
-  });
+    return () => clearInterval(interval);
+  }, [start_time]);
   return duration;
 };

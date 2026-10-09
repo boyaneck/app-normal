@@ -5,21 +5,11 @@ interface sidebarStore {
   onExpand: () => void;
   onCollapse: () => void;
 }
-interface streamerInfoBarProps {}
 
 export const useSidebarStore = create<sidebarStore>((set) => ({
   collapsed: false,
   onExpand: () => set(() => ({ collapsed: false })),
   onCollapse: () => set(() => ({ collapsed: true })),
-}));
-
-export const streamerInfoBarStore = create<streamerInfoBarProps>((set) => ({
-  show_streamer_info_bar: false,
-  streamer_info_items: [],
-
-  set_show_streamer_info_bar: (show: boolean) =>
-    set({ show_streamer_info_bar: show }),
-  set_streamer_info_items: (item) => set({ streamer_info_items: item }),
 }));
 // export type bar_state = "chat" | "setting" | "streamer_info";
 export type bar_state = "chat" | "setting" | "streamer";

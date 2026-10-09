@@ -7,7 +7,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const layout = ({ children }: Props) => {
+const Layout = ({ children }: Props) => {
   const pathname = usePathname();
   const isAuthPage = pathname === "/signin" || pathname === "/login";
   const isHomePage = pathname === "/";
@@ -43,4 +43,4 @@ const layout = ({ children }: Props) => {
   );
 };
 
-export default layout;
+export default Layout;

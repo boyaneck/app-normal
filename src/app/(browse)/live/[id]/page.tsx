@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
 import Video from "../_components/video";
 import useUserStore from "@/store/user";
-import ChatPage from "../../chat/page";
+import ChatPage from "../../chat/chat-page";
 import { useQuery } from "@tanstack/react-query";
 import { getRecommendLiveList } from "@/api";
 import { useStreamingBarStore } from "@/store/bar-store";
