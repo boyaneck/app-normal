@@ -10,7 +10,7 @@ const Signin = () => {
         provider: "google",
         options: {
           queryParams: { access_type: "offline", prompt: "consent" },
-          redirectTo: "https://app-normal-btjb.vercel.app/callback",
+          redirectTo: `${window.location.origin}/callback`,
         },
       });
     } catch {}
@@ -20,7 +20,7 @@ const Signin = () => {
     try {
       await supabaseForClient.auth.signInWithOAuth({
         provider: "kakao",
-        options: { redirectTo: "https://app-normal-btjb.vercel.app/callback" },
+        options: { redirectTo: `${window.location.origin}/callback` },
       });
     } catch {}
   };
