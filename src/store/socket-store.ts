@@ -66,8 +66,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       prev.removeAllListeners();
       prev.close();
     }
-
-    const socket = io("http://localhost:3001/chat", {
+    const socket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}/chat`, {
       transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 10,
