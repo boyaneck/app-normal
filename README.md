@@ -1,6 +1,10 @@
 # appnormal 프로젝트
 
 
+URL:https://app-normal-btjb.vercel.app/
+
+
+
 제목: appnormal 
 "app normal(평범한 앱) 이지만 이 웹을 사용하는 이들의 특별한(abnormal)모습을 보여줌으로써 사람들과 소통을 도와주는 플랫폼"의 이중적 의미를 가짐 
 한줄 소개 : 라이브 스트리머가 코파일럿을 이용하여 방송 가능한 라이브 스트리밍 웹사이트
