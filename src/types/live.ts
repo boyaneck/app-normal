@@ -68,6 +68,8 @@ export interface ChatMessage {
 
 // Supabase live_stats 응답을 camelCase로 변환한 타입
 export interface PostLiveStats {
+  /** live_stats row id — AI 리포트·AI 채팅을 "어느 방송"에 대해 할지 서버에 알려주는 용도 */
+  id?: number | string;
   roomName?: string;
   startedAt?: string;
   dayLabel?: string;

@@ -91,7 +91,7 @@ export const useImage = () => {
     accept: {
       "image/jpeg": [],
       "image/png": [],
-      "image/wbep": [],
+      "image/webp": [],
     },
     maxFiles: 1,
     maxSize: 5 * 1024 * 1024,

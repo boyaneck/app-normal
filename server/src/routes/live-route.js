@@ -8,6 +8,9 @@ import { liveWebhook } from "../live/live-webhook.js";
 import { getLiveAnalytics } from "../live/live-analytics.js";
 import { getHomeLiveList } from "../algorithm/live-home-list.js";
 import { getRecommendLiveList } from "../live/live-recommend.js";
+import { liveListNow } from "../live/live_list_now.js";
+import { endLive } from "../live/end-live.js";
+import { requireUser } from "../middlewares/require-user.js";
 const router = express.Router();
 
 // 테스트용: 강제 하이라이트 스파이크 생성
@@ -43,6 +46,10 @@ router.post("/live_getIn");
 router.get("/live-recommend", getRecommendLiveList);
 router.get("/live-home", getHomeLiveList);
 router.post("/live-analytics", getLiveAnalytics);
+// 메인 배너: 시청자 많은 방송 TOP 7 (프론트 getLiveListNow가 호출)
+router.get("/live_list_now", liveListNow);
+// 호스트의 "방송 종료" 버튼
+router.post("/end", requireUser, endLive);
 router.post(
   "/webhook_duration",
   express.raw({ type: "application/webhook+json" }),

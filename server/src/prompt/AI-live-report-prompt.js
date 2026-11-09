@@ -2,9 +2,21 @@
  * 방송 종료 후 전체 통계 분석용 프롬프트
  * 실제 데이터를 주입해서 AI가 자유롭게 인사이트를 도출
  *
+ * 예전 문제: 프롬프트는 자유 텍스트를 요구하는데, 서버는 응답을 JSON.parse 해서
+ * 리포트 생성이 사실상 항상 실패했다. → 응답 형식을 JSON으로 명시한다.
+ *
  * @param {object} today - 이번 방송 데이터
  * @param {object|null} prev - 이전 방송 데이터
  */
+export const AI_LIVE_REPORT_FORMAT = `{
+  "summary": "이번 방송을 한두 문장으로 요약",
+  "good": ["잘 된 점 (수치 포함)", "..."],
+  "improve": ["개선이 필요한 점 (수치 포함)", "..."],
+  "suggestions": ["다음 방송에서 바로 실행할 제안", "..."]
+}`;
+
+const pct = (v) => `${((parseFloat(v) || 0) * 100).toFixed(1)}%`;
+
 export const AILiveReportPrompt = (today, prev) => {
   const todayReportPrompt = `
 이번 방송:
@@ -12,8 +24,8 @@ export const AILiveReportPrompt = (today, prev) => {
 - 최고 시청자: ${today.peakViewers}명
 - 총 방문자: ${today.totalVisitors}명
 - 후원 금액: ${today.fund}원
-- 채팅 전환율: ${(parseFloat(today.intoChatRate) * 100).toFixed(1)}%
-- 시청 지속률: ${(parseFloat(today.retentionRate) * 100).toFixed(1)}%
+- 채팅 전환율: ${pct(today.intoChatRate)}
+- 시청 지속률: ${pct(today.retentionRate)}
 - 방송 시간: ${today.durationMin}분
 - 카테고리: ${today.category}
 `;
@@ -25,8 +37,8 @@ export const AILiveReportPrompt = (today, prev) => {
 - 최고 시청자: ${prev.peakViewers}명
 - 총 방문자: ${prev.totalVisitors}명
 - 후원 금액: ${prev.fund}원
-- 채팅 전환율: ${(parseFloat(prev.intoChatRate) * 100).toFixed(1)}%
-- 시청 지속률: ${(parseFloat(prev.retentionRate) * 100).toFixed(1)}%
+- 채팅 전환율: ${pct(prev.intoChatRate)}
+- 시청 지속률: ${pct(prev.retentionRate)}
 - 방송 시간: ${prev.durationMin}분
 `
     : "\n이전 방송 데이터 없음 (첫 방송 또는 데이터 미수집)\n";
@@ -39,10 +51,13 @@ ${todayReportPrompt}
 ${prevReportPrompt}
 
 분석할 때:
-- 데이터에서 직접 패턴을 읽어서 결론을 내려. 미리 정해진 기준 없이 이 데이터만 보고 판단해.
+- 데이터에서 직접 패턴을 읽어서 결론을 내려. 데이터에 없는 건 추측하지 마.
 - 이전 방송 데이터가 있으면 반드시 비교해서 어떤 흐름인지 짚어줘.
 - 잘 된 부분과 개선이 필요한 부분을 구체적인 수치와 함께 말해줘.
 - 다음 방송에서 바로 실행할 수 있는 구체적인 제안을 2~3개 줘.
 - 한국어로 답해.
+
+반드시 아래 JSON 형식으로만 답해. 다른 글은 붙이지 마.
+${AI_LIVE_REPORT_FORMAT}
 `;
 };

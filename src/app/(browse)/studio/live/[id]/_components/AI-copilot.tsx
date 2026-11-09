@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff } from "lucide-react";
 import { askAICopilot } from "@/api/AI";
-import { Socket } from "socket.io-client";
 
 type Props = {
   hostId: string;
@@ -59,7 +58,10 @@ const AICopilot = ({ hostId, onAnswer }: Props) => {
 
   useEffect(() => {
     if (!transcript || isListening) return;
-    askAICopilot(transcript, hostId).then(onAnswer).catch(console.error);
+    // 어느 방송의 데이터를 볼지는 서버가 로그인 토큰으로 정한다
+    askAICopilot(transcript)
+      .then(onAnswer)
+      .catch(() => onAnswer("코파일럿 응답을 받지 못했어요. 잠시 후 다시 물어봐 주세요."));
   }, [transcript, isListening]);
 
   const toggleListening = () => {

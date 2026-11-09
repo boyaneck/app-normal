@@ -1,9 +1,10 @@
 import { WebhookReceiver } from "livekit-server-sdk";
 import { redis_client } from "../config/redis.js";
-import { insertLiveStats } from "../api/live.js";
-import { detectViewerSpike } from "./viewer-spike-detector.js";
 import { getRedisKeys } from "./redis-keys.js";
-import { startCopilotLoop, stopCopilotLoop } from "../copilot/ema/loop.js";
+import { startCopilotLoop } from "../copilot/loop.js";
+import { startTimeseriesRecording } from "./timeseries.js";
+import { finalizeLive } from "./finalize-live.js";
+import { LIVE_STATUS, getLiveInfo, setLiveStatus } from "./live-status.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
@@ -30,7 +31,11 @@ export const liveWebhook = async (req, res) => {
     return;
   }
 
-  const viewer = event.participant ? event.participant.identity : null;
+  const identity = event.participant ? event.participant.identity : null;
+  // 시청자 통계에서 제외: OBS(Ingress) 참가자(identity = roomName)와 호스트 모니터링 페이지(HOST-*)
+  // 예전에는 이 둘도 시청자로 세어져서 시청자 수/방문자 수가 실제보다 많게 기록됐다.
+  const isNotViewer = identity === roomName || identity?.startsWith("HOST-");
+  const viewer = identity && !isNotViewer ? identity : null;
 
   const keys = getRedisKeys(roomName);
 
@@ -39,6 +44,20 @@ export const liveWebhook = async (req, res) => {
       case "ingress_started": {
         console.log("ingress_Started가 시작되었요!");
         const live_started_at = Date.now();
+
+        // 새 방송 시작: 이전 방송의 종료 잠금이 남아 있으면 풀어준다
+        await redis_client.del(`live:${roomName}:finalize_lock`);
+
+        // 방송 상태를 live로 → 홈 목록에 노출됨
+        await setLiveStatus(roomName, LIVE_STATUS.LIVE, {
+          started_at: new Date(live_started_at).toISOString(),
+        });
+
+        // 추천/목록 API가 Redis INFO의 title을 읽으므로 설정 페이지에서 저장한 제목을 넣어둔다
+        const liveInfo = await getLiveInfo(roomName);
+        if (liveInfo?.title) {
+          await redis_client.hSet(keys.INFO, "title", liveInfo.title);
+        }
         await redis_client.hSetNX(
           keys.INFO,
           "started_at",
@@ -149,185 +168,20 @@ export const liveWebhook = async (req, res) => {
       }
 
       case "ingress_ended": {
-        stopTimeseriesRecording(roomName);
-        stopCopilotLoop(roomName);
-
+        // OBS 송출을 끈 순간. "방송 종료"라는 의미에 가장 정확히 맞는 이벤트라 여기서 정리한다.
+        await finalizeLive(roomName, { reason: "ingress_ended" });
         break;
       }
 
       case "room_finished": {
+        // 방이 비어서 닫힘. 위에서 이미 정리됐다면 잠금 때문에 건너뛴다 (안전망 역할)
         console.log("room_finished 이벤트 수신:", roomName);
-        stopTimeseriesRecording(roomName);
-        stopCopilotLoop(roomName);
-
-        const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
-
-        // 최대 시청자 수
-        const peakViewersStr = await redis_client.hGet(
-          keys.PEAK_VIEW,
-          "peak_view",
-        );
-        const peakViewers = peakViewersStr ? parseInt(peakViewersStr, 10) : 0;
-
-        // 방송 시작 시간
-        const startISO = startedAtStr
-          ? new Date(parseInt(startedAtStr, 10)).toISOString()
-          : new Date().toISOString();
-
-        // 누적 방문자 수
-        const totalVisitors = await redis_client.sCard(keys.ALL_VISITORS);
-
-        // 시청 지속률 (1분 이상 머문 사람 / 전체 방문자)
-        const stayedViewers = await redis_client.sCard(keys.STAY_MINUTE);
-        const retentionRate =
-          totalVisitors > 0 ? (stayedViewers / totalVisitors).toFixed(2) : "0";
-
-        // 채팅 전환율 = 1분이상 머문 사람 중 채팅을 친 사람 비율
-        const chattersWhoStayed = await redis_client.sInter([
-          keys.CHAT_UNIQUE_USERS,
-          keys.STAY_MINUTE,
-        ]);
-        const intoChatRate =
-          stayedViewers > 0
-            ? (chattersWhoStayed.length / stayedViewers).toFixed(2)
-            : "0";
-
-        const category = await redis_client.get(keys.CATEGORY);
-        const durationMin = startedAtStr
-          ? Math.round((Date.now() - parseInt(startedAtStr, 10)) / 60000)
-          : 0;
-
-        // 후원 통계
-        const fundStr = await redis_client.get(keys.DONATION_TOTAL_AMOUNT);
-        const donationCountStr = await redis_client.get(keys.DONATION_COUNT);
-        const donationUniqueUsers = await redis_client.sCard(
-          keys.DONATION_UNIQUE_USERS,
-        );
-        const fund = fundStr ? parseInt(fundStr, 10) : 0;
-        const donationCount = donationCountStr
-          ? parseInt(donationCountStr, 10)
-          : 0;
-
-        // 시계열 데이터 (Supabase 저장용)
-        const viewerTimeseries = await redis_client.zRangeWithScores(
-          keys.TIMESERIES,
-          0,
-          -1,
-        );
-        const donationTimeseries = await redis_client.zRangeWithScores(
-          keys.DONATION_TIMESERIES,
-          0,
-          -1,
-        );
-
-        // avg_viewer 계산 (시계열 평균)
-        const avgViewer =
-          viewerTimeseries.length > 0
-            ? Math.round(
-                viewerTimeseries.reduce(
-                  (sum, e) => sum + parseInt(e.value, 10),
-                  0,
-                ) / viewerTimeseries.length,
-              )
-            : 0;
-
-        // 통계 저장
-        const saveSuccess = await insertLiveStats({
-          roomName,
-          peakViewers,
-          startISO,
-          totalVisitors,
-          stayedViewers,
-          retentionRate,
-          intoChatRate,
-          category,
-          durationMin,
-          fund,
-          donationCount,
-          donationUniqueUsers,
-          avgViewer,
-          viewerTimeseries,
-          donationTimeseries,
-        });
-
-        if (saveSuccess) {
-          await redis_client.zRem(keys.VIEWER_RANK, roomName);
-
-          const keysToDelete = [
-            keys.VIEWERS,
-            keys.PEAK_VIEW,
-            keys.INFO,
-            keys.AVG_RATE,
-            keys.STAY_MINUTE,
-            keys.ALL_VISITORS,
-            keys.CATEGORY,
-            keys.TIMESERIES,
-            keys.DONATION,
-            keys.DONATION_TOTAL_AMOUNT,
-            keys.DONATION_COUNT,
-            keys.DONATION_TIMESERIES,
-            keys.DONATION_UNIQUE_USERS,
-            keys.CHAT_UNIQUE_USERS,
-            keys.CHAT_TIMESERIES,
-            keys.HIGHLIGHTS,
-          ];
-
-          for (const key of keysToDelete) {
-            await redis_client.del(key);
-          }
-        } else {
-          await redis_client.hSet(keys.INFO, "save_failed", "true");
-          console.error("Supabase 저장 실패 — Redis 데이터 유지");
-        }
-
+        await finalizeLive(roomName, { reason: "room_finished" });
         break;
       }
     }
   } catch (error) {
     console.error("Webhook processing error:", error);
-  }
-};
-
-// 시계열 데이터 기록
-const timeseriesIntervals = new Map();
-
-const startTimeseriesRecording = (roomName) => {
-  if (timeseriesIntervals.has(roomName)) return;
-  const viewersKey = `live:${roomName}:viewers`;
-  const timeseriesKey = `live:${roomName}:timeseries`;
-
-  const intervalId = setInterval(
-    async () => {
-      try {
-        const currentViewers = await redis_client.hLen(viewersKey);
-        const timestamp = Date.now();
-
-        await redis_client.zAdd(timeseriesKey, {
-          score: timestamp,
-          value: currentViewers.toString(),
-        });
-
-        await detectViewerSpike(roomName, currentViewers);
-
-        console.log(
-          `[Timeseries] ${roomName}: ${currentViewers}명 (${new Date(timestamp).toISOString()})`,
-        );
-      } catch (error) {
-        console.error(`[Timeseries Error] ${roomName}:`, error);
-      }
-    },
-    5 * 60 * 1000,
-  );
-
-  timeseriesIntervals.set(roomName, intervalId);
-};
-
-const stopTimeseriesRecording = (roomName) => {
-  const intervalId = timeseriesIntervals.get(roomName);
-  if (intervalId) {
-    clearInterval(intervalId);
-    timeseriesIntervals.delete(roomName);
-    console.log(`[Timeseries] ${roomName} 기록 중지`);
   }
 };
 

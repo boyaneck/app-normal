@@ -162,13 +162,17 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import LiveListVideo from "./live_list_video";
 
-// Supabase users 테이블에서 그대로 받아오는 행 (컬럼명 snake_case)
+// getLiveUser가 돌려주는 행: live_information(status='live') + users 정보를 합친 것
 interface LiveUserRow {
   id: string;
   user_nickname: string;
   profile_image?: string | null;
   stream_title?: string | null;
+  thumb_url?: string | null;
 }
+
+// 새로 시작된 방송이 홈에 나타나기까지의 최대 지연
+const LIVE_LIST_REFETCH_MS = 15 * 1000;
 
 const LiveList = () => {
   const [liveuser, setLiveUser] = useState<LiveUserRow[]>([]);
@@ -176,6 +180,7 @@ const LiveList = () => {
   const { data: LiveUser, isLoading } = useQuery({
     queryKey: ["LiveUser"],
     queryFn: getLiveUser,
+    refetchInterval: LIVE_LIST_REFETCH_MS,
   });
 
   const router = useRouter();

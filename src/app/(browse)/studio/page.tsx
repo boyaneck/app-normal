@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { StudioAIInput } from "./_components/AI-input";
 import LiveStat, { MiniCardInfo } from "./live-stat/live-stat";
@@ -10,8 +10,8 @@ import { IoStatsChartOutline } from "react-icons/io5";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoSettingsSharp } from "react-icons/io5";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { askStatChat } from "@/api/AI";
 const LiveSetting = dynamic(() => import("./live-setting/page"));
 
 const CARD_COLORS = ["#38bdf8", "#a78bfa", "#2dd4bf", "#e9a800", "#fb7185"];
@@ -30,11 +30,13 @@ const TABS = [
   },
 ];
 
-const StudioPage = () => {
+const StudioPageContent = () => {
   const { user } = useUserStore();
 
   const router = useRouter();
-  const [selectTab, setSelectTab] = useState<string>("");
+  // 방송 종료 후 /studio?tab=liveStat 으로 이동해 오면 통계 탭을 바로 연다
+  const searchParams = useSearchParams();
+  const [selectTab, setSelectTab] = useState<string>(searchParams.get("tab") ?? "");
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
     null,
   );
@@ -73,25 +75,22 @@ const StudioPage = () => {
           ? allCards.find((c) => c.index === selectedCardIndex)
           : null;
 
-      //프롬프트와 함께 질문 보내기
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ai/chat`,
-        {
-          cardTitle: selectedCard?.title ?? "",
-          currentValue: selectedCard?.value ?? 0,
-          prevValue: selectedCard?.prevValue ?? null,
-          unit: selectedCard?.unit ?? "",
-          //프롬프트에 최근 6개의 히스토리를 함께보내기✨
-          messages: updatedMessages.slice(-6),
-        },
-      );
+      // 카드 숫자는 서버가 DB에서 직접 읽는다 → 프론트는 "어느 방송의 어느 카드인지"만 보낸다
+      // (예전에는 프론트가 계산한 값을 그대로 믿어서 조작이 가능했고, 답변 근거도 카드 숫자 하나뿐이었다)
+      const answer = await askStatChat({
+        liveStatsId: selectedCard?.liveStatsId,
+        cardKey: selectedCard?.key,
+        cardTitle: selectedCard?.title ?? "",
+        //프롬프트에 최근 6개의 히스토리를 함께보내기✨
+        messages: updatedMessages.slice(-6),
+      });
 
       setMessages((prev) => [
         ...prev,
         {
           id: `a_${Date.now()}`,
           role: "ai",
-          content: data.answer ?? "응답을 받지 못했습니다.",
+          content: answer ?? "응답을 받지 못했습니다.",
         },
       ]);
     } catch {
@@ -282,5 +281,12 @@ const StudioPage = () => {
     </div>
   );
 };
+
+// useSearchParams를 쓰는 클라이언트 페이지는 Suspense로 감싸야 Next.js 빌드(정적 프리렌더)가 실패하지 않는다
+const StudioPage = () => (
+  <Suspense fallback={null}>
+    <StudioPageContent />
+  </Suspense>
+);
 
 export default StudioPage;
