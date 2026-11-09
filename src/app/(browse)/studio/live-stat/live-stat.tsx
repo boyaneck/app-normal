@@ -8,7 +8,7 @@ import RetentionRate from "./retantion-rate";
 import { useQuery } from "@tanstack/react-query";
 import { getLiveStatsWeek } from "@/api/live";
 import { PostLiveStats, ChatMessage } from "@/types/live";
-import ClipPanel from "./live-highlight-clip";
+import AIReportCard from "./ai-report";
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -47,6 +47,10 @@ const STAT_FIELDS = [
 
 export interface MiniCardInfo {
   index: number;
+  /** STAT_FIELDS의 key (서버가 어떤 컬럼을 볼지 정하는 데 사용) */
+  key: string;
+  /** 지금 보고 있는 방송의 live_stats id */
+  liveStatsId?: number | string;
   title: string;
   value: number;
   prevValue: number | null;
@@ -155,6 +159,7 @@ const LiveStats = ({
   const liveStatsWeek: PostLiveStats[] | null = useMemo(() => {
     if (!rawStats) return null;
     return rawStats.map((item: Record<string, any>) => ({
+      id: item.id,
       roomName: item.room_name,
       startedAt: item.started_at,
       dayLabel: item.started_at
@@ -187,6 +192,8 @@ const LiveStats = ({
     () =>
       STAT_FIELDS.map((f, i) => ({
         index: i,
+        key: f.key,
+        liveStatsId: currentData?.id,
         title: f.title,
         unit: f.unit,
         value: currentData
@@ -270,7 +277,7 @@ const LiveStats = ({
     <div className="space-y-4 p-6">
       <AnimatePresence mode="wait">
         {selectedCardIndex !== null ? (
-          /* ===== AI 채팅 뷰 (클립 35% / 채팅 flex-1) ===== */
+          /* ===== AI 채팅 뷰 ===== */
           <motion.div
             key="chat"
             initial={{ opacity: 0, y: 12 }}
@@ -280,12 +287,7 @@ const LiveStats = ({
             className="flex flex-row gap-2"
             style={{ height: "calc(100vh - 310px)", marginLeft: 150 }}
           >
-            {/* ===== 왼쪽: 클립 패널 (35%) ===== */}
-            <div className="h-full flex-shrink-0" style={{ width: "35%" }}>
-              <ClipPanel cardTitle={selectedField?.title} roomName={roomName} />
-            </div>
-
-            {/* ===== 오른쪽: AI 채팅 (나머지 전부) ===== */}
+            {/* AI 채팅 (방송 후 하이라이트 클립 패널은 기능 제거로 삭제) */}
             <div
               className="h-full flex flex-col rounded-2xl overflow-hidden flex-1"
               style={{
@@ -593,17 +595,22 @@ const LiveStats = ({
                 />
               </div>
               <div className="w-1/3 h-full">
-                <TopSupporters />
+                <TopSupporters hostId={roomName} />
               </div>
             </div>
 
-            {/* 시청자 유지율 (항상 최신 방송 기준, 2/3 너비) */}
+            {/* 시청자 유지율 (2/3) + AI 리포트 (1/3) — 항상 최신 방송 기준 */}
             {latestData && (
-              <div className="w-2/3">
-                <RetentionRate
-                  totalVisitors={latestData.totalVisitors}
-                  retentionRate={latestData.retentionRate}
-                />
+              <div className="flex flex-row gap-4">
+                <div className="w-2/3">
+                  <RetentionRate
+                    totalVisitors={latestData.totalVisitors}
+                    retentionRate={latestData.retentionRate}
+                  />
+                </div>
+                <div className="w-1/3">
+                  <AIReportCard liveStatsId={latestData.id} startedAt={latestData.startedAt} />
+                </div>
               </div>
             )}
           </motion.div>

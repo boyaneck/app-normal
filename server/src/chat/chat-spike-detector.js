@@ -78,6 +78,6 @@ export const detectChatSpike = async (roomName) => {
 
   await redis_client.zAdd(keys.HIGHLIGHTS, { score: now, value: highlight });
 
-  // 실시간 AI 코파일럿 트리거는 copilot/ema/loop.js(startCopilotLoop)가 전담
+  // 실시간 AI 코파일럿 트리거는 copilot/loop.js(startCopilotLoop)가 전담
   // 여기서는 클립 파이프라인용 하이라이트 기록까지만 담당
 };

@@ -11,6 +11,7 @@ interface Supporter {
 }
 
 interface TopSupportersProps {
+  hostId?: string;
   supporters?: Supporter[];
 }
 
@@ -30,18 +31,20 @@ const RANK_STYLE = [
   { num: "#38bdf8", bg: "rgba(56,189,248,0.07)",  border: "rgba(56,189,248,0.18)" },
 ];
 
-const TopSupporters = ({ supporters: propSupporters }: TopSupportersProps) => {
+const TopSupporters = ({ hostId, supporters: propSupporters }: TopSupportersProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const { data: fetchedSupporters } = useQuery({
-    queryKey: ["topSupporters"],
-    queryFn: getTopSupporters,
+    queryKey: ["topSupporters", hostId],
+    queryFn: () => getTopSupporters(hostId),
+    enabled: !!hostId,
     staleTime: 1000 * 60 * 5,
   });
 
-  const supporters = fetchedSupporters?.length
-    ? fetchedSupporters
-    : propSupporters ?? MOCK_SUPPORTERS;
+  // 실제 데이터를 받았으면(빈 배열 포함) 그대로 보여준다.
+  // 예전에는 후원이 0건이면 목업 후원자가 진짜처럼 표시됐다. 목업은 hostId가 없을 때만 사용.
+  const supporters: Supporter[] =
+    fetchedSupporters ?? propSupporters ?? (hostId ? [] : MOCK_SUPPORTERS);
 
   const maxAmount = supporters[0]?.amount ?? 1;
 
@@ -75,6 +78,9 @@ const TopSupporters = ({ supporters: propSupporters }: TopSupportersProps) => {
 
       {/* 리스트 */}
       <div className="flex flex-col flex-1 gap-0.5 min-h-0">
+        {supporters.length === 0 && (
+          <p className="text-[12px] text-black/30 py-6 text-center">아직 후원 기록이 없어요</p>
+        )}
         {supporters.map((s, i) => {
           const pct = Math.round((s.amount / maxAmount) * 100);
           const isHovered = hoveredIndex === i;

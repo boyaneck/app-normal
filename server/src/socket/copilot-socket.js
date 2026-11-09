@@ -1,18 +1,28 @@
+import { saveFeedback } from "../copilot/deliver/insight-store.js";
+
 let namespace = null;
+
 export const copilotSocket = (socket, copilotRoom) => {
+  // roomName은 copilot-host-auth에서 "LiveKit 호스트 토큰 안의 방 이름"으로 정해진다
   const roomName = socket.data.roomName;
   namespace = copilotRoom;
-  console.log("코파일럿룸 네임스페이스 확인하기 , ", namespace);
+
   socket.on("copilot-connected", () => {
     socket.join(`copilot:${roomName}`);
   });
 
-  //GROQ에서 응답 받은 걸로 오는
+  // 호스트가 코파일럿 멘트에 👍/👎를 눌렀을 때
+  socket.on("copilot-feedback", async ({ insightId, feedback } = {}) => {
+    if (!insightId) return;
+    await saveFeedback({ roomName, insightId, feedback });
+  });
 };
 
-export const sendCopilotInsightToHost = ({ hostID, insightFromGROQ }) => {
-  console.log("ai 피드백을 보내기 위해서 namespace 체크하기", namespace);
+/**
+ * 코파일럿 멘트를 호스트에게 보낸다
+ * @param insight { id: 기록 id (피드백용, 기록 실패 시 null), line: 멘트 }
+ */
+export const sendCopilotInsightToHost = ({ hostID, insight }) => {
   if (!namespace) return;
-  namespace.to(`copilot:${hostID}`).emit(`copilotInsight`, insightFromGROQ);
+  namespace.to(`copilot:${hostID}`).emit("copilotInsight", insight);
 };
-//GROQ로 부터 받은 해당 질문에 대한 INSIGHT 를 RETURN

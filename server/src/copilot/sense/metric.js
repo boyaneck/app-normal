@@ -1,10 +1,10 @@
 import { redis_client } from "../../config/redis.js";
 import { getRedisKeys } from "../../live/redis-keys.js";
 import { createDetector } from "./detector.js";
+import { COPILOT_CONFIG } from "../config.js";
 
-// TODO: 데모용 2초 — loop.js의 OBSERVE_INTERVAL_MS랑 반드시 같은 값으로 유지할 것
-// (둘이 다르면 겹치는/비는 구간이 생겨서 EMA 신호가 다시 희석/누락됨)
-const WINDOW_MS = 2 * 1000;
+// 집계 윈도우 = 관찰 주기 (config.js의 같은 상수를 쓰므로 둘이 어긋날 수 없음)
+const WINDOW_MS = COPILOT_CONFIG.OBSERVE_INTERVAL_MS;
 
 const rooms = new Map();
 const getDetector = (roomName) => {
@@ -12,7 +12,7 @@ const getDetector = (roomName) => {
     rooms.set(roomName, {
       chat: createDetector(),
       donation: createDetector(),
-      viewer: createDetector({ alpha: 0.2 }),
+      viewer: createDetector({ alpha: COPILOT_CONFIG.VIEWER_ALPHA }),
     });
   }
   return rooms.get(roomName);

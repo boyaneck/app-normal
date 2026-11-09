@@ -10,6 +10,8 @@ export default function Home() {
   const { data: live_list_now } = useQuery({
     queryKey: ["live_list"],
     queryFn: getLiveListNow,
+    // 새 방송/시청자 순위 변화를 반영하기 위해 주기적으로 다시 불러온다
+    refetchInterval: 15 * 1000,
   });
 
   const { collapsed } = useSidebarStore();
