@@ -111,7 +111,9 @@ const LivePage = ({ params }: { params: { id: string } }) => {
           onMouseLeave={() => set_show_streamer_info_bar(false)}
         >
           <LiveKitRoom
-            audio={true}
+            // 시청자는 송출하지 않는다 (예전에는 audio={true}라서 시청자에게 마이크 권한을 요청했다)
+            audio={false}
+            video={false}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
             className="h-full w-full "

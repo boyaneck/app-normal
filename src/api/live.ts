@@ -125,12 +125,12 @@ const explainSaveError = (error: unknown) => {
 };
 
 /**
- * 방송 설정 저장 + 상태를 waiting(OBS 연결 대기)으로 변경
+ * 방송 설정 저장 (제목, 설명, 썸네일)
  * @returns { ok, reason } — 실패하면 reason에 화면에 보여줄 원인
  *
+ * - 방송 상태(status)는 건드리지 않는다. live로 바꾸는 건 송출이 확인됐을 때 서버(LiveKit 웹훅)만 한다.
  * - 썸네일은 압축된 이미지(data URL)를 thumb_url 컬럼에 그대로 저장한다. (Storage 사용 안 함)
  * - 로그인 세션이 실린 클라이언트를 써서 RLS(본인 row만 수정)를 적용할 수 있게 했다.
- * - 이미 방송 중(live)이면 상태를 waiting으로 덮어쓰지 않는다.
  */
 export const insertAndUpdateLiveInfo = async ({
   user_id,
@@ -148,13 +148,6 @@ export const insertAndUpdateLiveInfo = async ({
       .from("live_information")
       .upsert({ user_id, thumb_url, title, desc }, { onConflict: "user_id" });
     if (error) throw error;
-
-    const { error: status_error } = await supabase
-      .from("live_information")
-      .update({ status: "waiting" })
-      .eq("user_id", user_id)
-      .neq("status", "live");
-    if (status_error) throw status_error;
 
     return { ok: true };
   } catch (error) {

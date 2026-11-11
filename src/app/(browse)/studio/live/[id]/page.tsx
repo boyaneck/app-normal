@@ -2,7 +2,7 @@
 import { useViewerToken } from "@/hooks/useViewerToken";
 import { useRef, useState, useEffect } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
-import Video from "@/app/(browse)/live/_components/video";
+import HostBroadcast from "./_components/host-broadcast";
 import ChatPage from "@/app/(browse)/chat/chat-page";
 import AICopilot from "./_components/AI-copilot";
 import AIAnswer from "./_components/AI-answer";
@@ -156,14 +156,15 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
     );
   }
 
-  const isWaiting = liveStatus === "waiting" || liveStatus === "ready";
+  // 송출 전 상태: 설정 페이지는 status를 바꾸지 않으므로 지난 방송의 ended가 남아 있을 수 있다
+  const isWaiting = liveStatus !== "live" && liveStatus !== "ending";
 
   return (
     <div>
       {/* 상단 바: 방송 상태 + 방송 종료 */}
       <div className="grid grid-cols-12 mb-3">
         <div className="col-start-2 col-span-10 flex items-center justify-between">
-          <LiveStatusBadge status={liveStatus} />
+          <LiveStatusBadge status={isWaiting ? "ready" : liveStatus} />
           <div className="flex items-center gap-3">
             {endError && <span className="text-[12px] text-red-500/80">{endError}</span>}
             <motion.button
@@ -187,8 +188,10 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
       <div className="grid grid-cols-12 h-[75vh] relative">
         {/* 방송 화면 */}
         <div ref={videoRef} className="col-start-2 col-span-7 h-full relative">
+          {/* 마이크·카메라는 접속하자마자 켜지 않는다. 호스트가 "방송 시작"을 눌렀을 때만 켠다 */}
           <LiveKitRoom
-            audio={true}
+            audio={false}
+            video={false}
             token={token}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
             className="h-full w-full"
@@ -196,30 +199,8 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
             adaptiveStream={true}
             dynacast={true}
           >
-            <Video host_name={id} host_identity={id} />
+            <HostBroadcast hostId={id} liveStatus={liveStatus} />
           </LiveKitRoom>
-
-          {/* OBS 연결 대기 안내 (status가 live가 되면 사라짐) */}
-          <AnimatePresence>
-            {isWaiting && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-2 bg-black/70 backdrop-blur-sm rounded-xl text-center"
-              >
-                <motion.span
-                  className="w-2.5 h-2.5 rounded-full bg-sky-400"
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ duration: 1.6, repeat: Infinity }}
-                />
-                <p className="text-white/80 text-sm font-medium">OBS 연결을 기다리는 중이에요</p>
-                <p className="text-white/40 text-xs">
-                  OBS에서 &lsquo;방송 시작&rsquo;을 누르면 자동으로 방송이 시작돼요
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* 모달 백드롭 (비디오 위, 코파일럿 아래) */}
           <div
@@ -299,7 +280,7 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
 };
 
 const STATUS_LABEL: Record<LiveStatus, { text: string; color: string }> = {
-  ready: { text: "준비 중", color: "rgba(0,0,0,0.35)" },
+  ready: { text: "송출 대기", color: "rgba(14,165,233,0.9)" },
   waiting: { text: "OBS 연결 대기", color: "rgba(14,165,233,0.9)" },
   live: { text: "LIVE", color: "rgba(239,68,68,0.95)" },
   ending: { text: "종료 처리 중", color: "rgba(234,179,8,0.95)" },
