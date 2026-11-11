@@ -28,7 +28,16 @@ const Video = ({ host_name, host_identity }: VideoProps) => {
   const icon = useStreamingBarStore((state) => state.icon);
   const participants = useParticipants(); //
   const connection_state = useConnectionState();
-  const host_participant = useRemoteParticipant(host_identity);
+  // 송출자 찾기: OBS 방송은 Ingress 참가자(identity = 방 이름),
+  // 브라우저 방송은 카메라를 켠 호스트(identity = "HOST-...")
+  const ingress_participant = useRemoteParticipant(host_identity);
+  const browser_host_participant = participants.find(
+    (participant) =>
+      participant instanceof RemoteParticipant &&
+      participant.identity.startsWith("HOST-") &&
+      participant.isCameraEnabled,
+  );
+  const host_participant = ingress_participant ?? browser_host_participant;
   const { isPlaying, muted, setMuted, setVolume, volume, togglePlayButton } =
     useVideoStore();
 

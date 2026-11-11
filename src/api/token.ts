@@ -53,8 +53,20 @@ export const createViewerToken = async (hostID: string | undefined) => {
 
   // 스트리머의 모든 정보 가져오기
   const host = await getUserInfoById(hostID);
-  const isHost = nowUserInfo?.id === host?.id;
-  console.log("그러면 진짜로 이사람이 호스트 인가요 ??", isHost);
+  // 로그인 ID(auth.users)와 users 테이블 ID가 다르게 만들어진 계정이 있어서, 이메일이 같아도 호스트로 인정한다.
+  // (이메일은 Supabase 로그인이 검증한 값이라 브라우저가 조작할 수 없다)
+  // TODO: 두 ID를 같게 맞추면 이메일 비교는 지운다
+  const isSameId = !!host && nowUserInfo?.id === host.id;
+  const isSameEmail =
+    !!host?.user_email && !!nowUserInfo?.email && nowUserInfo.email === host.user_email;
+  const isHost = isSameId || isSameEmail;
+  console.log("[token] 호스트 판단", {
+    isHost,
+    login_id: nowUserInfo?.id,
+    host_id: host?.id,
+    isSameId,
+    isSameEmail,
+  });
   // LiveKit 토큰 생성
   const token = new AccessToken(
     process.env.LIVEKIT_API_KEY,
