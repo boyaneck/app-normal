@@ -5,6 +5,7 @@ import { startCopilotLoop } from "../copilot/loop.js";
 import { startTimeseriesRecording } from "./timeseries.js";
 import { finalizeLive } from "./finalize-live.js";
 import { LIVE_STATUS, getLiveInfo, setLiveStatus } from "./live-status.js";
+import { isLiveSimulationEnabled, startLiveSimulation } from "./live-simulator.js";
 
 const api_key = process.env.LIVEKIT_API_KEY;
 const api_secret = process.env.LIVEKIT_API_SECRET;
@@ -76,6 +77,13 @@ const startLive = async (roomName, { source, category }) => {
 
   // 실시간 AI 코파일럿 루프 시작 (15초 주기 관찰)
   startCopilotLoop(roomName);
+
+  // [테스트 전용] SIMULATE_LIVE=true면 가짜 시청자/채팅/후원을 시간 압축으로 발생시킨다
+  if (isLiveSimulationEnabled()) {
+    startLiveSimulation(roomName).catch((err) =>
+      console.error(`[Simulate] ${roomName} 시작 실패:`, err.message),
+    );
+  }
 };
 
 /**
