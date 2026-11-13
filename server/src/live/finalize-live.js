@@ -5,6 +5,7 @@ import { LIVE_STATUS, setLiveStatus } from "./live-status.js";
 import { stopTimeseriesRecording } from "./timeseries.js";
 import { stopCopilotLoop } from "../copilot/loop.js";
 import { generateLiveReport } from "./live-report.js";
+import { stopLiveSimulation, stretchStatsTime } from "./live-simulator.js";
 
 const FINALIZE_LOCK_SEC = 60;
 
@@ -35,6 +36,8 @@ export const finalizeLive = async (roomName, { reason = "unknown" } = {}) => {
   // 루프는 어떤 경우든 먼저 멈춘다
   stopTimeseriesRecording(roomName);
   stopCopilotLoop(roomName);
+  // 시뮬레이터도 집계 전에 멈춘다 (시뮬레이션 중이 아니었으면 null)
+  const simulation = await stopLiveSimulation(roomName);
 
   const startedAtStr = await redis_client.hGet(keys.INFO, "started_at");
   if (!startedAtStr) {
@@ -48,7 +51,11 @@ export const finalizeLive = async (roomName, { reason = "unknown" } = {}) => {
   console.log(`[Finalize] ${roomName} 정리 시작 (${reason})`);
 
   try {
-    const stats = await collectLiveStats(roomName, startedAtStr);
+    let stats = await collectLiveStats(roomName, startedAtStr);
+    if (simulation) {
+      // 실제 3분 방송 → 가상 3시간 방송으로 시간을 늘려서 저장
+      stats = stretchStatsTime(stats, parseInt(startedAtStr, 10), simulation.timeScale);
+    }
     const saved = await insertLiveStats(stats);
 
     if (!saved) {
