@@ -152,15 +152,11 @@
 // export default LiveList;
 
 "use client";
-import { getHomeTrendingLiveList, getLiveUser } from "@/api";
-import { useViewerToken } from "@/hooks/useViewerToken";
-import { useSidebarStore } from "@/store/bar-store";
-import useUserStore from "@/store/user";
-import { LiveKitRoom } from "@livekit/components-react";
+import { getLiveUser } from "@/api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import LiveListVideo from "./live_list_video";
+import React, { useEffect, useRef, useState } from "react";
+import LivePreview from "./live_preview";
 
 // getLiveUser가 돌려주는 행: live_information(status='live') + users 정보를 합친 것
 interface LiveUserRow {
@@ -173,25 +169,36 @@ interface LiveUserRow {
 
 // 새로 시작된 방송이 홈에 나타나기까지의 최대 지연
 const LIVE_LIST_REFETCH_MS = 15 * 1000;
+// 마우스가 이 시간 이상 머물러야 미리보기 연결 (스쳐 지나갈 때마다 LiveKit에 접속하지 않도록)
+const PREVIEW_HOVER_DELAY_MS = 300;
 
 const LiveList = () => {
-  const [liveuser, setLiveUser] = useState<LiveUserRow[]>([]);
-  const { user } = useUserStore((state) => state);
-  const { data: LiveUser, isLoading } = useQuery({
+  const { data: liveuser = [], isLoading } = useQuery<LiveUserRow[]>({
     queryKey: ["LiveUser"],
     queryFn: getLiveUser,
     refetchInterval: LIVE_LIST_REFETCH_MS,
   });
 
   const router = useRouter();
-  const [host_id, setHost_id] = useState("");
-  const [chkPreviewForToken, setChkPreviewForToken] = useState("");
-  const { token } = useViewerToken(host_id);
+  // 지금 미리보기 중인 방송 (한 번에 하나만 연결)
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startPreview = (id: string) => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setPreviewId(id), PREVIEW_HOVER_DELAY_MS);
+  };
+
+  const stopPreview = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    setPreviewId(null);
+  };
 
   useEffect(() => {
-    if (LiveUser) setLiveUser(LiveUser);
-    setChkPreviewForToken(token);
-  }, [LiveUser, token]);
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -215,13 +222,15 @@ const LiveList = () => {
         liveuser.map((user) => (
           <div
             key={user.id}
-            onMouseEnter={() => setHost_id(user.id)}
+            onMouseEnter={() => startPreview(user.id)}
+            onMouseLeave={stopPreview}
             onClick={() => onHandlerRouter(user.id, user.user_nickname)}
             className={`
-              relative group cursor-pointer aspect-video rounded-2xl 
+              relative group cursor-pointer aspect-video rounded-2xl
               /* 기본 상태: 평면적인 유리창 느낌 */
               bg-white/[0.02] border border-white/10 backdrop-blur-md
-              transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)
+              /* 살짝 튕기듯 떠오르는 곡선 (예전엔 Tailwind가 인식 못 하는 클래스라 적용되지 않았다) */
+              transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
               
               /* 호버 상태: 입체적으로 튀어나오는 효과 */
               hover:z-30                       /* 다른 카드보다 위로 올라오게 */
@@ -231,21 +240,24 @@ const LiveList = () => {
               hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)] /* 깊은 하단 그림자 */
             `}
           >
-            {/* 1. 라이브 비디오 레이어 */}
+            {/* 1. 썸네일 + 라이브 미리보기 레이어 */}
             <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden">
-              {token && user.id === host_id ? (
-                <LiveKitRoom
-                  video={true}
-                  audio={false}
-                  token={token}
-                  serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_WS_URL}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                >
-                  <LiveListVideo />
-                </LiveKitRoom>
+              {user.thumb_url ? (
+                <img
+                  src={user.thumb_url}
+                  alt={user.stream_title ?? user.user_nickname}
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-neutral-900 to-black flex items-center justify-center">
                   <div className="w-10 h-10 rounded-full border border-white/5 animate-pulse" />
+                </div>
+              )}
+
+              {/* hover한 카드만 LiveKit에 연결 → 썸네일 위에 실시간 영상 */}
+              {previewId === user.id && (
+                <div className="absolute inset-0 bg-black animate-in fade-in duration-500">
+                  <LivePreview hostId={user.id} />
                 </div>
               )}
             </div>

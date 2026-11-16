@@ -22,7 +22,10 @@ const hostGoneKey = (roomName) => `live:${roomName}:host_gone`;
  */
 const startLive = async (roomName, { source, category }) => {
   const current = await getLiveInfo(roomName);
-  if (current?.status === LIVE_STATUS.LIVE) return;
+  if (current?.status === LIVE_STATUS.LIVE) {
+    console.log(`[Live] ${roomName} 이미 live 상태 → 시작 처리 건너뜀 (${source})`);
+    return;
+  }
 
   console.log(`[Live] ${roomName} 방송 시작 (${source})`);
   const keys = getRedisKeys(roomName);
@@ -136,7 +139,9 @@ export const liveWebhook = async (req, res) => {
   const identity = event.participant ? event.participant.identity : null;
   // 시청자 통계에서 제외: OBS(Ingress) 참가자(identity = roomName)와 호스트 모니터링 페이지(HOST-*)
   // 예전에는 이 둘도 시청자로 세어져서 시청자 수/방문자 수가 실제보다 많게 기록됐다.
-  const isNotViewer = identity === roomName || identity?.startsWith("HOST-");
+  // 홈 목록 hover 미리보기(PREVIEW-*)도 제외: 마우스만 올려도 시청자가 들어왔다 나간 것으로 기록되던 문제
+  const isNotViewer =
+    identity === roomName || identity?.startsWith("HOST-") || identity?.startsWith("PREVIEW-");
   const viewer = identity && !isNotViewer ? identity : null;
   const isHost = !!identity?.startsWith("HOST-");
 
@@ -152,6 +157,9 @@ export const liveWebhook = async (req, res) => {
 
       case "track_published": {
         // 브라우저 송출 시작: 호스트(HOST-*)가 영상 트랙(카메라/화면 공유)을 올렸을 때
+        console.log(
+          `[Webhook] track_published 수신: ${identity} (type=${event.track?.type}, isHost=${isHost})`,
+        );
         if (!isHost || event.track?.type !== TrackType.VIDEO) break;
         await redis_client.del(hostGoneKey(roomName)); // 잠깐 끊겼다 다시 올린 경우: 종료 예약 취소
         await startLive(roomName, { source: "browser", category: event.room?.metadata?.category });

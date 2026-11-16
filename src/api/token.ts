@@ -20,6 +20,32 @@ const createGuestUser = () => {
 };
 
 /**
+ * 홈 목록 hover 미리보기 전용 토큰
+ * - identity를 "PREVIEW-"로 구분 → 서버 웹훅이 시청자 통계(시청자 수, 방문자, 코파일럿)에서 제외한다.
+ *   (일반 시청자 토큰을 쓰면 마우스를 올릴 때마다 시청자가 들어왔다 나간 것으로 기록됐다)
+ * - 매번 새 uuid → 같은 사람이 다른 탭에서 그 방송을 보고 있어도 identity가 겹쳐 끊기지 않는다.
+ * - 보기만 가능(송출·데이터 전송 불가), hidden → 방송 화면의 참가자 목록에도 안 보인다.
+ */
+export const createPreviewToken = async (hostID: string) => {
+  const token = new AccessToken(
+    process.env.LIVEKIT_API_KEY,
+    process.env.LIVEKIT_API_SECRET,
+    { identity: `PREVIEW-${v4()}`, ttl: "10m" },
+  );
+
+  token.addGrant({
+    room: hostID,
+    roomJoin: true,
+    canSubscribe: true,
+    canPublish: false,
+    canPublishData: false,
+    hidden: true,
+  });
+
+  return await token.toJwt();
+};
+
+/**
  * @param hostID 현새 스트리머의 아이디
  * @returns 게스트 또는 해당 유저의 정보가 들어간 토큰을 발행
  */
