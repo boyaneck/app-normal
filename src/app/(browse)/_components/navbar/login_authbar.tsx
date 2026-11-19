@@ -1,9 +1,76 @@
 "use client";
 import useSigninAndLogout from "@/hooks/useSigninAndLogout";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, ReactNode } from "react";
+import {
+  IoLogOutOutline,
+  IoPersonCircleOutline,
+  IoPersonCircleSharp,
+  IoVideocamOutline,
+  IoVideocamSharp,
+} from "react-icons/io5";
+
+/**
+ * 헤더 아이콘 버튼 (스튜디오 사이드바의 "설정" 버튼과 같은 형태)
+ * - 평소: 반투명 유리 원형 + 외곽선 아이콘
+ * - hover / 활성: 거의 불투명한 흰 유리 + 채워진 아이콘
+ * - 아래쪽 툴팁으로 버튼 이름 표시
+ */
+const GlassIconButton = ({
+  label,
+  iconOutline,
+  iconSharp,
+  active = false,
+  onClick,
+}: {
+  label: string;
+  iconOutline: ReactNode;
+  iconSharp: ReactNode;
+  active?: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={label}
+    className="group relative flex items-center justify-center"
+  >
+    {/* 유리 원형: 투명한 배경 + 블러 + 얇은 흰 테두리 + 위쪽 빛 반사 */}
+    <div
+      className={`relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center
+        backdrop-blur-xl backdrop-saturate-150 border transition-all duration-300 group-hover:scale-105
+        shadow-[0_8px_24px_rgba(0,0,0,0.12),inset_0_1px_1px_rgba(255,255,255,0.6),inset_0_-1px_1px_rgba(255,255,255,0.1)]
+        ${
+          active
+            ? "bg-white/50 border-white/60"
+            : "bg-white/[0.12] border-white/30 group-hover:bg-white/50 group-hover:border-white/60"
+        }`}
+    >
+      {/* 유리 표면 광택 (위쪽이 밝고 아래로 갈수록 투명) */}
+      <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/40 via-white/5 to-transparent" />
+
+      {/* 평소: 회색 실선 아이콘 / hover·활성: 검은색으로 채워진 아이콘 */}
+      <span
+        className={`relative transition-colors duration-200 ${
+          active ? "hidden" : "block text-gray-400 group-hover:hidden"
+        }`}
+      >
+        {iconOutline}
+      </span>
+      <span className={`relative text-black ${active ? "block" : "hidden group-hover:block"}`}>
+        {iconSharp}
+      </span>
+    </div>
+
+    {/* 툴팁 (헤더라서 버튼 아래쪽) */}
+    <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+      <div className="px-2.5 py-1 rounded-lg whitespace-nowrap text-[11px] font-medium text-white bg-black/80 backdrop-blur shadow-lg">
+        {label}
+      </div>
+    </div>
+  </button>
+);
 
 const Login_authbar = () => {
   const supabaseForClient = createClientComponentClient();
@@ -31,97 +98,44 @@ const Login_authbar = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const iconBtn = {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "rgba(56,189,248,0.1)",
-    border: "0.5px solid rgba(56,189,248,0.22)",
-    cursor: "pointer",
-    transition: "all 0.18s",
-    color: "rgba(255,255,255,0.7)",
-  } as const;
-
+  // 비로그인: 유저 아이콘 버튼 → 로그인 페이지
   if (!isIdentified) {
     return (
-      <Link
-        href="/signin"
-        className="text-[13px] font-medium px-4 py-2 rounded-xl transition-all hover:scale-[1.02]"
-        style={{
-          background: "rgba(56,189,248,0.12)",
-          border: "0.5px solid rgba(56,189,248,0.25)",
-          color: "rgba(56,189,248,0.9)",
-        }}
-      >
-        로그인
-      </Link>
+      <GlassIconButton
+        label="로그인"
+        iconOutline={<IoPersonCircleOutline size={22} />}
+        iconSharp={<IoPersonCircleSharp size={22} />}
+        onClick={() => router.push("/signin")}
+      />
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {/* 스튜디오 버튼 */}
-      <button
+    <div className="flex items-center gap-3">
+      <GlassIconButton
+        label="스튜디오"
+        iconOutline={<IoVideocamOutline size={20} />}
+        iconSharp={<IoVideocamSharp size={20} />}
         onClick={() => router.push("/studio")}
-        style={iconBtn}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(56,189,248,0.18)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(56,189,248,0.1)")}
-        title="스튜디오"
-      >
-        {/* 라이브 스트리밍 아이콘 */}
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.362a1 1 0 01-1.447.894L15 14" />
-          <rect x="3" y="6" width="12" height="12" rx="2" />
-          <circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none" />
-        </svg>
-      </button>
+      />
 
-      {/* 유저 아이콘 + 드롭다운 */}
+      {/* 로그인 상태: 유저 아이콘 + 드롭다운 */}
       <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setDropdownOpen(prev => !prev)}
-          style={{
-            ...iconBtn,
-            background: dropdownOpen ? "rgba(56,189,248,0.2)" : iconBtn.background,
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = "rgba(56,189,248,0.18)")}
-          onMouseLeave={e => (e.currentTarget.style.background = dropdownOpen ? "rgba(56,189,248,0.2)" : "rgba(56,189,248,0.1)")}
-          title="내 계정"
-        >
-          {/* 유저 아이콘 */}
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" />
-          </svg>
-        </button>
+        <GlassIconButton
+          label="내 계정"
+          iconOutline={<IoPersonCircleOutline size={22} />}
+          iconSharp={<IoPersonCircleSharp size={22} />}
+          active={dropdownOpen}
+          onClick={() => setDropdownOpen((prev) => !prev)}
+        />
 
-        {/* 드롭다운 */}
         {dropdownOpen && (
-          <div
-            className="absolute right-0 mt-2 w-36 rounded-2xl overflow-hidden"
-            style={{
-              background: "rgba(7,28,46,0.92)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: "0.5px solid rgba(56,189,248,0.15)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-            }}
-          >
+          <div className="absolute right-0 mt-3 w-36 rounded-2xl overflow-hidden bg-white/[0.08] border border-white/25 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.3)]">
             <button
               onClick={signOut}
-              className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] transition-colors"
-              style={{ color: "rgba(255,255,255,0.65)" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(56,189,248,0.08)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+              className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-white/85 transition-colors hover:bg-white/15"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
+              <IoLogOutOutline size={16} />
               로그아웃
             </button>
           </div>
