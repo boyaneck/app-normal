@@ -165,7 +165,19 @@ interface LiveUserRow {
   profile_image?: string | null;
   stream_title?: string | null;
   thumb_url?: string | null;
+  isDemo?: boolean;
 }
+
+// 실제 방송이 없어도 목록이 비어 보이지 않도록 항상 붙는 데모 카드 (프론트 전용, LiveKit에 연결하지 않음)
+const DEMO_LIVE: LiveUserRow = {
+  id: "demo-live",
+  user_nickname: "appnormal",
+  stream_title: "데모 방송 · 실시간 스트리밍 미리보기",
+  thumb_url:
+    "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop",
+  profile_image: null,
+  isDemo: true,
+};
 
 // 새로 시작된 방송이 홈에 나타나기까지의 최대 지연
 const LIVE_LIST_REFETCH_MS = 15 * 1000;
@@ -173,11 +185,13 @@ const LIVE_LIST_REFETCH_MS = 15 * 1000;
 const PREVIEW_HOVER_DELAY_MS = 300;
 
 const LiveList = () => {
-  const { data: liveuser = [], isLoading } = useQuery<LiveUserRow[]>({
+  const { data: liveUsers = [], isLoading } = useQuery<LiveUserRow[]>({
     queryKey: ["LiveUser"],
     queryFn: getLiveUser,
     refetchInterval: LIVE_LIST_REFETCH_MS,
   });
+  // 실제 방송을 먼저, 데모 카드는 항상 맨 뒤에
+  const liveuser = [...liveUsers, DEMO_LIVE];
 
   const router = useRouter();
   // 지금 미리보기 중인 방송 (한 번에 하나만 연결)
@@ -222,11 +236,11 @@ const LiveList = () => {
         liveuser.map((user) => (
           <div
             key={user.id}
-            onMouseEnter={() => startPreview(user.id)}
+            onMouseEnter={() => !user.isDemo && startPreview(user.id)}
             onMouseLeave={stopPreview}
-            onClick={() => onHandlerRouter(user.id, user.user_nickname)}
+            onClick={() => !user.isDemo && onHandlerRouter(user.id, user.user_nickname)}
             className={`
-              relative group cursor-pointer aspect-video rounded-2xl
+              relative group aspect-video rounded-2xl ${user.isDemo ? "cursor-default" : "cursor-pointer"}
               /* 기본 상태: 평면적인 유리창 느낌 */
               bg-white/[0.02] border border-white/10 backdrop-blur-md
               /* 살짝 튕기듯 떠오르는 곡선 (예전엔 Tailwind가 인식 못 하는 클래스라 적용되지 않았다) */
@@ -241,11 +255,12 @@ const LiveList = () => {
             `}
           >
             {/* 1. 썸네일 + 라이브 미리보기 레이어 */}
-            <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-900 to-black">
               {user.thumb_url ? (
                 <img
                   src={user.thumb_url}
                   alt={user.stream_title ?? user.user_nickname}
+                  onError={(e) => (e.currentTarget.style.display = "none")}
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
               ) : (
@@ -254,8 +269,15 @@ const LiveList = () => {
                 </div>
               )}
 
+              {/* 데모 카드 표시 */}
+              {user.isDemo && (
+                <div className="absolute top-4 left-4 z-30 px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-[0.15em] text-white/90 bg-white/10 border border-white/25 backdrop-blur-md">
+                  DEMO
+                </div>
+              )}
+
               {/* hover한 카드만 LiveKit에 연결 → 썸네일 위에 실시간 영상 */}
-              {previewId === user.id && (
+              {previewId === user.id && !user.isDemo && (
                 <div className="absolute inset-0 bg-black animate-in fade-in duration-500">
                   <LivePreview hostId={user.id} />
                 </div>

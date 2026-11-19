@@ -10,7 +10,7 @@ import { IoStatsChartOutline } from "react-icons/io5";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { IoSettingsSharp } from "react-icons/io5";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { askStatChat } from "@/api/AI";
 const LiveSetting = dynamic(() => import("./live-setting/page"));
 
@@ -33,7 +33,6 @@ const TABS = [
 const StudioPageContent = () => {
   const { user } = useUserStore();
 
-  const router = useRouter();
   // 방송 종료 후 /studio?tab=liveStat 으로 이동해 오면 통계 탭을 바로 연다
   const searchParams = useSearchParams();
   const [selectTab, setSelectTab] = useState<string>(searchParams.get("tab") ?? "");
@@ -269,14 +268,6 @@ const StudioPageContent = () => {
             })}
           </motion.div>
         )}
-        <div
-          className="w-7 h-7 rounded-full bg-sky-200 border border-gray-400"
-          onClick={() => {
-            router.push(`/studio/live/${user?.userId}`);
-          }}
-        >
-          호스트 방송 모니터링
-        </div>
       </AnimatePresence>
     </div>
   );
