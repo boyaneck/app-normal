@@ -4,7 +4,6 @@ import { useRef, useState, useEffect } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
 import HostBroadcast from "./_components/host-broadcast";
 import ChatPage from "@/app/(browse)/chat/chat-page";
-import AICopilot from "./_components/AI-copilot";
 import AIAnswer from "./_components/AI-answer";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
@@ -208,17 +207,6 @@ const StudioLivePage = ({ params }: { params: { id: string } }) => {
               answer ? "opacity-100" : "opacity-0"
             }`}
           />
-
-          {/* AI 코파일럿 — z-20 으로 백드롭 위에 노출 */}
-          <div className="absolute bottom-4 right-4 z-20 w-52 h-40 bg-black/50 backdrop-blur-sm rounded-2xl border border-white/10">
-            <AICopilot
-              hostId={id}
-              onAnswer={(text) => {
-                setAnswer(text);
-                setInsightId(null); // 음성 질문 답변은 피드백 대상이 아님
-              }}
-            />
-          </div>
         </div>
 
         {/* 채팅 패널 */}
