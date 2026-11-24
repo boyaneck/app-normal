@@ -124,10 +124,10 @@ const AICopilot = ({ hostId, onAnswer }: Props) => {
           )}
         </motion.button>
       </div>
-      {/* 상태 텍스트 */}
-      <p className="text-sm text-white/40 tracking-widest">
-        {isListening ? "듣고 있어요..." : "마이크를 눌러 말해보세요"}
-      </p>
+      {/* 상태 텍스트 (듣는 중일 때만 표시) */}
+      {isListening && (
+        <p className="text-sm text-white/40 tracking-widest">듣고 있어요...</p>
+      )}
     </div>
   );
 };
