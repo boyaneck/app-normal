@@ -176,7 +176,10 @@ const LiveStats = ({
 
   const currentData = useMemo(() => {
     if (!liveStatsWeek?.length) return null;
-    return liveStatsWeek[hoveredChartIndex ?? 0] ?? liveStatsWeek[0];
+    if (hoveredChartIndex === null) return liveStatsWeek[0];
+    // 차트(WeeklyChart)는 과거→최신 순으로 뒤집어 그리므로, 호버 인덱스도 뒤집어서 찾는다
+    // (liveStatsWeek는 최신→과거 순)
+    return liveStatsWeek[liveStatsWeek.length - 1 - hoveredChartIndex] ?? liveStatsWeek[0];
   }, [liveStatsWeek, hoveredChartIndex]);
 
   const highlightedKey = useMemo(() => {
